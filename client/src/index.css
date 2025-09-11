@@ -32,15 +32,15 @@
 
   --sidebar-border: 210 8% 88%;
 
-  --sidebar-primary: 210 45% 25%;
+  --sidebar-primary: 210 100% 50%;
 
-  --sidebar-primary-foreground: 210 10% 98%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 210 15% 88%;
+  --sidebar-accent: 210 100% 95%;
 
-  --sidebar-accent-foreground: 210 15% 20%;
+  --sidebar-accent-foreground: 210 100% 30%;
 
-  --sidebar-ring: 210 45% 25%;
+  --sidebar-ring: 210 100% 50%;
 
   --popover: 210 8% 92%;
 
@@ -48,9 +48,9 @@
 
   --popover-border: 210 8% 86%;
 
-  --primary: 210 45% 25%;
+  --primary: 210 100% 50%;
 
-  --primary-foreground: 210 10% 98%;
+  --primary-foreground: 0 0% 100%;
 
   --secondary: 210 8% 88%;
 
@@ -352,5 +352,15 @@
 
   .animate-delay-300 {
     animation-delay: 0.3s;
+  }
+
+  /* Premium marquee animation */
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
   }
 }
