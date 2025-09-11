@@ -4,6 +4,7 @@ import Navigation from "./Navigation";
 import Hero from "./Hero";
 import Features from "./Features";
 import Gallery from "./Gallery";
+import Footer from "./Footer";
 import AuthPanel from "./AuthPanel";
 
 export default function HomePage() {
@@ -61,13 +62,7 @@ export default function HomePage() {
         <Gallery />
       </main>
 
-      <footer className="bg-card border-t border-border py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="font-body text-muted-foreground">
-            © 2025 Trakia Trips. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
 
       <AuthPanel 
         isOpen={showAuthPanel}
