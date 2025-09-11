@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import MarqueeTape from "./MarqueeTape";
 import Navigation from "./Navigation";
 import Hero from "./Hero";
 import Features from "./Features";
@@ -51,6 +52,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      <MarqueeTape />
       <Navigation />
       
       <main>
