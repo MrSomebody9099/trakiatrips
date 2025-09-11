@@ -164,7 +164,7 @@ export default function Gallery() {
             </p>
           </div>
           
-          {/* Instagram Videos Grid */}
+          {/* Clean Instagram Videos Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
             {instagramVideos.map((video, index) => (
               <div
@@ -173,15 +173,19 @@ export default function Gallery() {
                 data-testid={`instagram-video-${index}`}
               >
                 <iframe
-                  src={video.src}
+                  src={`${video.src}?utm_source=ig_embed&amp;utm_campaign=loading`}
                   className="w-full h-full rounded-2xl"
                   frameBorder="0"
                   scrolling="no"
+                  allowTransparency={true}
                   title={video.title}
+                  style={{ border: 'none', background: 'transparent' }}
                 />
                 
-                {/* Subtle Overlay for Consistency */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-2xl"></div>
+                {/* Clean Video Overlay - Hide unwanted elements */}
+                <div className="absolute inset-0 pointer-events-none rounded-2xl">
+                  <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/80 to-transparent"></div>
+                </div>
                 
                 {/* Premium Border Accent */}
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-pink-400/30 rounded-2xl transition-all duration-300"></div>
