@@ -57,100 +57,51 @@ export default function Hero({ onBookingClick }: HeroProps) {
             </div>
           </div>
           
-          {/* Right Column - Adventure Videos */}
-          <div className="relative lg:ml-12 space-y-4 md:space-y-6">
-            {/* Live Adventure Videos Grid */}
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {/* Skiing Video */}
-              <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[3/4] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-200">
-                <video
-                  src="/videos/enjoying-skiing.mp4"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  muted
-                  loop
-                  playsInline
-                  onMouseEnter={(e) => e.currentTarget.play()}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.pause();
-                    e.currentTarget.currentTime = 0;
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent">
-                  <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4 right-3 md:right-4 text-white">
-                    <h3 className="font-heading font-bold text-sm md:text-lg mb-1 md:mb-2">
-                      Epic Skiing
-                    </h3>
-                    <p className="font-body text-xs md:text-sm text-white/90">
-                      Premium slopes & powder
-                    </p>
+          {/* Right Column - Premium Blue-tinted Glass Panel */}
+          <div className="relative lg:ml-12">
+            <div className="relative bg-gradient-to-br from-blue-500/20 to-blue-600/30 backdrop-blur-xl border border-blue-300/30 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl shadow-blue-500/20 animate-fade-in-up animate-delay-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent rounded-3xl"></div>
+              
+              <div className="relative z-10 text-center space-y-8">
+                <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  <span className="block">Ski.</span>
+                  <span className="block text-blue-200">Adventure.</span>
+                  <span className="block text-blue-100">Celebrate.</span>
+                </h2>
+                
+                <div className="space-y-6 text-white/90">
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
+                    <span className="font-body text-lg md:text-xl">World-class ski slopes</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
+                    <span className="font-body text-lg md:text-xl">Epic pool party experiences</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
+                    <span className="font-body text-lg md:text-xl">ATV mountain adventures</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
+                    <span className="font-body text-lg md:text-xl">Afrobeats & House DJs</span>
                   </div>
                 </div>
-                {/* Play Button */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="w-0 h-0 border-l-3 md:border-l-4 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent ml-1"></div>
-                </div>
-              </div>
-
-              {/* Pool Party Video */}
-              <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[3/4] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-300">
-                <video
-                  src="/videos/pool-party.mp4"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  muted
-                  loop
-                  playsInline
-                  onMouseEnter={(e) => e.currentTarget.play()}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.pause();
-                    e.currentTarget.currentTime = 0;
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent">
-                  <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4 right-3 md:right-4 text-white">
-                    <h3 className="font-heading font-bold text-sm md:text-lg mb-1 md:mb-2">
-                      Pool Parties
-                    </h3>
-                    <p className="font-body text-xs md:text-sm text-white/90">
-                      Epic night vibes
-                    </p>
-                  </div>
-                </div>
-                {/* Play Button */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="w-0 h-0 border-l-3 md:border-l-4 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent ml-1"></div>
+                
+                <div className="pt-8 border-t border-blue-300/30">
+                  <p className="text-blue-100 font-medium text-lg md:text-xl">
+                    Limited to 100 adventurers
+                  </p>
+                  <p className="text-blue-200/80 text-sm md:text-base mt-2">
+                    March 6-9, 2025 • Bansko, Bulgaria
+                  </p>
                 </div>
               </div>
             </div>
             
-            {/* Skiing Downhill Video - Full Width */}
-            <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[16/9] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-400">
-              <video
-                src="/videos/skiing-downhill.mp4"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                muted
-                loop
-                playsInline
-                onMouseEnter={(e) => e.currentTarget.play()}
-                onMouseLeave={(e) => {
-                  e.currentTarget.pause();
-                  e.currentTarget.currentTime = 0;
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent">
-                <div className="absolute bottom-4 md:bottom-6 left-4 md:left-6 right-4 md:right-6 text-white">
-                  <h3 className="font-heading font-bold text-base md:text-xl mb-2 md:mb-3">
-                    Epic Downhill Adventures
-                  </h3>
-                  <p className="font-body text-sm md:text-base text-white/90">
-                    Feel the rush of perfect powder and mountain freedom
-                  </p>
-                </div>
-              </div>
-              {/* Play Button */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div className="w-0 h-0 border-l-5 md:border-l-6 border-l-white border-t-3 md:border-t-4 border-t-transparent border-b-3 md:border-b-4 border-b-transparent ml-1"></div>
-              </div>
-            </div>
+            {/* Floating accent elements */}
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-blue-400/30 to-blue-500/30 rounded-full blur-xl"></div>
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-300/20 to-blue-400/20 rounded-full blur-xl"></div>
           </div>
         </div>
       </div>
