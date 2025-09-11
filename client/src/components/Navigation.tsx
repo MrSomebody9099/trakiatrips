@@ -9,9 +9,9 @@ export default function Navigation() {
     <>
       {/* Premium ticker banner */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary via-blue-600 to-primary h-8 overflow-hidden">
-        <div className="flex items-center h-full whitespace-nowrap animate-pulse">
-          <div className="text-white font-body font-medium text-sm px-4 animate-bounce">
-            🎿 Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available 🏔️
+        <div className="flex items-center h-full animate-marquee whitespace-nowrap">
+          <div className="text-white font-body font-medium text-sm px-8">
+            Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available • Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available • Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available
           </div>
         </div>
       </div>
