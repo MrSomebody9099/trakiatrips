@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import heroBackground from "@assets/Washington-Ski-Resorts-Backcountry-1-scaled-1-1920x1080_1757580505748.jpg";
 import skiPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.52_8921f211_1757579817544.jpg";
 import celebratePhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e23d55a8_1757579817549.jpg";
-import enjoyingSkiingVideo from "@assets/enjoying skiing video_1757583705145.mp4";
-import poolPartyVideo from "@assets/night Pool party video_1757583705146.mp4";
-import skiingDownhillVideo from "@assets/skiing downhill video_1757583705147.mp4";
 
 interface HeroProps {
   onBookingClick?: () => void;
@@ -67,7 +64,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
               {/* Skiing Video */}
               <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[3/4] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-200">
                 <video
-                  src={enjoyingSkiingVideo}
+                  src="/videos/enjoying-skiing.mp4"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   muted
                   loop
@@ -97,7 +94,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
               {/* Pool Party Video */}
               <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[3/4] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-300">
                 <video
-                  src={poolPartyVideo}
+                  src="/videos/pool-party.mp4"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   muted
                   loop
@@ -128,7 +125,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
             {/* Skiing Downhill Video - Full Width */}
             <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden aspect-[16/9] hover-elevate transition-all duration-500 animate-fade-in-up animate-delay-400">
               <video
-                src={skiingDownhillVideo}
+                src="/videos/skiing-downhill.mp4"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 muted
                 loop
