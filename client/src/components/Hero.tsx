@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import heroBackground from "@assets/Washington-Ski-Resorts-Backcountry-1-scaled-1-1920x1080_1757580505748.jpg";
 import skiPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.52_8921f211_1757579817544.jpg";
 import celebratePhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e23d55a8_1757579817549.jpg";
 
@@ -10,17 +10,13 @@ interface HeroProps {
 export default function Hero({ onBookingClick }: HeroProps) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Premium Split Background */}
+      {/* Premium Mountain Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/60 to-blue-600/40"></div>
         <div 
-          className="absolute left-0 top-0 w-3/5 h-full bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${skiPhoto})` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroBackground})` }}
         />
-        <div 
-          className="absolute right-0 top-0 w-2/5 h-full bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${celebratePhoto})` }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-blue-800/70 to-blue-600/50"></div>
       </div>
       
       {/* Floating Content Grid */}
@@ -49,25 +45,14 @@ export default function Hero({ onBookingClick }: HeroProps) {
               Where alpine skiing meets après-ski parties. Experience Bulgaria's most exclusive winter festival.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 animate-fade-in-up animate-delay-300">
+            <div className="flex justify-center lg:justify-start animate-fade-in-up animate-delay-300">
               <Button 
                 size="lg" 
-                className="font-heading text-lg px-10 py-7 bg-blue-500 hover:bg-blue-600 text-white shadow-2xl shadow-blue-500/30"
+                className="font-heading text-xl px-12 py-8 bg-blue-500 hover:bg-blue-600 text-white shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all duration-300"
                 onClick={onBookingClick}
                 data-testid="button-book-adventure"
               >
-                Book Your Spot
-                <span className="ml-2 text-sm bg-white/20 px-2 py-1 rounded">€175</span>
-              </Button>
-              
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="font-heading text-lg px-10 py-7 bg-white/5 backdrop-blur border-white/30 text-white hover:bg-white/10 group"
-                data-testid="button-watch-video"
-              >
-                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Watch Adventures
+                Book Your Adventure
               </Button>
             </div>
           </div>
