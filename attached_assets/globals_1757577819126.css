@@ -1,0 +1,507 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated color palette to match reference image - light purple/lavender theme */
+  --background: oklch(0.95 0.02 280); /* Light lavender background */
+  --foreground: oklch(0.25 0.08 200); /* Dark teal text */
+  --card: oklch(0.98 0 0); /* Off-white */
+  --card-foreground: oklch(0.25 0.08 200); /* Dark teal */
+  --popover: oklch(0.95 0.02 280); /* Light lavender */
+  --popover-foreground: oklch(0.25 0.08 200); /* Dark teal */
+  --primary: oklch(0.55 0.15 220); /* Deep blue */
+  --primary-foreground: oklch(1 0 0); /* White */
+  --secondary: oklch(0.85 0.05 220); /* Light blue */
+  --secondary-foreground: oklch(0.25 0.08 200); /* Dark teal */
+  --muted: oklch(0.92 0.02 280); /* Light muted lavender */
+  --muted-foreground: oklch(0.45 0.05 200); /* Medium teal */
+  --accent: oklch(0.65 0.12 220); /* Medium blue accent */
+  --accent-foreground: oklch(1 0 0); /* White */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.02 280); /* Light lavender border */
+  --input: oklch(1 0 0); /* White input */
+  --ring: oklch(0.55 0.15 220); /* Blue ring */
+  --chart-1: oklch(0.55 0.15 220);
+  --chart-2: oklch(0.65 0.12 220);
+  --chart-3: oklch(0.75 0.08 220);
+  --chart-4: oklch(0.85 0.05 220);
+  --chart-5: oklch(0.95 0.02 280);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.95 0.02 280);
+  --sidebar-foreground: oklch(0.25 0.08 200);
+  --sidebar-primary: oklch(0.55 0.15 220);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.65 0.12 220);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.9 0.02 280);
+  --sidebar-ring: oklch(0.55 0.15 220);
+  --font-brand: var(--font-dancing);
+  --font-heading: var(--font-montserrat);
+  --font-body: var(--font-raleway);
+}
+
+.dark {
+  /* Updated dark mode colors */
+  --background: oklch(0.08 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.65 0.12 220);
+  --primary-foreground: oklch(0.08 0 0);
+  --secondary: oklch(0.2 0.05 220);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.55 0.15 220);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.2 0 0);
+  --input: oklch(0.15 0 0);
+  --ring: oklch(0.65 0.12 220);
+  --chart-1: oklch(0.65 0.12 220);
+  --chart-2: oklch(0.55 0.15 220);
+  --chart-3: oklch(0.45 0.18 220);
+  --chart-4: oklch(0.35 0.15 220);
+  --chart-5: oklch(0.25 0.12 220);
+  --sidebar: oklch(0.08 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.65 0.12 220);
+  --sidebar-primary-foreground: oklch(0.08 0 0);
+  --sidebar-accent: oklch(0.2 0.05 220);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.2 0 0);
+  --sidebar-ring: oklch(0.65 0.12 220);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-poppins);
+  --font-brand: var(--font-dancing);
+  --font-heading: var(--font-montserrat);
+  --font-body: var(--font-raleway);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Simplified glassmorphism utilities - removed complex animations */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(30, 58, 138, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-button {
+  background: rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.glass-button:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Enhanced glass-button-colorful with better contrast */
+.glass-button-colorful {
+  background: oklch(0.45 0.18 220); /* Deep blue background */
+  border: 2px solid oklch(0.55 0.15 220);
+  color: white !important;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3); /* Added shadow for depth */
+}
+
+.glass-button-colorful:hover {
+  background: oklch(0.55 0.15 220);
+  border-color: oklch(0.65 0.12 220);
+  transform: translateY(-1px);
+  color: white !important;
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+/* Enhanced glass-text with much stronger contrast */
+.glass-text {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9), 1px 1px 4px rgba(0, 0, 0, 0.8);
+  color: white !important;
+  font-weight: 600; /* Slightly bolder for better readability */
+}
+
+/* Updated glass-hero to use blue tint instead of black */
+.glass-hero {
+  background: rgba(30, 58, 138, 0.3); /* Blue semi-transparent background matching ice mountain */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.2);
+}
+
+.glass-nav-text {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Added missing glass-button-colorful class for Book Your Adventure button */
+.glass-button-colorful {
+  background: oklch(0.55 0.15 220); /* Deep blue background */
+  border: 2px solid oklch(0.65 0.12 220); /* Medium blue border */
+  color: white !important;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.glass-button-colorful:hover {
+  background: oklch(0.65 0.12 220);
+  border-color: oklch(0.75 0.08 220);
+  transform: translateY(-1px);
+  color: white !important;
+  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+/* Added missing glass-colorful class for What's Included cards */
+.glass-colorful {
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  border: 2px solid oklch(0.9 0.02 280); /* Light lavender border */
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.glass-colorful:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: oklch(0.85 0.05 220);
+  transform: translateY(-2px);
+}
+
+/* Updated text gradients to match reference image - dark teal color */
+.text-gradient {
+  color: oklch(0.25 0.08 200) !important; /* Dark teal fallback */
+  background: linear-gradient(135deg, oklch(0.25 0.08 200), oklch(0.35 0.1 200));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-hero {
+  color: white !important;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Added missing text-gradient-warm class for card headings */
+.text-gradient-warm {
+  color: oklch(0.25 0.08 200) !important; /* Dark teal fallback */
+  background: linear-gradient(135deg, oklch(0.25 0.08 200), oklch(0.55 0.15 220));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+/* Simplified background gradients - removed complex animations */
+.bg-gradient-festival {
+  background: linear-gradient(135deg, oklch(0.95 0.02 280), oklch(0.92 0.02 280));
+}
+
+/* Removed all floating glass animations and bubble effects */
+
+/* Simplified festival card effects - removed complex animations */
+.festival-card {
+  transition: all 0.3s ease;
+}
+
+.festival-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Removed pulse glow animation */
+
+/* Simplified section gradients */
+.bg-gradient-coral {
+  background: linear-gradient(135deg, oklch(0.95 0.02 280), oklch(0.92 0.02 280));
+}
+
+.bg-gradient-turquoise {
+  background: linear-gradient(135deg, oklch(0.92 0.02 280), oklch(0.89 0.02 280));
+}
+
+.bg-gradient-orange {
+  background: linear-gradient(135deg, oklch(0.89 0.02 280), oklch(0.86 0.02 280));
+}
+
+/* Gallery styles with improved contrast */
+.horizontal-gallery {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.horizontal-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery-item {
+  flex: 0 0 auto;
+  width: 300px;
+  height: 400px;
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+}
+
+.gallery-item img,
+.gallery-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Enhanced gallery overlay with stronger dark background for better contrast */
+.gallery-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0.6) 100%);
+  color: white !important;
+  padding: 1.5rem;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px); /* Added blur for better text separation */
+}
+
+.gallery-overlay h3,
+.gallery-overlay p {
+  color: white !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9); /* Stronger text shadow */
+}
+
+.gallery-overlay h3.text-party-cyan {
+  color: #0ea5e9 !important; /* Darker blue instead of cyan for better contrast */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  font-weight: 700; /* Bolder text for better visibility */
+}
+
+/* Simplified fade-in animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Removed snow animation */
+
+/* Video styling */
+.hero-video {
+  transform: rotate(90deg);
+  width: 177.78vh;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.hero-text {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Typography classes */
+.font-brand {
+  font-family: var(--font-brand);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Updated responsive typography to match clean reference design */
+@media (max-width: 768px) {
+  .hero-bg {
+    background-position: 75% center !important;
+    background-size: cover !important;
+  }
+
+  .text-gradient {
+    font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .ticker-content {
+    font-size: 0.75rem !important;
+    padding-left: 100%;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 2.25rem) !important;
+    line-height: 1.2 !important;
+    font-weight: 600 !important; /* Clean, medium weight like reference */
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 4vw, 1.875rem) !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+  }
+
+  h3 {
+    font-size: clamp(1.125rem, 3.5vw, 1.5rem) !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .text-gradient {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    line-height: 1.1;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 600; /* Clean, medium weight */
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2vw, 1.875rem);
+    font-weight: 600;
+  }
+}
+
+/* Ticker tape animation */
+@keyframes ticker {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.ticker-tape {
+  overflow: hidden;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8);
+  color: white;
+}
+
+.ticker-content {
+  display: inline-block;
+  animation: ticker 30s linear infinite;
+  padding-left: 100%;
+  color: white;
+  font-weight: 500;
+}
+
+/* Updated festival typography to match clean reference style */
+.text-festival-heading {
+  color: oklch(0.25 0.08 200) !important; /* Dark teal like reference */
+  font-family: var(--font-heading);
+  font-weight: 600; /* Medium weight, not ultra-bold */
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em; /* Subtle letter spacing */
+}
+
+.text-festival-subheading {
+  color: oklch(0.25 0.08 200) !important; /* Dark teal */
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+/* Updated text-party-cyan class to use darker blue */
+.text-party-cyan {
+  color: #0ea5e9 !important; /* Darker blue for better contrast */
+  font-weight: 700; /* Bolder weight for better visibility */
+}
