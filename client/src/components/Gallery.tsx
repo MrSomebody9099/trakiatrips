@@ -177,7 +177,6 @@ export default function Gallery() {
                   className="w-full h-full rounded-2xl"
                   frameBorder="0"
                   scrolling="no"
-                  allowTransparency={true}
                   title={video.title}
                   style={{ border: 'none', background: 'transparent' }}
                 />
