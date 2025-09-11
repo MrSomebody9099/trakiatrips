@@ -17,14 +17,18 @@ export default function Navigation() {
       </div>
 
       {/* Premium navigation */}
-      <nav className="fixed top-8 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-b border-border shadow-lg">
+      <nav className="fixed top-8 left-0 right-0 z-40 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg border-b border-blue-700/50 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center md:hidden"></div>
 
             <div className="flex-1 flex justify-center items-center">
-              <h1 className="font-heading font-bold text-2xl text-primary tracking-wider uppercase">
-                TRAKIA TRIPS
+              <h1 className="font-heading font-black text-2xl md:text-3xl text-white tracking-wider uppercase relative">
+                <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  TRAKIA
+                </span>
+                <span className="text-blue-200 ml-2">TRIPS</span>
+                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
               </h1>
             </div>
 
@@ -32,7 +36,7 @@ export default function Navigation() {
               onClick={() => setIsOpen(!isOpen)}
               variant="outline"
               size="icon"
-              className="hover-elevate"
+              className="hover-elevate border-blue-400/50 text-white hover:bg-blue-700/50"
               data-testid="button-menu-toggle"
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -40,42 +44,42 @@ export default function Navigation() {
           </div>
 
           {isOpen && (
-            <div className="bg-card/95 backdrop-blur-lg rounded-lg mt-4 p-6 mb-4 border border-border shadow-xl animate-fade-in-up">
-              <div className="flex flex-col space-y-4">
+            <div className="bg-gradient-to-br from-blue-900/95 to-blue-800/95 backdrop-blur-lg rounded-2xl mt-4 p-8 mb-4 border border-blue-600/50 shadow-2xl animate-fade-in-up">
+              <div className="flex flex-col space-y-6">
                 <a
-                  href="#home"
-                  className="text-foreground hover:text-primary transition-colors font-body font-medium text-lg uppercase tracking-wide hover-elevate p-2 rounded"
+                  href="/"
+                  className="text-white hover:text-blue-200 transition-colors font-heading font-bold text-xl uppercase tracking-wider hover-elevate p-3 rounded-xl bg-blue-800/30 hover:bg-blue-700/50"
                   onClick={() => setIsOpen(false)}
                   data-testid="link-home"
                 >
                   HOME
                 </a>
                 <a
-                  href="#about"
-                  className="text-foreground hover:text-primary transition-colors font-body font-medium text-lg uppercase tracking-wide hover-elevate p-2 rounded"
+                  href="/about"
+                  className="text-white hover:text-blue-200 transition-colors font-heading font-bold text-xl uppercase tracking-wider hover-elevate p-3 rounded-xl bg-blue-800/30 hover:bg-blue-700/50"
                   onClick={() => setIsOpen(false)}
                   data-testid="link-about"
                 >
                   ABOUT US
                 </a>
                 <a
-                  href="#booking"
-                  className="text-foreground hover:text-primary transition-colors font-body font-medium text-lg uppercase tracking-wide hover-elevate p-2 rounded"
+                  href="/booking"
+                  className="text-white hover:text-blue-200 transition-colors font-heading font-bold text-xl uppercase tracking-wider hover-elevate p-3 rounded-xl bg-blue-800/30 hover:bg-blue-700/50"
                   onClick={() => setIsOpen(false)}
                   data-testid="link-booking"
                 >
                   BOOK TRIP
                 </a>
                 <a
-                  href="#terms"
-                  className="text-foreground hover:text-primary transition-colors font-body font-medium text-lg uppercase tracking-wide hover-elevate p-2 rounded"
+                  href="/terms"
+                  className="text-white hover:text-blue-200 transition-colors font-heading font-bold text-xl uppercase tracking-wider hover-elevate p-3 rounded-xl bg-blue-800/30 hover:bg-blue-700/50"
                   onClick={() => setIsOpen(false)}
                   data-testid="link-terms"
                 >
                   TERMS
                 </a>
                 <Button
-                  className="mt-4 hover-elevate"
+                  className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-heading font-bold text-lg py-4 rounded-xl shadow-lg hover-elevate"
                   onClick={() => setIsOpen(false)}
                   data-testid="button-book-now"
                 >
