@@ -155,6 +155,21 @@ export default function Gallery() {
                     loop
                     playsInline
                     preload="auto"
+                    onMouseEnter={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.muted = true;
+                      video.play().then(() => {
+                        console.log('🎬 Video hover started:', item.title);
+                      }).catch((err) => {
+                        console.error('❌ Video hover play failed:', item.title, err);
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.pause();
+                      video.currentTime = 0;
+                      console.log('⏸️ Video hover stopped:', item.title);
+                    }}
                     onClick={(e) => {
                       e.preventDefault();
                       const video = e.currentTarget as HTMLVideoElement;
