@@ -1,0 +1,149 @@
+You are updating a website project called Trakia Trips, a ski trip booking platform.
+⚠️ Important: Do not change the existing theme, design style, fonts, colors, or glass/abstract elements. Keep the design intact and just apply the changes below.
+The site must be fully mobile responsive (proportionate to phone/tablet/desktop).
+
+🔹 1. Package & Pricing Updates
+
+Change “Weekend Package” → “2 Day Deal” with price 185€.
+
+Change “Extended Package” → “Full Weekend Package” with price 245€.
+
+Under packages, add: “Airport transfers available (not included).”
+
+Both packages should clearly show:
+
+4-star hotel (Breakfast + Dinner included).
+
+Bus transport from Stara Zagora.
+
+Club events with Afrobeats & House DJs.
+
+Add visible note: “This does not include flights or ski pass.”
+
+Payment must support installments:
+
+Deposit now.
+
+Remainder due 6th January.
+
+🔹 2. Section & Text Changes
+
+Change headings:
+
+“What’s Included” → “Our Package Includes.”
+
+“Adventurers” → “Bookings.”
+
+“Experiences” → “Experience.”
+
+Change date format everywhere to: “6th–9th of March.”
+
+Remove any specific numbers (like 500+ travelers). Instead, say: “Limited Places.”
+
+Change “Squad Adventures” → “Group Adventures.”
+
+In “Not included” section, add:
+
+“Whatever is not mentioned under the included section.” (legal protection).
+
+Update copy to: “Discounted rates on ski rentals.”
+
+🔹 3. Booking Flow & Add-ons
+
+Ski Rentals: allow customer to choose per day (number of rental days).
+
+Snowboards: must be a separate option with its own price.
+
+Airport Transfers:
+
+Ask for flight number.
+
+If flight not booked yet, allow editing later through profile/dashboard.
+
+Rooms/Guests:
+
+Options: double rooms, 3-person apartments, 5-person apartments.
+
+Support up to 15 guests per booking.
+
+Collect for each guest: Full Name, Date of Birth, Phone Number.
+
+Evening Events: set price to 0 (free), but still allow booking (so organizers can track numbers).
+
+Add “Book Now” buttons under package cards and images.
+
+🔹 4. Transport
+
+Replace all mentions of “VIP Transport” with “Private Transport.”
+
+🔹 5. Payment Integration (Fondy)
+
+Integrate Fondy Hosted Checkout instead of Stripe.
+
+Flow:
+
+User clicks Purchase.
+
+Redirect to Fondy Checkout page.
+
+After payment → redirect to /success or /failed.
+
+Fondy also sends a webhook POST to /webhook on the backend.
+
+Backend verifies payment using Merchant ID + Secret Key (I will provide later).
+
+Backend updates booking status in DB.
+
+Do not hardcode keys. Use env variables:
+
+process.env.FONDY_MERCHANT_ID
+
+process.env.FONDY_SECRET_KEY
+
+🔹 6. Profile Dashboard (New Feature)
+
+Add Profile icon (top right corner).
+
+When user logs in, they should see a dashboard with:
+
+Packages they purchased.
+
+Booking details (dates, room type, extras).
+
+All guest details they entered.
+
+Options to add more guests or edit existing info.
+
+Option to update flight number if not provided earlier.
+
+Profile must match the site’s design theme and be mobile-friendly.
+
+🔹 7. Technical Requirements
+
+Backend: Node.js with Express.
+
+Required routes:
+
+/success → thank you page.
+
+/failed → payment failed page.
+
+/webhook → Fondy webhook verification + booking update.
+
+Database: Supabase (or local DB) for storing bookings, guests, payments.
+
+Gallery section: must support horizontal scrolling with loop, showing images and videos (I will provide media).
+
+Must remain mobile optimized and theme consistent.
+
+👉 Final output:
+
+Updated frontend with all changes applied.
+
+Backend with Fondy integration placeholders.
+
+User profile/dashboard fully functional.
+
+Booking flow supports multiple guests, add-ons, and installments.
+
+Mobile optimized UI, no broken layouts.
