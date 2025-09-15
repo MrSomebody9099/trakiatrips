@@ -20,35 +20,36 @@ export default function Hero({ onBookingClick }: HeroProps) {
       </div>
       
       {/* Floating Content Grid */}
-      <div className="relative z-10 px-4 max-w-7xl mx-auto w-full">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen py-20">
+      <div className="relative z-10 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center min-h-screen py-16 sm:py-20">
           
           {/* Left Column - Main Hero */}
-          <div className="text-center lg:text-left space-y-8">
+          <div className="text-center lg:text-left space-y-6 sm:space-y-8">
             <div className="space-y-4">
-              <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-2 text-white/90 font-medium animate-fade-in-up">
-                🎿 6th–9th of March, 2025 • Bansko
+              <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 sm:px-6 py-1.5 sm:py-2 text-white/90 font-medium animate-fade-in-up text-xs sm:text-sm">
+                <span className="hidden sm:inline">🎿 6th–9th of March, 2025 • Bansko</span>
+                <span className="sm:hidden">🎿 March 6-9 • Bansko</span>
               </div>
               
-              <h1 className="font-heading text-6xl md:text-7xl xl:text-8xl font-black text-white leading-tight animate-fade-in-up animate-delay-100">
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-tight animate-fade-in-up animate-delay-100">
                 EPIC
                 <br />
                 <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
                   ADVENTURES
                 </span>
                 <br />
-                <span className="text-4xl md:text-5xl xl:text-6xl font-light">await</span>
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light">await</span>
               </h1>
             </div>
             
-            <p className="font-body text-xl md:text-2xl text-white/90 max-w-lg animate-fade-in-up animate-delay-200">
+            <p className="font-body text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-lg animate-fade-in-up animate-delay-200">
               Where alpine skiing meets après-ski parties. Experience Bulgaria's most exclusive winter festival.
             </p>
             
             <div className="flex justify-center lg:justify-start animate-fade-in-up animate-delay-300">
               <Button 
                 size="lg" 
-                className="font-heading text-xl px-12 py-8 bg-blue-500 hover:bg-blue-600 text-white shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all duration-300"
+                className="font-heading text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-12 py-4 sm:py-6 md:py-8 bg-blue-500 hover:bg-blue-600 text-white shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all duration-300"
                 onClick={onBookingClick}
                 data-testid="button-book-adventure"
               >
@@ -63,7 +64,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent rounded-3xl"></div>
               
               <div className="relative z-10 text-center space-y-8">
-                <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight">
                   <span className="block">Ski.</span>
                   <span className="block text-blue-200">Adventure.</span>
                   <span className="block text-blue-100">Celebrate.</span>
@@ -72,27 +73,27 @@ export default function Hero({ onBookingClick }: HeroProps) {
                 <div className="space-y-6 text-white/90">
                   <div className="flex items-center justify-center space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
-                    <span className="font-body text-lg md:text-xl">World-class ski slopes</span>
+                    <span className="font-body text-sm sm:text-base md:text-lg lg:text-xl">World-class ski slopes</span>
                   </div>
                   <div className="flex items-center justify-center space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
-                    <span className="font-body text-lg md:text-xl">Epic pool party experiences</span>
+                    <span className="font-body text-sm sm:text-base md:text-lg lg:text-xl">Epic pool party experiences</span>
                   </div>
                   <div className="flex items-center justify-center space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
-                    <span className="font-body text-lg md:text-xl">ATV mountain adventures</span>
+                    <span className="font-body text-sm sm:text-base md:text-lg lg:text-xl">ATV mountain adventures</span>
                   </div>
                   <div className="flex items-center justify-center space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full"></div>
-                    <span className="font-body text-lg md:text-xl">Afrobeats & House DJs</span>
+                    <span className="font-body text-sm sm:text-base md:text-lg lg:text-xl">Afrobeats & House DJs</span>
                   </div>
                 </div>
                 
                 <div className="pt-8 border-t border-blue-300/30">
-                  <p className="text-blue-100 font-medium text-lg md:text-xl">
+                  <p className="text-blue-100 font-medium text-base sm:text-lg md:text-xl">
                     Limited to 100 adventurers
                   </p>
-                  <p className="text-blue-200/80 text-sm md:text-base mt-2">
+                  <p className="text-blue-200/80 text-xs sm:text-sm md:text-base mt-2">
                     March 6-9, 2025 • Bansko, Bulgaria
                   </p>
                 </div>

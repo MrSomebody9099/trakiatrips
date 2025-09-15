@@ -10,7 +10,7 @@ export default function Navigation() {
       {/* Premium ticker banner */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary via-blue-600 to-primary h-8 overflow-hidden">
         <div className="flex items-center h-full animate-marquee whitespace-nowrap">
-          <div className="text-white font-body font-medium text-sm px-8">
+          <div className="text-white font-body font-medium text-xs sm:text-sm px-4 sm:px-8">
             Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places • Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places • Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places
           </div>
         </div>
@@ -23,7 +23,7 @@ export default function Navigation() {
             <div className="flex items-center md:hidden"></div>
 
             <div className="flex-1 flex justify-center items-center">
-              <h1 className="font-heading font-black text-2xl md:text-3xl text-white tracking-wider uppercase relative">
+              <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white tracking-wider uppercase relative">
                 <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                   TRAKIA
                 </span>
