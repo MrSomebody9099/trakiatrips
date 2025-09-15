@@ -1,3 +1,5 @@
+import { Play, Pause } from "lucide-react";
+import { useState, useRef } from "react";
 import skiGroupPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.52_8921f211_1757579817544.jpg";
 import atvSoloPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_89b49da5_1757579817546.jpg";
 import atvGroupPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e5ee5227_1757579817548.jpg";
@@ -15,16 +17,6 @@ const galleryItems = [
     orientation: "landscape",
   },
   {
-    type: "video" as const,
-    src: "/videos/enjoying-skiing.mp4",
-    title: "Skiing Action",
-    description: "Experience the thrill of carving through fresh powder on pristine mountain slopes.",
-    category: "skiing",
-    featured: false,
-    orientation: "portrait",
-    testId: "video-skiing",
-  },
-  {
     type: "image" as const,
     src: poolPartyPhoto,
     title: "Legendary Pool Parties",
@@ -34,16 +26,6 @@ const galleryItems = [
     orientation: "portrait",
   },
   {
-    type: "video" as const,
-    src: "/videos/pool-party.mp4",
-    title: "Night Pool Parties",
-    description: "Epic nighttime pool parties with amazing vibes, music and unforgettable moments.",
-    category: "party",
-    featured: false,
-    orientation: "portrait",
-    testId: "video-pool-party",
-  },
-  {
     type: "image" as const,
     src: atvSoloPhoto,
     title: "Mountain ATV Adventures", 
@@ -51,26 +33,6 @@ const galleryItems = [
     category: "adventure",
     featured: false,
     orientation: "landscape",
-  },
-  {
-    type: "video" as const,
-    src: "/videos/skiing-downhill.mp4",
-    title: "Downhill Rush",
-    description: "Feel the adrenaline as you carve through perfect powder on legendary Bulgarian slopes.",
-    category: "skiing",
-    featured: false,
-    orientation: "portrait",
-    testId: "video-skiing-downhill",
-  },
-  {
-    type: "video" as const,
-    src: "/videos/snow-mobile.mp4",
-    title: "Snow Mobile Adventure",
-    description: "Explore the mountain wilderness with high-speed snowmobile adventures.",
-    category: "adventure",
-    featured: false,
-    orientation: "portrait",
-    testId: "video-snow-mobile",
   },
   {
     type: "image" as const,
@@ -92,6 +54,37 @@ const galleryItems = [
   },
 ];
 
+const videoItems = [
+  {
+    src: "/videos/enjoying-skiing.mp4",
+    title: "Skiing Action",
+    description: "Experience the thrill of carving through fresh powder on pristine mountain slopes.",
+    category: "skiing",
+    testId: "video-skiing",
+  },
+  {
+    src: "/videos/pool-party.mp4",
+    title: "Night Pool Parties",
+    description: "Epic nighttime pool parties with amazing vibes, music and unforgettable moments.",
+    category: "party",
+    testId: "video-pool-party",
+  },
+  {
+    src: "/videos/skiing-downhill.mp4",
+    title: "Downhill Rush",
+    description: "Feel the adrenaline as you carve through perfect powder on legendary Bulgarian slopes.",
+    category: "skiing",
+    testId: "video-skiing-downhill",
+  },
+  {
+    src: "/videos/snow-mobile.mp4",
+    title: "Snow Mobile Adventure",
+    description: "Explore the mountain wilderness with high-speed snowmobile adventures.",
+    category: "adventure",
+    testId: "video-snow-mobile",
+  },
+];
+
 const instagramVideos = [
   {
     src: "https://www.instagram.com/reel/DObghFHCF2R/embed",
@@ -102,6 +95,112 @@ const instagramVideos = [
     title: "Party Highlights",
   },
 ];
+
+function VideoCard({ video, index }: { video: any; index: number }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const togglePlay = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    if (isPlaying) {
+      videoEl.pause();
+      setIsPlaying(false);
+    } else {
+      videoEl.muted = true;
+      videoEl.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.error('❌ Video play failed:', video.title, err);
+      });
+    }
+  };
+
+  return (
+    <div 
+      className="relative group rounded-2xl aspect-[3/4] overflow-hidden hover-elevate transition-all duration-500"
+      data-testid={video.testId}
+    >
+      <video
+        ref={videoRef}
+        src={video.src}
+        className="w-full h-full object-cover"
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        onEnded={() => setIsPlaying(false)}
+      />
+      
+      {/* Play/Pause Button */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center cursor-pointer"
+        onClick={togglePlay}
+      >
+        <div 
+          className={`
+            bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-4 md:p-6 
+            transition-all duration-300 hover:bg-white/30 hover:scale-110
+            ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}
+          `}
+        >
+          {isPlaying ? (
+            <Pause className="w-8 h-8 md:w-12 md:h-12 text-white" />
+          ) : (
+            <Play className="w-8 h-8 md:w-12 md:h-12 text-white ml-1" />
+          )}
+        </div>
+      </div>
+      
+      {/* Video Info Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
+        <div className="text-white">
+          <div className="flex items-center space-x-2 text-xs text-blue-200 mb-2">
+            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <span className="uppercase tracking-wide font-medium">{video.category}</span>
+          </div>
+          
+          <h3 className="font-heading font-bold text-lg md:text-xl leading-tight mb-2">
+            {video.title}
+          </h3>
+          
+          <p className="font-body text-sm text-white/90 leading-relaxed line-clamp-2">
+            {video.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EpicVideosSection() {
+  return (
+    <div className="mt-20 md:mt-32 animate-fade-in-up animate-delay-400">
+      <div className="text-center mb-12 md:mb-16">
+        <div className="inline-block bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-full px-6 py-2 text-purple-600 font-medium mb-6">
+          Epic Adventures
+        </div>
+        <h2 className="font-heading font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-6 md:mb-8">
+          ADVENTURE
+          <br />
+          <span className="bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+            VIDEOS
+          </span>
+        </h2>
+        <p className="font-body text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+          Watch real moments from our epic adventures - click play to experience the thrill
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
+        {videoItems.map((video, index) => (
+          <VideoCard key={index} video={video} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Gallery() {
   return (
@@ -144,57 +243,13 @@ export default function Gallery() {
               <div
                 key={index}
                 className={`relative group rounded-2xl ${gridClass} hover-elevate transition-all duration-500 overflow-hidden`}
-                data-testid={item.type === 'video' ? item.testId : `gallery-item-${index}`}
+                data-testid={`gallery-item-${index}`}
               >
-                {item.type === 'video' ? (
-                  <video
-                    key={item.src}
-                    src={item.src}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    onMouseEnter={(e) => {
-                      const video = e.currentTarget as HTMLVideoElement;
-                      video.muted = true;
-                      video.play().then(() => {
-                        console.log('🎬 Video hover started:', item.title);
-                      }).catch((err) => {
-                        console.error('❌ Video hover play failed:', item.title, err);
-                      });
-                    }}
-                    onMouseLeave={(e) => {
-                      const video = e.currentTarget as HTMLVideoElement;
-                      video.pause();
-                      video.currentTime = 0;
-                      console.log('⏸️ Video hover stopped:', item.title);
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const video = e.currentTarget as HTMLVideoElement;
-                      
-                      if (video.paused) {
-                        video.muted = true;
-                        video.play().then(() => {
-                          console.log('🎬 Video started playing:', item.title);
-                        }).catch((err) => {
-                          console.error('❌ Video play failed:', item.title, err);
-                        });
-                      } else {
-                        video.pause();
-                        video.currentTime = 0;
-                        console.log('⏸️ Video stopped:', item.title);
-                      }
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                )}
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
                 
                 {/* Premium Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-900/30 to-transparent opacity-60 group-hover:opacity-80 transition-all duration-300">
@@ -223,6 +278,9 @@ export default function Gallery() {
             );
           })}
         </div>
+        
+        {/* Epic Videos Section */}
+        <EpicVideosSection />
         
         {/* Instagram Moments Section */}
         <div className="mt-20 md:mt-32 animate-fade-in-up animate-delay-300">
