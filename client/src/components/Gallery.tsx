@@ -15,6 +15,16 @@ const galleryItems = [
     orientation: "landscape",
   },
   {
+    type: "video" as const,
+    src: "/videos/enjoying-skiing.mp4",
+    title: "Epic Skiing",
+    description: "Hit the pristine slopes of Bansko with world-class equipment and breathtaking mountain views.",
+    category: "skiing",
+    featured: true,
+    orientation: "portrait",
+    testId: "video-skiing",
+  },
+  {
     type: "image" as const,
     src: poolPartyPhoto,
     title: "Legendary Pool Parties",
@@ -24,6 +34,16 @@ const galleryItems = [
     orientation: "portrait",
   },
   {
+    type: "video" as const,
+    src: "/videos/pool-party.mp4",
+    title: "Pool Parties",
+    description: "When the sun sets, the real adventure begins. Dance the night away with world-class DJs.",
+    category: "party",
+    featured: false,
+    orientation: "portrait",
+    testId: "video-pool-party",
+  },
+  {
     type: "image" as const,
     src: atvSoloPhoto,
     title: "Mountain ATV Adventures", 
@@ -31,6 +51,16 @@ const galleryItems = [
     category: "adventure",
     featured: false,
     orientation: "landscape",
+  },
+  {
+    type: "video" as const,
+    src: "/videos/skiing-downhill.mp4",
+    title: "Downhill Rush",
+    description: "Feel the adrenaline as you carve through perfect powder on legendary Bulgarian slopes.",
+    category: "skiing",
+    featured: false,
+    orientation: "portrait",
+    testId: "video-skiing-downhill",
   },
   {
     type: "image" as const,
@@ -104,13 +134,38 @@ export default function Gallery() {
               <div
                 key={index}
                 className={`relative group rounded-2xl ${gridClass} hover-elevate transition-all duration-500 overflow-hidden`}
-                data-testid={`gallery-item-${index}`}
+                data-testid={item.type === 'video' ? item.testId : `gallery-item-${index}`}
               >
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                {item.type === 'video' ? (
+                  <video
+                    src={item.src}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    muted
+                    loop
+                    playsInline
+                    onMouseEnter={(e) => {
+                      try {
+                        e.currentTarget.play();
+                      } catch (err) {
+                        console.log('Video play failed:', err);
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      try {
+                        e.currentTarget.pause();
+                        e.currentTarget.currentTime = 0;
+                      } catch (err) {
+                        console.log('Video pause failed:', err);
+                      }
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                )}
                 
                 {/* Premium Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-900/30 to-transparent opacity-60 group-hover:opacity-80 transition-all duration-300">
@@ -135,8 +190,8 @@ export default function Gallery() {
                 {/* Premium Border Accent */}
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/30 rounded-2xl transition-all duration-300"></div>
                 
-                {/* Play Button for Featured Images */}
-                {isLarge && (
+                {/* Play Button for Videos and Featured Images */}
+                {(item.type === 'video' || isLarge) && (
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/30">
                     <div className="w-0 h-0 border-l-4 md:border-l-6 border-l-white border-t-3 md:border-t-4 border-t-transparent border-b-3 md:border-b-4 border-b-transparent ml-1"></div>
                   </div>
