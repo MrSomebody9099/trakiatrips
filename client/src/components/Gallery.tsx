@@ -150,39 +150,26 @@ export default function Gallery() {
                   <video
                     key={item.src}
                     src={item.src}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
                     muted
                     loop
                     playsInline
                     preload="auto"
-                    onMouseEnter={(e) => {
-                      const video = e.currentTarget as HTMLVideoElement;
-                      video.muted = true;
-                      video.play().then(() => {
-                        console.log('✅ Video playing:', item.title);
-                      }).catch((err) => {
-                        console.error('❌ Video play failed:', item.title, err);
-                      });
-                    }}
-                    onMouseLeave={(e) => {
-                      const video = e.currentTarget as HTMLVideoElement;
-                      video.pause();
-                      video.currentTime = 0;
-                      console.log('⏹️ Video stopped:', item.title);
-                    }}
                     onClick={(e) => {
+                      e.preventDefault();
                       const video = e.currentTarget as HTMLVideoElement;
+                      
                       if (video.paused) {
                         video.muted = true;
                         video.play().then(() => {
-                          console.log('📱 Video playing via click:', item.title);
+                          console.log('🎬 Video started playing:', item.title);
                         }).catch((err) => {
-                          console.error('📱 Video click failed:', item.title, err);
+                          console.error('❌ Video play failed:', item.title, err);
                         });
                       } else {
                         video.pause();
                         video.currentTime = 0;
-                        console.log('📱 Video clicked to stop:', item.title);
+                        console.log('⏸️ Video stopped:', item.title);
                       }
                     }}
                   />
