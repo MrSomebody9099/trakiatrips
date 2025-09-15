@@ -61,11 +61,68 @@ interface AddOnSelection {
   days?: number; // For per-day items like ski/snowboard rentals
 }
 
-const roomOptions: RoomOption[] = [
-  { id: "double", name: "Double Room", capacity: 2, description: "" },
-  { id: "apartment-3", name: "3-Person Apartment", capacity: 3, description: "" },
-  { id: "apartment-5", name: "5-Person Apartment", capacity: 5, description: "" },
-];
+// Dynamic room assignment function based on guest count
+const getRoomOptions = (guestCount: number): RoomOption[] => {
+  const options: RoomOption[] = [];
+  
+  switch (guestCount) {
+    case 1:
+      options.push({ id: "2person-1", name: "2-Person Room", capacity: 2, description: "1 person in a 2-person room" });
+      break;
+    case 2:
+      options.push({ id: "2person-1", name: "One 2-Person Room", capacity: 2, description: "Perfect for 2 people" });
+      break;
+    case 3:
+      options.push({ id: "3person-1", name: "One 3-Person Room", capacity: 3, description: "Perfect for 3 people" });
+      break;
+    case 4:
+      options.push({ id: "2person-2", name: "Two 2-Person Rooms", capacity: 4, description: "Two separate 2-person rooms" });
+      break;
+    case 5:
+      options.push({ id: "5person-1", name: "One 5-Person Room", capacity: 5, description: "Perfect for 5 people" });
+      break;
+    case 6:
+      options.push({ id: "3person-2", name: "Two 3-Person Rooms", capacity: 6, description: "Two separate 3-person rooms" });
+      options.push({ id: "2person-3", name: "Three 2-Person Rooms", capacity: 6, description: "Three separate 2-person rooms" });
+      break;
+    case 7:
+      options.push({ id: "5person-1-2person-1", name: "One 5-Person Room + One 2-Person Room", capacity: 7, description: "5-person room and 2-person room" });
+      break;
+    case 8:
+      options.push({ id: "5person-1-3person-1", name: "One 5-Person Room + One 3-Person Room", capacity: 8, description: "5-person room and 3-person room" });
+      options.push({ id: "2person-4", name: "Four 2-Person Rooms", capacity: 8, description: "Four separate 2-person rooms" });
+      break;
+    case 9:
+      options.push({ id: "3person-3", name: "Three 3-Person Rooms", capacity: 9, description: "Three separate 3-person rooms" });
+      break;
+    case 10:
+      options.push({ id: "5person-2", name: "Two 5-Person Rooms", capacity: 10, description: "Two separate 5-person rooms" });
+      options.push({ id: "2person-5", name: "Five 2-Person Rooms", capacity: 10, description: "Five separate 2-person rooms" });
+      break;
+    case 11:
+      options.push({ id: "5person-1-3person-2", name: "One 5-Person Room + Two 3-Person Rooms", capacity: 11, description: "5-person room and two 3-person rooms" });
+      break;
+    case 12:
+      options.push({ id: "3person-4", name: "Four 3-Person Rooms", capacity: 12, description: "Four separate 3-person rooms" });
+      options.push({ id: "2person-6", name: "Six 2-Person Rooms", capacity: 12, description: "Six separate 2-person rooms" });
+      break;
+    case 13:
+      options.push({ id: "5person-2-3person-1", name: "Two 5-Person Rooms + One 3-Person Room", capacity: 13, description: "Two 5-person rooms and one 3-person room" });
+      break;
+    case 14:
+      options.push({ id: "5person-2-2person-2", name: "Two 5-Person Rooms + Two 2-Person Rooms", capacity: 14, description: "Two 5-person rooms and two 2-person rooms" });
+      options.push({ id: "3person-2-2person-4", name: "Two 3-Person Rooms + Four 2-Person Rooms", capacity: 14, description: "Two 3-person rooms and four 2-person rooms" });
+      break;
+    case 15:
+      options.push({ id: "5person-3", name: "Three 5-Person Rooms", capacity: 15, description: "Three separate 5-person rooms" });
+      options.push({ id: "3person-5", name: "Five 3-Person Rooms", capacity: 15, description: "Five separate 3-person rooms" });
+      break;
+    default:
+      break;
+  }
+  
+  return options;
+};
 
 interface BookingFlowProps {
   onClose?: () => void;
@@ -120,6 +177,9 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const handlePeopleChange = (change: number) => {
     const newCount = Math.max(1, Math.min(15, numberOfPeople + change));
     setNumberOfPeople(newCount);
+    
+    // Reset room selection when guest count changes
+    setSelectedRoomOption(null);
     
     // Adjust guests array
     if (newCount > numberOfPeople) {
@@ -465,10 +525,13 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
             {/* Room Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Room Selection</CardTitle>
+                <CardTitle>Room Assignment</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Based on {numberOfPeople} people, here are your room options:
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {roomOptions.map((room) => (
+                {getRoomOptions(numberOfPeople).map((room) => (
                   <div key={room.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/50">
                     <Checkbox
                       id={room.id}
@@ -478,12 +541,17 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                     />
                     <div className="flex-1">
                       <Label htmlFor={room.id} className="cursor-pointer font-semibold">
-                        {room.name} (up to {room.capacity} people)
+                        {room.name}
                       </Label>
                       <p className="text-sm text-muted-foreground">{room.description}</p>
                     </div>
                   </div>
                 ))}
+                {getRoomOptions(numberOfPeople).length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">
+                    Please select the number of people to see available room options.
+                  </p>
+                )}
               </CardContent>
             </Card>
 
