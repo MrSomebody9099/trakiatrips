@@ -41,6 +41,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   const [userEmail, setUserEmail] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [tempBookings, setTempBookings] = useState<Booking[]>([]);
 
   useEffect(() => {
     // Load user data from localStorage
@@ -48,14 +49,54 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
     if (email) {
       setUserEmail(email);
     }
+
+    // Load temporary booking from localStorage
+    const tempBookingData = localStorage.getItem("tempBooking");
+    if (tempBookingData) {
+      try {
+        const tempBooking = JSON.parse(tempBookingData);
+        
+        // Transform temporary booking to match Booking interface
+        const transformedBooking: Booking = {
+          id: tempBooking.id,
+          packageName: tempBooking.packageName,
+          packagePrice: parseInt(tempBooking.packagePrice) || 0,
+          dates: tempBooking.dates,
+          numberOfGuests: tempBooking.numberOfGuests,
+          roomType: tempBooking.roomType,
+          addOns: tempBooking.addOns || [],
+          totalAmount: tempBooking.actualTotalAmount || tempBooking.totalAmount || 0,
+          paymentStatus: tempBooking.paymentStatus || 'paid',
+          bookingDate: tempBooking.createdAt,
+          flightNumber: tempBooking.flightNumber,
+          guests: tempBooking.guests.map((guest: any, index: number) => ({
+            id: `temp-guest-${index}`,
+            name: guest.name,
+            email: guest.email,
+            phone: guest.phone,
+            dateOfBirth: guest.dateOfBirth
+          }))
+        };
+        
+        setTempBookings([transformedBooking]);
+        
+        // Clean up localStorage after loading
+        localStorage.removeItem("tempBooking");
+      } catch (error) {
+        console.error("Error parsing temporary booking:", error);
+      }
+    }
   }, []);
 
   // Fetch bookings using React Query
-  const { data: bookings = [], isLoading, error } = useQuery({
+  const { data: apiBookings = [], isLoading, error } = useQuery({
     queryKey: ['/api/bookings', userEmail],
     queryFn: () => fetch(`/api/bookings/${userEmail}`).then(res => res.json()),
     enabled: !!userEmail,
   });
+
+  // Combine temporary bookings with API bookings
+  const bookings = [...tempBookings, ...apiBookings];
 
   // Update guest mutation
   const updateGuestMutation = useMutation({
