@@ -148,60 +148,41 @@ export default function Gallery() {
               >
                 {item.type === 'video' ? (
                   <video
+                    key={item.src}
                     src={item.src}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     muted
                     loop
                     playsInline
-                    preload="metadata"
-                    onLoadedData={(e) => {
-                      console.log('Video loaded:', item.src);
-                    }}
-                    onError={(e) => {
-                      console.error('Video error:', item.src, e);
-                    }}
-                    onMouseEnter={async (e) => {
-                      console.log('Attempting to play video:', item.src);
-                      try {
-                        const video = e.currentTarget;
-                        video.muted = true; // Ensure muted
-                        const playPromise = video.play();
-                        if (playPromise !== undefined) {
-                          await playPromise;
-                          console.log('Video playing:', item.src);
-                        }
-                      } catch (err) {
-                        console.error('Video play failed:', item.src, err);
-                      }
+                    preload="auto"
+                    onMouseEnter={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.muted = true;
+                      video.play().then(() => {
+                        console.log('✅ Video playing:', item.title);
+                      }).catch((err) => {
+                        console.error('❌ Video play failed:', item.title, err);
+                      });
                     }}
                     onMouseLeave={(e) => {
-                      try {
-                        const video = e.currentTarget;
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.pause();
+                      video.currentTime = 0;
+                      console.log('⏹️ Video stopped:', item.title);
+                    }}
+                    onClick={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      if (video.paused) {
+                        video.muted = true;
+                        video.play().then(() => {
+                          console.log('📱 Video playing via click:', item.title);
+                        }).catch((err) => {
+                          console.error('📱 Video click failed:', item.title, err);
+                        });
+                      } else {
                         video.pause();
                         video.currentTime = 0;
-                        console.log('Video paused and reset:', item.src);
-                      } catch (err) {
-                        console.error('Video pause failed:', item.src, err);
-                      }
-                    }}
-                    onClick={async (e) => {
-                      console.log('Video clicked:', item.src);
-                      try {
-                        const video = e.currentTarget;
-                        if (video.paused) {
-                          video.muted = true;
-                          const playPromise = video.play();
-                          if (playPromise !== undefined) {
-                            await playPromise;
-                            console.log('Video playing via click:', item.src);
-                          }
-                        } else {
-                          video.pause();
-                          video.currentTime = 0;
-                          console.log('Video paused via click:', item.src);
-                        }
-                      } catch (err) {
-                        console.error('Video click failed:', item.src, err);
+                        console.log('📱 Video clicked to stop:', item.title);
                       }
                     }}
                   />
@@ -236,12 +217,6 @@ export default function Gallery() {
                 {/* Premium Border Accent */}
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/30 rounded-2xl transition-all duration-300"></div>
                 
-                {/* Play Button for Videos and Featured Images */}
-                {(item.type === 'video' || isLarge) && (
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/30">
-                    <div className="w-0 h-0 border-l-4 md:border-l-6 border-l-white border-t-3 md:border-t-4 border-t-transparent border-b-3 md:border-b-4 border-b-transparent ml-1"></div>
-                  </div>
-                )}
               </div>
             );
           })}
