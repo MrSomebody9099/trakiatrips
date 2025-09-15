@@ -19,26 +19,27 @@ interface Package {
 const packages: Package[] = [
   {
     id: "weekend",
-    name: "Weekend Package",
-    price: 175,
-    dates: "Fri 6th - Sun 8th March",
+    name: "2 Day Deal",
+    price: 185,
+    dates: "6th–8th of March",
     description: "Perfect for a weekend getaway",
-    includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Does NOT include flights or ski pass"],
+    includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Airport transfers available (not included)", "This does not include flights or ski pass"],
   },
   {
     id: "extended",
-    name: "Extended Package", 
-    price: 235,
-    dates: "Fri 6th - Mon 9th March",
+    name: "Full Weekend Package", 
+    price: 245,
+    dates: "6th–9th of March",
     description: "Extended adventure with extra day",
-    includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Does NOT include flights or ski pass"],
+    includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Airport transfers available (not included)", "This does not include flights or ski pass"],
   },
 ];
 
 const addOns = [
   { id: "quad", name: "Quad Bike Adventure", price: 50 },
-  { id: "ski", name: "Ski Gear Rental", price: 30 },
-  { id: "club", name: "Evening Club Events", price: 40 },
+  { id: "ski", name: "Ski Gear Rental (per day)", price: 30, isPerDay: true },
+  { id: "snowboard", name: "Snowboard Rental (per day)", price: 35, isPerDay: true },
+  { id: "club", name: "Evening Club Events", price: 0 },
 ];
 
 interface Guest {
@@ -48,6 +49,24 @@ interface Guest {
   dateOfBirth: string;
 }
 
+interface RoomOption {
+  id: string;
+  name: string;
+  capacity: number;
+  description: string;
+}
+
+interface AddOnSelection {
+  id: string;
+  days?: number; // For per-day items like ski/snowboard rentals
+}
+
+const roomOptions: RoomOption[] = [
+  { id: "double", name: "Double Room", capacity: 2, description: "Two single beds, shared bathroom" },
+  { id: "apartment-3", name: "3-Person Apartment", capacity: 3, description: "Private apartment with kitchenette" },
+  { id: "apartment-5", name: "5-Person Apartment", capacity: 5, description: "Spacious apartment with full kitchen" },
+];
+
 interface BookingFlowProps {
   onClose?: () => void;
 }
@@ -56,7 +75,10 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [numberOfPeople, setNumberOfPeople] = useState(1);
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const [selectedAddOns, setSelectedAddOns] = useState<AddOnSelection[]>([]);
+  const [selectedRoomOption, setSelectedRoomOption] = useState<RoomOption | null>(null);
+  const [airportTransfer, setAirportTransfer] = useState(false);
+  const [flightNumber, setFlightNumber] = useState("");
   const [leadBooker, setLeadBooker] = useState<Guest>({
     name: "", email: "", phone: "", dateOfBirth: ""
   });
@@ -64,9 +86,15 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const basePrice = selectedPackage ? selectedPackage.price * numberOfPeople : 0;
-  const addOnPrice = selectedAddOns.reduce((sum, addOnId) => {
-    const addOn = addOns.find(a => a.id === addOnId);
-    return sum + (addOn ? addOn.price * numberOfPeople : 0);
+  const addOnPrice = selectedAddOns.reduce((sum, addOnSelection) => {
+    const addOn = addOns.find(a => a.id === addOnSelection.id);
+    if (!addOn) return sum;
+    
+    const isPerDay = (addOn as any).isPerDay;
+    const days = isPerDay ? (addOnSelection.days || 1) : 1;
+    const priceMultiplier = isPerDay ? days : numberOfPeople;
+    
+    return sum + (addOn.price * priceMultiplier * numberOfPeople);
   }, 0);
   const totalPrice = basePrice + addOnPrice;
 
@@ -76,7 +104,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   };
 
   const handlePeopleChange = (change: number) => {
-    const newCount = Math.max(1, Math.min(8, numberOfPeople + change));
+    const newCount = Math.max(1, Math.min(15, numberOfPeople + change));
     setNumberOfPeople(newCount);
     
     // Adjust guests array
@@ -91,11 +119,24 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     }
   };
 
-  const handleAddOnToggle = (addOnId: string) => {
+  const handleAddOnToggle = (addOnId: string, days = 1) => {
+    setSelectedAddOns(prev => {
+      const existingIndex = prev.findIndex(item => item.id === addOnId);
+      if (existingIndex >= 0) {
+        // Remove if already selected
+        return prev.filter((_, index) => index !== existingIndex);
+      } else {
+        // Add new selection
+        return [...prev, { id: addOnId, days }];
+      }
+    });
+  };
+
+  const handleAddOnDaysChange = (addOnId: string, days: number) => {
     setSelectedAddOns(prev => 
-      prev.includes(addOnId) 
-        ? prev.filter(id => id !== addOnId)
-        : [...prev, addOnId]
+      prev.map(item => 
+        item.id === addOnId ? { ...item, days } : item
+      )
     );
   };
 
@@ -200,7 +241,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-heading font-semibold text-lg">Number of People</h3>
-                    <p className="font-body text-muted-foreground">Select 1-8 people</p>
+                    <p className="font-body text-muted-foreground">Select 1-15 people</p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <Button
@@ -219,7 +260,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                       onClick={() => handlePeopleChange(1)}
                       variant="outline"
                       size="icon"
-                      disabled={numberOfPeople >= 8}
+                      disabled={numberOfPeople >= 15}
                       data-testid="button-increase-people"
                     >
                       <Plus className="h-4 w-4" />
@@ -350,25 +391,113 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
               </Card>
             )}
 
+            {/* Room Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Room Selection</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {roomOptions.map((room) => (
+                  <div key={room.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/50">
+                    <Checkbox
+                      id={room.id}
+                      checked={selectedRoomOption?.id === room.id}
+                      onCheckedChange={() => setSelectedRoomOption(selectedRoomOption?.id === room.id ? null : room)}
+                      data-testid={`checkbox-room-${room.id}`}
+                    />
+                    <div className="flex-1">
+                      <Label htmlFor={room.id} className="cursor-pointer font-semibold">
+                        {room.name} (up to {room.capacity} people)
+                      </Label>
+                      <p className="text-sm text-muted-foreground">{room.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Airport Transfer */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Airport Transfer (Optional)</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="airport-transfer"
+                    checked={airportTransfer}
+                    onCheckedChange={(checked) => setAirportTransfer(checked === true)}
+                    data-testid="checkbox-airport-transfer"
+                  />
+                  <Label htmlFor="airport-transfer" className="cursor-pointer">
+                    Airport Transfer Service (Price available upon request)
+                  </Label>
+                </div>
+                {airportTransfer && (
+                  <div>
+                    <Label htmlFor="flight-number">Flight Number (Optional)</Label>
+                    <Input
+                      id="flight-number"
+                      value={flightNumber}
+                      onChange={(e) => setFlightNumber(e.target.value)}
+                      placeholder="e.g., FR1234 (can be updated later)"
+                      data-testid="input-flight-number"
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Add-On Experiences */}
             <Card>
               <CardHeader>
                 <CardTitle>Add-On Experiences</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {addOns.map((addOn) => (
-                  <div key={addOn.id} className="flex items-center space-x-3">
-                    <Checkbox
-                      id={addOn.id}
-                      checked={selectedAddOns.includes(addOn.id)}
-                      onCheckedChange={() => handleAddOnToggle(addOn.id)}
-                      data-testid={`checkbox-addon-${addOn.id}`}
-                    />
-                    <Label htmlFor={addOn.id} className="flex-1 cursor-pointer">
-                      {addOn.name} (+€{addOn.price}/person)
-                    </Label>
-                  </div>
-                ))}
+                {addOns.map((addOn) => {
+                  const isSelected = selectedAddOns.find(item => item.id === addOn.id);
+                  const isPerDay = (addOn as any).isPerDay;
+                  return (
+                    <div key={addOn.id} className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <Checkbox
+                          id={addOn.id}
+                          checked={!!isSelected}
+                          onCheckedChange={() => handleAddOnToggle(addOn.id)}
+                          data-testid={`checkbox-addon-${addOn.id}`}
+                        />
+                        <Label htmlFor={addOn.id} className="flex-1 cursor-pointer">
+                          {addOn.name} {addOn.price > 0 ? `(€${addOn.price}${isPerDay ? '/day' : '/person'})` : '(Free)'}
+                        </Label>
+                      </div>
+                      {isSelected && isPerDay && (
+                        <div className="ml-6 flex items-center space-x-3">
+                          <Label>Number of days:</Label>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={() => handleAddOnDaysChange(addOn.id, Math.max(1, (isSelected.days || 1) - 1))}
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              disabled={(isSelected.days || 1) <= 1}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-8 text-center">{isSelected.days || 1}</span>
+                            <Button
+                              onClick={() => handleAddOnDaysChange(addOn.id, (isSelected.days || 1) + 1)}
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
 
                 <div className="flex items-center space-x-3 pt-4">
                   <Checkbox
@@ -412,6 +541,12 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                     <span>Total:</span>
                     <span data-testid="text-total-price">€{totalPrice}</span>
                   </div>
+                </div>
+                
+                <div className="space-y-3 mb-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-blue-900">Payment Options:</h4>
+                  <p className="text-sm text-blue-800">• Deposit now</p>
+                  <p className="text-sm text-blue-800">• Remainder due 6th January</p>
                 </div>
                 
                 <Button
