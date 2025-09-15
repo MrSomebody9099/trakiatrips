@@ -153,19 +153,55 @@ export default function Gallery() {
                     muted
                     loop
                     playsInline
-                    onMouseEnter={(e) => {
+                    preload="metadata"
+                    onLoadedData={(e) => {
+                      console.log('Video loaded:', item.src);
+                    }}
+                    onError={(e) => {
+                      console.error('Video error:', item.src, e);
+                    }}
+                    onMouseEnter={async (e) => {
+                      console.log('Attempting to play video:', item.src);
                       try {
-                        e.currentTarget.play();
+                        const video = e.currentTarget;
+                        video.muted = true; // Ensure muted
+                        const playPromise = video.play();
+                        if (playPromise !== undefined) {
+                          await playPromise;
+                          console.log('Video playing:', item.src);
+                        }
                       } catch (err) {
-                        console.log('Video play failed:', err);
+                        console.error('Video play failed:', item.src, err);
                       }
                     }}
                     onMouseLeave={(e) => {
                       try {
-                        e.currentTarget.pause();
-                        e.currentTarget.currentTime = 0;
+                        const video = e.currentTarget;
+                        video.pause();
+                        video.currentTime = 0;
+                        console.log('Video paused and reset:', item.src);
                       } catch (err) {
-                        console.log('Video pause failed:', err);
+                        console.error('Video pause failed:', item.src, err);
+                      }
+                    }}
+                    onClick={async (e) => {
+                      console.log('Video clicked:', item.src);
+                      try {
+                        const video = e.currentTarget;
+                        if (video.paused) {
+                          video.muted = true;
+                          const playPromise = video.play();
+                          if (playPromise !== undefined) {
+                            await playPromise;
+                            console.log('Video playing via click:', item.src);
+                          }
+                        } else {
+                          video.pause();
+                          video.currentTime = 0;
+                          console.log('Video paused via click:', item.src);
+                        }
+                      } catch (err) {
+                        console.error('Video click failed:', item.src, err);
                       }
                     }}
                   />
