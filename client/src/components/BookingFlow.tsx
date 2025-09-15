@@ -254,27 +254,28 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
     console.log('Processing payment:', { bookingData, guests: allGuests, paymentAmount, paymentPlan });
 
+    // TEMPORARY: Skip payment integration and redirect to dashboard for testing
     try {
-      const response = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookingData,
-          guests: allGuests,
-          totalAmount: paymentAmount // Use calculated payment amount
-        })
-      });
+      // Create mock booking with unique ID for testing
+      const mockBooking = {
+        id: 'temp-' + Date.now(),
+        ...bookingData,
+        guests: allGuests,
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        createdAt: new Date().toISOString(),
+        paymentAmount: paymentAmount,
+        actualTotalAmount: totalPrice
+      };
 
-      if (!response.ok) {
-        throw new Error('Failed to create payment');
-      }
+      // Store temporary booking data for dashboard to pick up
+      localStorage.setItem('tempBooking', JSON.stringify(mockBooking));
+      localStorage.setItem('userEmail', leadBooker.email);
 
-      const data = await response.json();
+      console.log('Temporary booking created:', mockBooking);
       
-      // Redirect to Fondy checkout
-      window.location.href = data.checkout_url;
+      // Redirect directly to dashboard instead of payment
+      window.location.href = '/dashboard';
       
     } catch (error) {
       console.error('Payment error:', error);
