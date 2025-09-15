@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import Navigation from "./Navigation";
 
 interface Guest {
   id: string;
@@ -59,10 +60,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   // Update guest mutation
   const updateGuestMutation = useMutation({
     mutationFn: async ({ guestId, guestData }: { guestId: string, guestData: any }) => {
-      return apiRequest(`/api/guests/${guestId}`, {
-        method: 'PUT',
-        body: guestData
-      });
+      return apiRequest(`/api/guests/${guestId}`, 'PUT', guestData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookings', userEmail] });
@@ -72,10 +70,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   // Update booking mutation
   const updateBookingMutation = useMutation({
     mutationFn: async ({ bookingId, bookingData }: { bookingId: string, bookingData: any }) => {
-      return apiRequest(`/api/bookings/${bookingId}`, {
-        method: 'PUT',
-        body: bookingData
-      });
+      return apiRequest(`/api/bookings/${bookingId}`, 'PUT', bookingData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookings', userEmail] });
@@ -130,8 +125,10 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20 py-24 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+      <Navigation />
+      <div className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
         
         {/* Header */}
         <div className="text-center mb-12">
@@ -149,7 +146,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
 
         {/* Bookings */}
         <div className="space-y-8">
-          {bookings.map((booking) => (
+          {bookings.map((booking: Booking) => (
             <Card key={booking.id} className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 pb-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -199,7 +196,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Add-ons</Label>
                         <div className="mt-1 space-y-1">
-                          {booking.addOns.map((addOn, index) => (
+                          {booking.addOns.map((addOn: string, index: number) => (
                             <div key={index} className="text-sm text-foreground">• {addOn}</div>
                           ))}
                           {booking.addOns.length === 0 && (
@@ -242,7 +239,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                     </div>
                     
                     <div className="space-y-3">
-                      {booking.guests.map((guest) => (
+                      {booking.guests.map((guest: Guest) => (
                         <div 
                           key={guest.id} 
                           className="flex items-center justify-between p-3 bg-accent/30 rounded-lg"
@@ -298,6 +295,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
             Back to Home
           </Button>
         </div>
+      </div>
       </div>
 
       {/* Edit Guest Dialog */}

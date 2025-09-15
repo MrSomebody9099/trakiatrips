@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import Navigation from "./Navigation";
 
 interface Package {
   id: string;
@@ -223,9 +224,11 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
   if (step === 1) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-accent/20 py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+      <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+        <Navigation />
+        <div className="py-24 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
             <h1 className="font-heading font-bold text-4xl text-foreground mb-4">
               Book Your Ski Adventure
             </h1>
@@ -278,15 +281,18 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20 py-24 px-4">
-      <div className="max-w-4xl mx-auto">
-        <Button 
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+      <Navigation />
+      <div className="py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Button 
           onClick={() => setStep(1)}
           variant="outline" 
           className="mb-6 hover-elevate"
@@ -660,6 +666,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
       </div>
     </div>
