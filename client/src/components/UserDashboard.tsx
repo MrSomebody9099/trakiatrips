@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User, Edit3, Plus, Calendar, MapPin, Users, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +38,6 @@ interface UserDashboardProps {
 
 export default function UserDashboard({ onClose }: UserDashboardProps) {
   const [userEmail, setUserEmail] = useState("");
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -45,47 +46,41 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
     const email = localStorage.getItem("userEmail");
     if (email) {
       setUserEmail(email);
-      loadUserBookings(email);
     }
   }, []);
 
-  const loadUserBookings = async (email: string) => {
-    // In a real app, this would fetch from your API
-    // For demo, we'll use mock data
-    const mockBookings: Booking[] = [
-      {
-        id: "booking-001",
-        packageName: "2 Day Deal",
-        packagePrice: 185,
-        dates: "6th–8th of March",
-        numberOfGuests: 2,
-        roomType: "Double Room",
-        addOns: ["Ski Gear Rental (2 days)", "Evening Club Events"],
-        totalAmount: 430,
-        paymentStatus: 'paid',
-        bookingDate: "2024-02-15",
-        flightNumber: "FR1234",
-        guests: [
-          {
-            id: "guest-1",
-            name: "John Smith",
-            email: email,
-            phone: "+359 88 123 4567",
-            dateOfBirth: "1990-01-01"
-          },
-          {
-            id: "guest-2", 
-            name: "Jane Smith",
-            email: "jane@example.com",
-            phone: "+359 88 123 4568",
-            dateOfBirth: "1992-05-15"
-          }
-        ]
-      }
-    ];
-    
-    setBookings(mockBookings);
-  };
+  // Fetch bookings using React Query
+  const { data: bookings = [], isLoading, error } = useQuery({
+    queryKey: ['/api/bookings', userEmail],
+    queryFn: () => fetch(`/api/bookings/${userEmail}`).then(res => res.json()),
+    enabled: !!userEmail,
+  });
+
+  // Update guest mutation
+  const updateGuestMutation = useMutation({
+    mutationFn: async ({ guestId, guestData }: { guestId: string, guestData: any }) => {
+      return apiRequest(`/api/guests/${guestId}`, {
+        method: 'PUT',
+        body: guestData
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings', userEmail] });
+    }
+  });
+
+  // Update booking mutation
+  const updateBookingMutation = useMutation({
+    mutationFn: async ({ bookingId, bookingData }: { bookingId: string, bookingData: any }) => {
+      return apiRequest(`/api/bookings/${bookingId}`, {
+        method: 'PUT',
+        body: bookingData
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings', userEmail] });
+    }
+  });
 
   const handleEditGuest = (guest: Guest) => {
     setEditingGuest({ ...guest });
@@ -95,21 +90,25 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   const handleSaveGuest = () => {
     if (!editingGuest) return;
     
-    setBookings(prev => prev.map(booking => ({
-      ...booking,
-      guests: booking.guests.map(guest => 
-        guest.id === editingGuest.id ? editingGuest : guest
-      )
-    })));
+    updateGuestMutation.mutate({
+      guestId: editingGuest.id,
+      guestData: {
+        name: editingGuest.name,
+        email: editingGuest.email,
+        phone: editingGuest.phone,
+        dateOfBirth: editingGuest.dateOfBirth
+      }
+    });
     
     setIsEditDialogOpen(false);
     setEditingGuest(null);
   };
 
   const handleUpdateFlightNumber = (bookingId: string, flightNumber: string) => {
-    setBookings(prev => prev.map(booking => 
-      booking.id === bookingId ? { ...booking, flightNumber } : booking
-    ));
+    updateBookingMutation.mutate({
+      bookingId,
+      bookingData: { flightNumber }
+    });
   };
 
   if (!userEmail) {

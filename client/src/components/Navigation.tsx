@@ -35,7 +35,11 @@ export default function Navigation() {
             <div className="flex items-center space-x-2">
               {/* Profile Icon */}
               <Button
-                onClick={() => window.location.href = '/profile'}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/profile';
+                  link.click();
+                }}
                 variant="ghost"
                 size="icon"
                 className="hover-elevate text-white hover:bg-blue-700/50 rounded-full"

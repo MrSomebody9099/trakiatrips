@@ -84,6 +84,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   });
   const [guests, setGuests] = useState<Guest[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [paymentPlan, setPaymentPlan] = useState<'full' | 'installment'>('full');
 
   const basePrice = selectedPackage ? selectedPackage.price * numberOfPeople : 0;
   const addOnPrice = selectedAddOns.reduce((sum, addOnSelection) => {
@@ -92,9 +93,14 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     
     const isPerDay = (addOn as any).isPerDay;
     const days = isPerDay ? (addOnSelection.days || 1) : 1;
-    const priceMultiplier = isPerDay ? days : numberOfPeople;
     
-    return sum + (addOn.price * priceMultiplier * numberOfPeople);
+    if (isPerDay) {
+      // Per-day items: price * days * numberOfPeople
+      return sum + (addOn.price * days * numberOfPeople);
+    } else {
+      // Flat rate items: price * numberOfPeople (only once)
+      return sum + (addOn.price * numberOfPeople);
+    }
   }, 0);
   const totalPrice = basePrice + addOnPrice;
 
@@ -145,19 +151,40 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
 
   const handlePayment = async () => {
+    // Calculate payment amount based on plan
+    const paymentAmount = paymentPlan === 'installment' 
+      ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
+      : totalPrice;
+
     const bookingData = {
-      package: selectedPackage,
-      numberOfPeople,
-      addOns: selectedAddOns,
-      selectedRoomOption,
-      airportTransfer,
-      flightNumber,
-      totalPrice,
-      leadBooker,
-      guests
+      userEmail: leadBooker.email,
+      packageName: selectedPackage?.name || '',
+      packagePrice: (selectedPackage?.price || 0).toString(),
+      dates: selectedPackage?.dates || '',
+      numberOfGuests: numberOfPeople,
+      roomType: selectedRoomOption?.name || '',
+      addOns: selectedAddOns.map(addon => {
+        const addOnInfo = addOns.find(a => a.id === addon.id);
+        const isPerDay = (addOnInfo as any)?.isPerDay;
+        const days = isPerDay ? (addon.days || 1) : 1;
+        return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
+      }),
+      totalAmount: totalPrice.toString(),
+      paymentPlan: paymentPlan,
+      installmentStatus: paymentPlan === 'installment' 
+        ? { deposit: 'pending', balance: 'pending' }
+        : null,
+      flightNumber: flightNumber || undefined,
     };
 
-    console.log('Processing payment:', bookingData);
+    const allGuests = [leadBooker, ...guests].map(guest => ({
+      name: guest.name,
+      email: guest.email,
+      phone: guest.phone,
+      dateOfBirth: guest.dateOfBirth
+    }));
+
+    console.log('Processing payment:', { bookingData, guests: allGuests, paymentAmount, paymentPlan });
 
     try {
       const response = await fetch('/api/create-payment', {
@@ -167,7 +194,8 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         },
         body: JSON.stringify({
           bookingData,
-          totalAmount: totalPrice
+          guests: allGuests,
+          totalAmount: paymentAmount // Use calculated payment amount
         })
       });
 
@@ -573,10 +601,42 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   </div>
                 </div>
                 
-                <div className="space-y-3 mb-6 p-4 bg-blue-50 rounded-lg">
+                <div className="space-y-4 mb-6 p-4 bg-blue-50 rounded-lg">
                   <h4 className="font-semibold text-blue-900">Payment Options:</h4>
-                  <p className="text-sm text-blue-800">• Deposit now</p>
-                  <p className="text-sm text-blue-800">• Remainder due 6th January</p>
+                  
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentPlan"
+                        value="full"
+                        checked={paymentPlan === 'full'}
+                        onChange={(e) => setPaymentPlan(e.target.value as 'full' | 'installment')}
+                        className="w-4 h-4 text-blue-600"
+                        data-testid="radio-full-payment"
+                      />
+                      <div>
+                        <div className="font-medium text-blue-900">Pay Full Amount</div>
+                        <div className="text-sm text-blue-700">Pay €{totalPrice} now</div>
+                      </div>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentPlan"
+                        value="installment"
+                        checked={paymentPlan === 'installment'}
+                        onChange={(e) => setPaymentPlan(e.target.value as 'full' | 'installment')}
+                        className="w-4 h-4 text-blue-600"
+                        data-testid="radio-installment-payment"
+                      />
+                      <div>
+                        <div className="font-medium text-blue-900">Installment Plan</div>
+                        <div className="text-sm text-blue-700">Pay €{Math.ceil(totalPrice * 0.3)} deposit now, €{totalPrice - Math.ceil(totalPrice * 0.3)} due by January 6th</div>
+                      </div>
+                    </label>
+                  </div>
                 </div>
                 
                 <Button
@@ -585,7 +645,10 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   className="w-full hover-elevate"
                   data-testid="button-proceed-payment"
                 >
-                  Proceed to Payment - €{totalPrice}
+                  {paymentPlan === 'installment' 
+                    ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
+                    : `Proceed to Payment - €${totalPrice}`
+                  }
                 </Button>
               </CardContent>
             </Card>

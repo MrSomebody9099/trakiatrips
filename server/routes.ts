@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema } from "@shared/schema";
+import crypto from "crypto";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // put application routes here
@@ -22,50 +24,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fondy webhook for payment verification
-  app.post('/webhook', (req, res) => {
-    console.log('Fondy webhook received:', req.body);
-    
-    const merchantId = process.env.FONDY_MERCHANT_ID;
-    const secretKey = process.env.FONDY_SECRET_KEY;
-    
-    if (!merchantId || !secretKey) {
-      console.error('Fondy credentials not configured');
-      return res.status(500).json({ error: 'Payment configuration error' });
-    }
+  app.post('/webhook', async (req, res) => {
+    try {
+      console.log('Fondy webhook received:', req.body);
+      
+      const merchantId = process.env.FONDY_MERCHANT_ID;
+      const secretKey = process.env.FONDY_SECRET_KEY;
+      
+      if (!merchantId || !secretKey) {
+        console.error('Fondy credentials not configured');
+        return res.status(500).json({ error: 'Payment configuration error' });
+      }
 
-    // TODO: Implement proper signature verification
-    // TODO: Update booking status in database
-    
-    res.status(200).json({ success: true });
+      const webhookData = req.body;
+      const { order_id: orderId, order_status, amount, signature: receivedSignature } = webhookData;
+      
+      if (!orderId || !receivedSignature) {
+        console.error('Invalid webhook data: missing order_id or signature');
+        return res.status(400).json({ error: 'Invalid webhook data' });
+      }
+
+      // Verify webhook signature
+      const expectedSignature = generateFondySignature(
+        { ...webhookData, signature: undefined }, 
+        secretKey
+      );
+      
+      if (receivedSignature !== expectedSignature) {
+        console.error('Invalid webhook signature:', { received: receivedSignature, expected: expectedSignature });
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+
+      // Update booking status
+      const paymentStatus = order_status === 'approved' ? 'paid' : 'failed';
+      const updatedBooking = await storage.updateBookingPaymentStatus(orderId, paymentStatus);
+      
+      if (!updatedBooking) {
+        console.error('Booking not found for order:', orderId);
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+
+      // Update payment transaction
+      const transaction = await storage.getPaymentTransactionByFondyOrderId(orderId);
+      if (transaction) {
+        await storage.updatePaymentTransaction(transaction.id, {
+          status: order_status,
+          fondyResponse: webhookData
+        });
+      }
+      
+      console.log(`Payment ${paymentStatus} for booking ${updatedBooking.id}, order ${orderId}`);
+      
+      res.status(200).json({ success: true });
+      
+    } catch (error) {
+      console.error('Webhook processing error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   });
 
-  // API endpoint to create Fondy checkout
-  app.post('/api/create-payment', (req, res) => {
-    const { bookingData, totalAmount } = req.body;
-    
-    const merchantId = process.env.FONDY_MERCHANT_ID;
-    const secretKey = process.env.FONDY_SECRET_KEY;
-    
-    if (!merchantId || !secretKey) {
-      return res.status(500).json({ error: 'Payment configuration not found' });
-    }
+  // API endpoint to create booking and Fondy payment
+  app.post('/api/create-payment', async (req, res) => {
+    try {
+      const { bookingData, guests } = req.body;
+      
+      const merchantId = process.env.FONDY_MERCHANT_ID;
+      const secretKey = process.env.FONDY_SECRET_KEY;
+      
+      if (!merchantId || !secretKey) {
+        return res.status(500).json({ error: 'Payment configuration not found' });
+      }
 
-    // Generate unique order ID
-    const orderId = `trakia-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    // For demo purposes, return a mock Fondy checkout URL
-    // In production, you would create a proper Fondy checkout session
-    const fondyCheckoutData = {
-      checkout_url: `https://pay.fondy.eu/merchants/${merchantId}/default/index.html?order_id=${orderId}&amount=${totalAmount * 100}&currency=EUR&order_desc=Trakia+Trips+Booking&response_url=${process.env.REPLIT_URL || 'http://localhost:5000'}/success&server_callback_url=${process.env.REPLIT_URL || 'http://localhost:5000'}/webhook`,
-      order_id: orderId
-    };
-    
-    console.log('Created payment for order:', orderId, 'Amount:', totalAmount);
-    
-    res.json(fondyCheckoutData);
+      // Validate booking data
+      const validatedBooking = insertBookingSchema.parse(bookingData);
+      
+      // Generate unique order ID
+      const orderId = `trakia-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Create booking in database
+      const booking = await storage.createBooking({
+        ...validatedBooking,
+        fondyOrderId: orderId,
+      });
+
+      // Create guests
+      if (guests && guests.length > 0) {
+        for (const guestData of guests) {
+          const validatedGuest = insertGuestSchema.parse({
+            ...guestData,
+            bookingId: booking.id
+          });
+          await storage.createGuest(validatedGuest);
+        }
+      }
+
+      // Calculate payment amount based on payment plan
+      const fullAmount = parseFloat(validatedBooking.totalAmount);
+      const isInstallment = validatedBooking.paymentPlan === 'installment';
+      const paymentAmount = isInstallment ? Math.ceil(fullAmount * 0.3) : fullAmount;
+      const amountInCents = Math.round(paymentAmount * 100);
+
+      // Create payment transaction record
+      await storage.createPaymentTransaction({
+        bookingId: booking.id,
+        fondyOrderId: orderId,
+        amount: paymentAmount.toString(),
+        paymentType: validatedBooking.paymentPlan === 'installment' ? 'deposit' : 'full',
+        status: 'pending'
+      });
+
+      // Create Fondy checkout parameters
+      const baseUrl = process.env.REPLIT_URL || 'http://localhost:5000';
+      const checkoutParams = {
+        order_id: orderId,
+        merchant_id: merchantId,
+        order_desc: `Trakia Trips - ${validatedBooking.packageName}`,
+        amount: amountInCents,
+        currency: 'EUR',
+        response_url: `${baseUrl}/success`,
+        server_callback_url: `${baseUrl}/webhook`,
+        sender_email: validatedBooking.userEmail,
+        product_id: validatedBooking.packageName.replace(/\s+/g, '_').toLowerCase(),
+        payment_systems: 'card,banklinks_eu',
+        default_payment_system: 'card'
+      };
+
+      // Generate signature for Fondy
+      const signature = generateFondySignature(checkoutParams, secretKey);
+      
+      // Build checkout URL
+      const checkoutUrl = `https://pay.fondy.eu/merchants/${merchantId}/default/index.html?` + 
+        Object.entries({ ...checkoutParams, signature })
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join('&');
+      
+      console.log('Created booking:', booking.id, 'Order:', orderId, 'Amount:', paymentAmount);
+      
+      res.json({
+        checkout_url: checkoutUrl,
+        order_id: orderId,
+        booking_id: booking.id
+      });
+      
+    } catch (error) {
+      console.error('Payment creation error:', error);
+      res.status(400).json({ error: error instanceof Error ? error.message : 'Invalid booking data' });
+    }
+  });
+
+  // API endpoint to get user bookings
+  app.get('/api/bookings/:email', async (req, res) => {
+    try {
+      const { email } = req.params;
+      const bookings = await storage.getBookingsByUserEmail(email);
+      
+      // Fetch guests for each booking
+      const bookingsWithGuests = await Promise.all(
+        bookings.map(async (booking) => {
+          const guests = await storage.getGuestsByBookingId(booking.id);
+          return { ...booking, guests };
+        })
+      );
+      
+      res.json(bookingsWithGuests);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+  });
+
+  // API endpoint to update guest information
+  app.put('/api/guests/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const guestUpdates = req.body;
+      
+      const updatedGuest = await storage.updateGuest(id, guestUpdates);
+      
+      if (!updatedGuest) {
+        return res.status(404).json({ error: 'Guest not found' });
+      }
+      
+      res.json(updatedGuest);
+    } catch (error) {
+      console.error('Error updating guest:', error);
+      res.status(500).json({ error: 'Failed to update guest' });
+    }
+  });
+
+  // API endpoint to update booking (flight number, etc.)
+  app.put('/api/bookings/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const bookingUpdates = req.body;
+      
+      const updatedBooking = await storage.updateBooking(id, bookingUpdates);
+      
+      if (!updatedBooking) {
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+      
+      res.json(updatedBooking);
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      res.status(500).json({ error: 'Failed to update booking' });
+    }
   });
 
   const httpServer = createServer(app);
 
   return httpServer;
+}
+
+// Helper function to generate Fondy signature
+function generateFondySignature(params: Record<string, any>, secretKey: string): string {
+  // Remove signature from params if it exists
+  const { signature, ...cleanParams } = params;
+  
+  // Sort parameters by key and create signature string
+  const sortedKeys = Object.keys(cleanParams).sort();
+  const signatureString = sortedKeys
+    .filter(key => cleanParams[key] !== undefined && cleanParams[key] !== null)
+    .map(key => `${key}=${cleanParams[key]}`)
+    .join('|');
+  
+  // Add secret key to the end
+  const fullString = `${secretKey}|${signatureString}`;
+  
+  // Generate SHA1 hash
+  return crypto.createHash('sha1').update(fullString).digest('hex');
 }
