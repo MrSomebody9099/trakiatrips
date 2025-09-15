@@ -3,6 +3,7 @@ import atvSoloPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_89b49da5
 import atvGroupPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e5ee5227_1757579817548.jpg";
 import skiCelebrationPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e23d55a8_1757579817549.jpg";
 import poolPartyPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.14.12_3eb30612_1757579827194.jpg";
+import { Button } from "@/components/ui/button";
 
 const galleryItems = [
   {
@@ -253,12 +254,16 @@ export default function Gallery() {
           <p className="text-lg text-muted-foreground font-body mb-6">
             Ready to create your own epic memories?
           </p>
-          <div className="inline-flex items-center space-x-2 text-blue-600 font-medium">
+          <Button 
+            onClick={() => window.location.href = '/booking'}
+            className="inline-flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-full hover-elevate transition-all duration-300"
+            data-testid="button-book-adventure-gallery"
+          >
             <span>Book your adventure now</span>
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
               <div className="w-0 h-0 border-l-3 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent ml-0.5"></div>
             </div>
-          </div>
+          </Button>
         </div>
       </div>
     </section>
