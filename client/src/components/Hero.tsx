@@ -27,7 +27,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-4">
               <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-2 text-white/90 font-medium animate-fade-in-up">
-                🎿 March 6-9, 2025 • Bansko
+                🎿 6th–9th of March, 2025 • Bansko
               </div>
               
               <h1 className="font-heading text-6xl md:text-7xl xl:text-8xl font-black text-white leading-tight animate-fade-in-up animate-delay-100">

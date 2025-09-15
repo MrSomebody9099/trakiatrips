@@ -52,7 +52,7 @@ export default function AboutPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/20 rounded-2xl p-6 text-center">
                       <div className="text-3xl md:text-4xl font-black text-blue-600 mb-2">100+</div>
-                      <div className="text-sm font-medium text-muted-foreground">Adventurers</div>
+                      <div className="text-sm font-medium text-muted-foreground">Bookings</div>
                     </div>
                     <div className="bg-gradient-to-br from-blue-600/10 to-blue-700/20 rounded-2xl p-6 text-center">
                       <div className="text-3xl md:text-4xl font-black text-blue-600 mb-2">4</div>
@@ -79,7 +79,7 @@ export default function AboutPage() {
                         <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
                       </div>
                     </div>
-                    <h3 className="font-heading font-bold text-xl text-foreground">Premium Experiences</h3>
+                    <h3 className="font-heading font-bold text-xl text-foreground">Premium Experience</h3>
                     <p className="font-body text-muted-foreground leading-relaxed">Carefully selected venues, accommodations, and activities</p>
                   </div>
                   

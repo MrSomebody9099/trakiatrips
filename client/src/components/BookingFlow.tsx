@@ -144,16 +144,46 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     leadBooker.name && leadBooker.email && leadBooker.phone && leadBooker.dateOfBirth &&
     guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
 
-  const handlePayment = () => {
-    console.log('Processing payment:', {
+  const handlePayment = async () => {
+    const bookingData = {
       package: selectedPackage,
       numberOfPeople,
       addOns: selectedAddOns,
+      selectedRoomOption,
+      airportTransfer,
+      flightNumber,
       totalPrice,
       leadBooker,
       guests
-    });
-    alert(`Payment processing for €${totalPrice}! (Demo mode)`);
+    };
+
+    console.log('Processing payment:', bookingData);
+
+    try {
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingData,
+          totalAmount: totalPrice
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create payment');
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Fondy checkout
+      window.location.href = data.checkout_url;
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment system temporarily unavailable. Please try again later.');
+    }
   };
 
   if (step === 1) {

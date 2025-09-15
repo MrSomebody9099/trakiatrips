@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a premium travel booking platform for Trakia Trips, a ski festival organizer in Bansko, Bulgaria. The application serves as a marketing and booking system for their March 6-9, 2025 ski festival event. The platform features a modern, premium design inspired by Airbnb and Booking.com, with sophisticated visual treatments that convey luxury travel experiences while maintaining functional elegance for booking conversions.
+This is a premium travel booking platform for Trakia Trips, a ski festival organizer in Bansko, Bulgaria. The application serves as a marketing and booking system for their 6th–9th of March, 2025 ski festival event. The platform features a modern, premium design inspired by Airbnb and Booking.com, with sophisticated visual treatments that convey luxury travel experiences while maintaining functional elegance for booking conversions.
 
 The system is built as a full-stack web application with separate client and server architectures, featuring a React frontend with premium UI components, an Express.js backend, and PostgreSQL database integration through Drizzle ORM.
 

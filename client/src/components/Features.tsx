@@ -10,7 +10,7 @@ const features = [
   },
   {
     icon: MapPin,
-    title: "VIP TRANSPORT",
+    title: "PRIVATE TRANSPORT",
     description: "Premium bus from Stara Zagora",
     gradient: "from-blue-600 to-blue-700",
   },
@@ -23,7 +23,7 @@ const features = [
   {
     icon: Star,
     title: "EPIC POOL PARTIES",
-    description: "FREE for first 60 adventurers!",
+    description: "Limited Places Available!",
     gradient: "from-blue-800 to-blue-900",
   },
 ];
@@ -36,7 +36,7 @@ export default function Features() {
         {/* Premium Package Inclusions Section */}
         <div className="text-center mb-16 md:mb-20 animate-fade-in-up">
           <div className="inline-block bg-blue-500/10 border border-blue-500/20 rounded-full px-6 py-2 text-blue-600 font-medium mb-6">
-            ⭐ Premium Package Inclusions
+            ⭐ Our Package Includes
           </div>
           <h2 className="font-heading font-black text-4xl md:text-6xl lg:text-7xl text-foreground mb-6 md:mb-8">
             EPIC

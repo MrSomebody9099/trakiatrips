@@ -8,6 +8,7 @@ import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
 import BookingFlow from "./components/BookingFlow";
 import AdminDashboard from "./components/AdminDashboard";
+import UserDashboard from "./components/UserDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/terms" component={TermsPage} />
       <Route path="/booking" component={() => <BookingFlow />} />
       <Route path="/dashboard" component={() => <AdminDashboard />} />
+      <Route path="/profile" component={() => <UserDashboard />} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

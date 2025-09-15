@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Navigation() {
@@ -11,7 +11,7 @@ export default function Navigation() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary via-blue-600 to-primary h-8 overflow-hidden">
         <div className="flex items-center h-full animate-marquee whitespace-nowrap">
           <div className="text-white font-body font-medium text-sm px-8">
-            Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available • Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available • Early Bird Special: Save €50 • Book by Feb 15th • March 6-9 Ski Festival • Limited Spots Available
+            Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places • Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places • Early Bird Special: Save €50 • Book by Feb 15th • 6th–9th of March Ski Festival • Limited Places
           </div>
         </div>
       </div>
@@ -32,15 +32,29 @@ export default function Navigation() {
               </h1>
             </div>
 
-            <Button
-              onClick={() => setIsOpen(!isOpen)}
-              variant="outline"
-              size="icon"
-              className="hover-elevate border-blue-400/50 text-white hover:bg-blue-700/50"
-              data-testid="button-menu-toggle"
-            >
-              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+            <div className="flex items-center space-x-2">
+              {/* Profile Icon */}
+              <Button
+                onClick={() => window.location.href = '/profile'}
+                variant="ghost"
+                size="icon"
+                className="hover-elevate text-white hover:bg-blue-700/50 rounded-full"
+                data-testid="button-profile"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+              
+              {/* Menu Toggle */}
+              <Button
+                onClick={() => setIsOpen(!isOpen)}
+                variant="outline"
+                size="icon"
+                className="hover-elevate border-blue-400/50 text-white hover:bg-blue-700/50"
+                data-testid="button-menu-toggle"
+              >
+                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
 
           {isOpen && (
