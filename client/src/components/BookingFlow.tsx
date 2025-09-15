@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,6 @@ const addOns = [
   { id: "quad", name: "Quad Bike Adventure", price: 50 },
   { id: "ski", name: "Ski Gear Rental (per day)", price: 30, isPerDay: true },
   { id: "snowboard", name: "Snowboard Rental (per day)", price: 35, isPerDay: true },
-  { id: "club", name: "Evening Club Events", price: 0 },
 ];
 
 interface Guest {
@@ -62,9 +61,9 @@ interface AddOnSelection {
 }
 
 const roomOptions: RoomOption[] = [
-  { id: "double", name: "Double Room", capacity: 2, description: "Two single beds, shared bathroom" },
-  { id: "apartment-3", name: "3-Person Apartment", capacity: 3, description: "Private apartment with kitchenette" },
-  { id: "apartment-5", name: "5-Person Apartment", capacity: 5, description: "Spacious apartment with full kitchen" },
+  { id: "double", name: "Double Room", capacity: 2, description: "" },
+  { id: "apartment-3", name: "3-Person Apartment", capacity: 3, description: "" },
+  { id: "apartment-5", name: "5-Person Apartment", capacity: 5, description: "" },
 ];
 
 interface BookingFlowProps {
@@ -85,6 +84,14 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installment'>('full');
+
+  // Auto-fill email from localStorage if available
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("userEmail");
+    if (savedEmail && !leadBooker.email) {
+      setLeadBooker(prev => ({ ...prev, email: savedEmail }));
+    }
+  }, []);
 
   const basePrice = selectedPackage ? selectedPackage.price * numberOfPeople : 0;
   const addOnPrice = selectedAddOns.reduce((sum, addOnSelection) => {

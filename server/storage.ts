@@ -13,6 +13,7 @@ export interface IStorage {
   // Booking operations
   createBooking(booking: InsertBooking): Promise<Booking>;
   getBooking(id: string): Promise<Booking | undefined>;
+  getAllBookings(): Promise<Booking[]>;
   getBookingsByUserEmail(userEmail: string): Promise<Booking[]>;
   updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined>;
   updateBookingPaymentStatus(fondyOrderId: string, status: string): Promise<Booking | undefined>;
@@ -81,6 +82,10 @@ export class MemStorage implements IStorage {
 
   async getBooking(id: string): Promise<Booking | undefined> {
     return this.bookings.get(id);
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return Array.from(this.bookings.values());
   }
 
   async getBookingsByUserEmail(userEmail: string): Promise<Booking[]> {

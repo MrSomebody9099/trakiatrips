@@ -193,6 +193,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route - Get all bookings for admin dashboard
+  app.get('/api/admin/bookings', async (req, res) => {
+    try {
+      const allBookings = await storage.getAllBookings();
+      
+      // Fetch guests for each booking and format for admin dashboard
+      const bookingsWithGuests = await Promise.all(
+        allBookings.map(async (booking) => {
+          const guests = await storage.getGuestsByBookingId(booking.id);
+          return {
+            id: booking.id,
+            leadBooker: guests.length > 0 ? guests[0].name : 'Unknown',
+            email: booking.userEmail,
+            phone: guests.length > 0 ? guests[0].phone : '',
+            package: booking.packageName,
+            guests: booking.numberOfGuests,
+            amount: parseInt(booking.totalAmount),
+            date: booking.dates,
+            status: booking.paymentStatus
+          };
+        })
+      );
+      
+      res.json(bookingsWithGuests);
+    } catch (error) {
+      console.error('Error fetching all bookings:', error);
+      res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+  });
+
   // API endpoint to update guest information
   app.put('/api/guests/:id', async (req, res) => {
     try {

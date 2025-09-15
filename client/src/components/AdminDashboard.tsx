@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Users, CheckCircle, Clock, DollarSign, Search, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -53,9 +54,15 @@ interface AdminDashboardProps {
 export default function AdminDashboard({ isAuthenticated = false, onLogin }: AdminDashboardProps) {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
+
+  // Fetch all bookings for admin dashboard
+  const { data: bookings = [], isLoading } = useQuery({
+    queryKey: ['/api/admin/bookings'],
+    queryFn: () => fetch('/api/admin/bookings').then(res => res.json()),
+    enabled: isLoggedIn
+  });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +75,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
     }
   };
 
-  const filteredBookings = bookings.filter(booking =>
+  const filteredBookings = bookings.filter((booking: Booking) =>
     booking.leadBooker.toLowerCase().includes(searchTerm.toLowerCase()) ||
     booking.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     booking.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,9 +83,9 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
 
   const stats = {
     totalBookings: bookings.length,
-    confirmed: bookings.filter(b => b.status === "confirmed").length,
-    pending: bookings.filter(b => b.status === "pending").length,
-    totalRevenue: bookings.filter(b => b.status === "confirmed").reduce((sum, b) => sum + b.amount, 0)
+    confirmed: bookings.filter((b: Booking) => b.status === "confirmed").length,
+    pending: bookings.filter((b: Booking) => b.status === "pending").length,
+    totalRevenue: bookings.filter((b: Booking) => b.status === "confirmed").reduce((sum: number, b: Booking) => sum + b.amount, 0)
   };
 
   const getStatusColor = (status: string) => {
@@ -94,7 +101,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
     const headers = ["Booking ID", "Lead Booker", "Contact", "Package", "Guests", "Amount", "Date", "Status"];
     const csvContent = [
       headers.join(","),
-      ...filteredBookings.map(booking => [
+      ...filteredBookings.map((booking: Booking) => [
         booking.id,
         booking.leadBooker,
         `${booking.email} / ${booking.phone}`,
@@ -238,7 +245,11 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
             <CardTitle className="font-heading">All Bookings ({filteredBookings.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredBookings.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground font-body">Loading bookings...</p>
+              </div>
+            ) : filteredBookings.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground font-body">No bookings found.</p>
               </div>
@@ -258,7 +269,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredBookings.map((booking) => (
+                    {filteredBookings.map((booking: Booking) => (
                       <tr 
                         key={booking.id} 
                         className="border-b border-border/50 hover:bg-muted/50 transition-colors"
