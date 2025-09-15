@@ -1,0 +1,130 @@
+// HoverPlayVideo.jsx
+// A self-contained React component for Vite + Tailwind that plays a video on hover, supports keyboard focus, and toggles play on touch devices.
+
+import React, { useRef, useState } from 'react';
+
+export default function HoverPlayVideo({ src, poster, className = '' }) {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const play = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+    try {
+      await v.play();
+      setIsPlaying(true);
+    } catch (e) {
+      // autoplay might be blocked; ignoring error is fine
+      setIsPlaying(false);
+    }
+  };
+
+  const pause = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    setIsPlaying(false);
+  };
+
+  // Toggle for touch devices
+  const toggle = () => (isPlaying ? pause() : play());
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl shadow-lg ${className}`}
+      // hover handlers
+      onMouseEnter={play}
+      onMouseLeave={pause}
+      // keyboard accessibility
+      onFocus={play}
+      onBlur={pause}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        className="w-full h-auto object-cover block"
+        // for touch devices we'll let a tap toggle playback
+        onClick={(e) => {
+          // avoid interfering with pointer events on desktop
+          if (e.pointerType === 'touch' || e.nativeEvent instanceof TouchEvent) {
+            toggle();
+          } else {
+            // desktop click still toggles too (optional)
+            toggle();
+          }
+        }}
+      />
+
+      {/* small status badge */}
+      <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur">
+        {isPlaying ? 'Playing' : 'Paused'}
+      </div>
+    </div>
+  );
+}
+
+/*
+
+SETUP & USAGE (paste these commands in your terminal when creating a new Vite + React + Tailwind project):
+
+1) Create a new Vite React app
+   npm create vite@latest hover-play -- --template react
+   cd hover-play
+   npm install
+
+2) Install Tailwind CSS (PostCSS method)
+   npm install -D tailwindcss postcss autoprefixer
+   npx tailwindcss init -p
+
+3) Configure Tailwind (tailwind.config.cjs)
+   // replace content array to include your src
+   module.exports = {
+     content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+     theme: { extend: {} },
+     plugins: [],
+   }
+
+4) Add Tailwind directives to ./src/index.css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+
+5) Import index.css in src/main.jsx
+   import './index.css'
+
+6) Add this component file to src/components/HoverPlayVideo.jsx and use it in App.jsx
+
+EXAMPLE USAGE in App.jsx:
+
+import HoverPlayVideo from './components/HoverPlayVideo'
+
+export default function App() {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-xl w-full">
+        <HoverPlayVideo
+          src="/videos/demo.mp4"
+          poster="/images/poster.jpg"
+        />
+      </div>
+    </div>
+  )
+}
+
+NOTES & TIPS
+- Use muted + playsInline to improve browser autoplay behavior when possible.
+- Autoplay on desktop hover is usually allowed; mobile devices do not have hover — using a tap toggle is the fallback.
+- For many small preview clips keep them short, compressed (H.264/AV1/VP9) and use "preload='metadata'" to minimize bandwidth.
+- If you need to show several videos in a grid, consider pausing other videos when a new one plays (use a global event or context).
+
+DEPLOYING TO REPLIT
+- Push your project to a GitHub repo, then in Replit choose "Import from GitHub." Replit will detect a Node project.
+- Set the run command to `npm run dev` (or `vite`), and make sure Replit installs devDependencies.
+- Provide the video files in the /public folder or host them on an external CDN and use absolute URLs.
+
+*/
