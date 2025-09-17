@@ -127,7 +127,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-center font-heading">Admin Access</CardTitle>
+            <CardTitle className="text-center font-heading">Admin Dashboard Access</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
@@ -148,7 +148,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                 className="w-full hover-elevate"
                 data-testid="button-admin-login"
               >
-                Access Dashboard
+                Access Admin Dashboard
               </Button>
             </form>
           </CardContent>

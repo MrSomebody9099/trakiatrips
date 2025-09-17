@@ -69,13 +69,13 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
           paymentStatus: tempBooking.paymentStatus || 'paid',
           bookingDate: tempBooking.createdAt,
           flightNumber: tempBooking.flightNumber,
-          guests: tempBooking.guests.map((guest: any, index: number) => ({
+          guests: tempBooking.guests?.map((guest: any, index: number) => ({
             id: `temp-guest-${index}`,
             name: guest.name,
             email: guest.email,
             phone: guest.phone,
             dateOfBirth: guest.dateOfBirth
-          }))
+          })) || []
         };
         
         setTempBookings([transformedBooking]);
@@ -140,6 +140,12 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
     setEditingGuest(null);
   };
 
+  const handleAddGuest = (bookingId: string) => {
+    // For now, we'll just log this action
+    console.log("Add guest to booking:", bookingId);
+    // In a real implementation, this would open a dialog to add a new guest
+  };
+
   const handleUpdateFlightNumber = (bookingId: string, flightNumber: string) => {
     updateBookingMutation.mutate({
       bookingId,
@@ -152,7 +158,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
       <div className="min-h-screen bg-gradient-to-b from-background to-accent/20 py-24 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="font-heading font-bold text-4xl text-foreground mb-4">
-            Welcome to Your Dashboard
+            Your Profile
           </h1>
           <p className="font-body text-xl text-muted-foreground mb-8">
             Please sign in to view your bookings and manage your trips.
@@ -167,7 +173,6 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
-      <Navigation />
       <div className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
         
@@ -178,7 +183,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
             Welcome back!
           </div>
           <h1 className="font-heading font-bold text-4xl text-foreground mb-4">
-            Your Dashboard
+            Your Profile
           </h1>
           <p className="font-body text-xl text-muted-foreground">
             {userEmail}
@@ -271,6 +276,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        onClick={() => handleAddGuest(booking.id)}
                         className="hover-elevate"
                         data-testid={`button-add-guest-${booking.id}`}
                       >

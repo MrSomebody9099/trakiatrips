@@ -10,6 +10,7 @@ import BookingFlow from "./components/BookingFlow";
 import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/UserDashboard";
 import NotFound from "@/pages/not-found";
+import AuthProvider from "./components/AuthProvider";
 
 function Router() {
   return (
@@ -29,12 +30,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="bg-background text-foreground min-h-screen">
-          <Router />
-        </div>
-        <Toaster />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <div className="bg-background text-foreground min-h-screen">
+            <Router />
+          </div>
+          <Toaster />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
