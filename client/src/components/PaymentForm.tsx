@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, CreditCard } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { stripePromise, formatPrice } from '@/lib/stripe';
-import { supabase, getCurrentUser } from '@/lib/supabaseClient';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -31,29 +30,25 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get current user
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-
-        // Fetch package data
-        const { data: packageResult, error: packageError } = await supabase
-          .from('packages')
-          .select('*')
-          .eq('id', packageId)
-          .single();
+        // Mock data for now - this should be replaced with actual API calls
+        setUser({ id: 'user-1', email: 'user@example.com' });
         
-        if (packageError) throw packageError;
-        setPackageData(packageResult);
+        // Mock package data
+        setPackageData({
+          id: packageId,
+          name: 'Ski Festival Package',
+          price: 499,
+          payment_deadline: '2025-02-28'
+        });
         
-        // Fetch experiences if any
+        // Mock experiences data if any
         if (experienceIds.length > 0) {
-          const { data: experiencesResult, error: experiencesError } = await supabase
-            .from('experiences')
-            .select('*')
-            .in('id', experienceIds);
-          
-          if (experiencesError) throw experiencesError;
-          setExperiences(experiencesResult || []);
+          const mockExperiences = experienceIds.map((id, index) => ({
+            id,
+            name: `Experience ${index + 1}`,
+            price: 99
+          }));
+          setExperiences(mockExperiences);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -220,84 +215,6 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-            
-            <div>
-              <Label htmlFor="name">Cardholder name</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Full name on card"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="country">Billing address</Label>
-              {'United States'}
-              
-              <Input
-                id="address"
-                name="address"
-                placeholder="Address"
-                value={formData.address}
-                onChange={handleChange}
-                className="mt-2"
-              />
-              <div className="text-xs text-muted-foreground mt-1">
-                <button type="button" className="text-blue-600 hover:underline">
-                  Enter address manually
-                </button>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 mt-4">
-              <Checkbox 
-                id="saveInfo" 
-                checked={formData.saveInfo}
-                onCheckedChange={handleCheckboxChange}
-              />
-              <Label htmlFor="saveInfo" className="text-sm">
-                Save my info for 1-click checkout with Link
-              </Label>
-            </div>
-            
-            <div className="text-xs text-muted-foreground mt-2">
-              Securely pay on Fireship LLC and everywhere Link is accepted.
-            </div>
-            
-            <div className="flex items-center mt-4">
-              <div className="text-sm text-muted-foreground">
-                (201) 555-0123
-              </div>
-              <div className="ml-auto">
-                <button type="button" className="text-xs text-blue-600 hover:underline">
-                  More info
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-blue-600 hover:bg-blue-700"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Processing...' : `Pay €${amount.toFixed(2)}`}
-          </Button>
-          
-          <div className="text-xs text-center text-muted-foreground mt-4">
-            <p>For testing, use these cards:</p>
-            <p className="font-medium">Success: 4242 4242 4242 4242</p>
-            <p className="font-medium">Decline: 4000 0000 0000 0002</p>
-          </div>
-        </form>
       </CardContent>
     </Card>
   );
