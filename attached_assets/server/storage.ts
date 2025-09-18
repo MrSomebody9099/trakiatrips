@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
+import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction } from "../../shared/schema.js";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
