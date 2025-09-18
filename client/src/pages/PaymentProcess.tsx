@@ -42,11 +42,30 @@ export default function PaymentProcess() {
     setError(null);
     
     try {
-      // Instead of redirecting to an external URL, show our own payment form
-      setShowPaymentForm(true);
+      // Create Stripe checkout session
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packageName: bookingData.bookingData.packageName,
+          packageType: bookingData.bookingData.dates,
+          paymentMode: bookingData.bookingData.paymentPlan,
+          totalAmount: bookingData.paymentAmount,
+          depositAmount: Math.round(bookingData.paymentAmount * 0.3),
+          bookingData: bookingData
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
       
-      // Store booking data for later use on success page
-      localStorage.setItem("pendingBookingData", JSON.stringify(bookingData));
+      // Redirect to Stripe Checkout
+      window.location.href = url;
       
     } catch (err: any) {
       console.error('Error initializing payment:', err);

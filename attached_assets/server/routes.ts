@@ -6,8 +6,11 @@ import crypto from "crypto";
 import Stripe from "stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize Stripe with the test secret key
-  const stripe = new Stripe('rk_test_51S1VAFLGfJ0rGgPcnc3xNTWloVKu2hg84ytEMeyaictC3b9cq0hSQZv2hTRIb5laAaqcGaoGCIq8nVp64as3XZ2n00tEp8v9OH', {
+  // Initialize Stripe with environment variable - javascript_stripe integration
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-10-16',
   });
 
