@@ -1,14 +1,11 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const router = Router();
 
 // Initialize Stripe with the secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-08-27.basil',
 });
 
 // Create a checkout session
@@ -73,7 +70,7 @@ router.post('/webhook', async (req, res) => {
 
   try {
     // Verify the webhook signature
-    event = stripe.webhooks.constructEvent(payload, sig, process.env.STRIPE_WEBHOOK_SECRET || '');
+    event = stripe.webhooks.constructEvent(payload, sig as string, process.env.STRIPE_WEBHOOK_SECRET || '');
     
     // Handle the event
     if (event.type === 'checkout.session.completed') {
