@@ -3,8 +3,58 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema } from "@shared/schema";
 import crypto from "crypto";
+import Stripe from "stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize Stripe with the test secret key
+  const stripe = new Stripe('rk_test_51S1VAFLGfJ0rGgPcnc3xNTWloVKu2hg84ytEMeyaictC3b9cq0hSQZv2hTRIb5laAaqcGaoGCIq8nVp64as3XZ2n00tEp8v9OH', {
+    apiVersion: '2023-10-16',
+  });
+
+  // Create a Stripe checkout session
+  app.post('/api/create-checkout-session', async (req, res) => {
+    try {
+      const { packageName, packageType, paymentMode, totalAmount, depositAmount, bookingData } = req.body;
+
+      // Determine the amount to charge based on payment mode
+      const amount = paymentMode === 'full' ? totalAmount : depositAmount;
+      
+      // Format the amount for Stripe (in cents)
+      const stripeAmount = Math.round(amount * 100);
+
+      // Create a Stripe checkout session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: packageName,
+                description: `${packageType} - ${paymentMode === 'full' ? 'Full Payment' : 'Deposit Payment'}`,
+              },
+              unit_amount: stripeAmount,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.protocol}://${req.get('host')}/payment-process`,
+        metadata: {
+          paymentMode: paymentMode,
+          totalAmount: totalAmount.toString(),
+          depositAmount: depositAmount.toString(),
+        },
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
   // put application routes here
   // prefix all routes with /api
 

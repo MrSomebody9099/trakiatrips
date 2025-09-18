@@ -44,7 +44,7 @@ export default function TermsPage() {
                     </div>
                     <h3 className="font-heading font-bold text-xl text-foreground mb-3">Payment</h3>
                     <p className="font-body text-muted-foreground leading-relaxed">
-                      Full payment required upon booking. Early bird discounts apply for bookings before February 15th, 2025.
+                      Full payment required upon booking. Early bird discounts apply for bookings before December 31st, 2024. We offer flexible payment options for group bookings.
                     </p>
                   </div>
                   

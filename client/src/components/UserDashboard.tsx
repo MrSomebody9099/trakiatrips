@@ -42,12 +42,29 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [tempBookings, setTempBookings] = useState<Booking[]>([]);
+  const [currentBookingId, setCurrentBookingId] = useState<string>("");
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: ""
+  });
+  const [isUserEditDialogOpen, setIsUserEditDialogOpen] = useState(false);
+  const [editingUserInfo, setEditingUserInfo] = useState(userInfo);
 
   useEffect(() => {
     // Load user data from localStorage
     const email = localStorage.getItem("userEmail");
     if (email) {
       setUserEmail(email);
+      
+      // Update user info from localStorage
+      setUserInfo({
+        name: localStorage.getItem("userName") || "",
+        email: email,
+        phone: localStorage.getItem("userPhone") || "",
+        address: localStorage.getItem("userAddress") || ""
+      });
     }
 
     // Load temporary booking from localStorage
@@ -80,7 +97,10 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
         
         setTempBookings([transformedBooking]);
         
-        // Clean up localStorage after loading
+        // Set current booking ID
+          setCurrentBookingId(transformedBooking.id);
+          
+          // Clean up localStorage after loading
         localStorage.removeItem("tempBooking");
       } catch (error) {
         console.error("Error parsing temporary booking:", error);
@@ -139,11 +159,12 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
     setIsEditDialogOpen(false);
     setEditingGuest(null);
   };
+  
+  // This function is already defined elsewhere in the file, removing duplicate
 
   const handleAddGuest = (bookingId: string) => {
-    // For now, we'll just log this action
-    console.log("Add guest to booking:", bookingId);
-    // In a real implementation, this would open a dialog to add a new guest
+    setCurrentBookingId(bookingId);
+    handleAddNewGuest(bookingId);
   };
 
   const handleUpdateFlightNumber = (bookingId: string, flightNumber: string) => {
@@ -163,16 +184,95 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
           <p className="font-body text-xl text-muted-foreground mb-8">
             Please sign in to view your bookings and manage your trips.
           </p>
-          <Button onClick={onClose} className="hover-elevate">
+          <Button 
+            onClick={() => window.location.href = '/'} 
+            className="hover-elevate"
+          >
             Back to Home
           </Button>
         </div>
       </div>
     );
   }
+  
+  const handleEditUserInfo = () => {
+    setEditingUserInfo({...userInfo});
+    setIsUserEditDialogOpen(true);
+  };
+  
+  const handleSaveUserInfo = () => {
+    // Ensure we don't save empty values as "Not provided"
+    const updatedUserInfo = {
+      name: editingUserInfo.name.trim() || "",
+      phone: editingUserInfo.phone.trim() || "",
+      address: editingUserInfo.address.trim() || ""
+    };
+    
+    setUserInfo(updatedUserInfo);
+    localStorage.setItem("userName", updatedUserInfo.name);
+    localStorage.setItem("userPhone", updatedUserInfo.phone);
+    localStorage.setItem("userAddress", updatedUserInfo.address);
+    setIsUserEditDialogOpen(false);
+  };
+  
+  const handleAddNewGuest = (bookingId: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+    
+    const newGuest: Guest = {
+      id: `new-guest-${Date.now()}`,
+      name: "",
+      email: "",
+      phone: "",
+      dateOfBirth: ""
+    };
+    
+    setEditingGuest(newGuest);
+    setIsEditDialogOpen(true);
+    
+    // Store the booking ID to know where to add the guest
+    localStorage.setItem("addGuestToBookingId", bookingId);
+  };
+  
+  const handleSaveNewGuest = () => {
+    if (!editingGuest) return;
+    
+    const bookingId = localStorage.getItem("addGuestToBookingId");
+    if (!bookingId) return;
+    
+    const updatedBookings = bookings.map(booking => {
+      if (booking.id === bookingId) {
+        return {
+          ...booking,
+          guests: [...booking.guests, editingGuest],
+          numberOfGuests: booking.numberOfGuests + 1
+        };
+      }
+      return booking;
+    });
+    
+    // Update local state
+    setTempBookings(updatedBookings.filter(b => tempBookings.some(tb => tb.id === b.id)));
+    
+    // If it's an API booking, update via API
+    if (!tempBookings.some(b => b.id === bookingId)) {
+      updateBookingMutation.mutate({
+        bookingId,
+        bookingData: {
+          guests: updatedBookings.find(b => b.id === bookingId)?.guests,
+          numberOfGuests: updatedBookings.find(b => b.id === bookingId)?.numberOfGuests
+        }
+      });
+    }
+    
+    localStorage.removeItem("addGuestToBookingId");
+    setIsEditDialogOpen(false);
+    setEditingGuest(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/20">
+      <Navigation />
       <div className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
         
@@ -189,14 +289,51 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
             {userEmail}
           </p>
         </div>
+        
+        {/* User Information Card */}
+        <Card className="mb-8">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50">
+            <div className="flex justify-between items-center">
+              <CardTitle className="font-heading text-2xl text-foreground">
+                Personal Information
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={handleEditUserInfo}>
+                <Edit3 className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-medium text-muted-foreground mb-2">Name</h3>
+                <p className="text-lg">{userInfo.name || localStorage.getItem("userName") || userInfo.email.split('@')[0]}</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-muted-foreground mb-2">Email</h3>
+                <p className="text-lg">{userInfo.email}</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-muted-foreground mb-2">Phone</h3>
+                <p className="text-lg">{userInfo.phone || localStorage.getItem("userPhone") || ""}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Bookings */}
+        <h2 className="font-heading text-2xl font-semibold mb-6">Your Bookings</h2>
         <div className="space-y-8">
           {bookings.map((booking: Booking) => (
             <Card key={booking.id} className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 pb-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
+                    <div className="flex items-center mb-2">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 mr-2">
+                        Active Package
+                      </Badge>
+                    </div>
                     <CardTitle className="font-heading text-2xl text-foreground mb-2">
                       {booking.packageName}
                     </CardTitle>
@@ -238,7 +375,59 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                       Booking Details
                     </h3>
                     
-                    <div className="space-y-4">
+                  {/* Booking Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Package</h3>
+                      <p className="text-lg font-medium">{booking.packageName}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Dates</h3>
+                      <p className="text-lg font-medium">{booking.dates}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Guests</h3>
+                      <p className="text-lg font-medium">{booking.numberOfGuests} people</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Room Type</h3>
+                      <p className="text-lg font-medium">{booking.roomType || "Standard"}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Total Amount</h3>
+                      <p className="text-lg font-medium">€{booking.totalAmount}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-2">Payment Status</h3>
+                      <Badge className={booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                        {booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  {/* Additional Services */}
+                  {booking.addOns && booking.addOns.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-medium text-muted-foreground mb-2">Additional Services</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {booking.addOns.map((addon, index) => (
+                          <Badge key={index} variant="outline" className="bg-blue-50">
+                            {addon}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Flight Information */}
+                  {booking.flightNumber && (
+                    <div className="mb-6">
+                      <h3 className="font-medium text-muted-foreground mb-2">Airport Transfer</h3>
+                      <p className="text-lg font-medium">Flight: {booking.flightNumber}</p>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4">
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Add-ons</Label>
                         <div className="mt-1 space-y-1">
@@ -251,19 +440,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                         </div>
                       </div>
                       
-                      <div>
-                        <Label htmlFor={`flight-${booking.id}`} className="text-sm font-medium text-muted-foreground">
-                          Flight Number (Optional)
-                        </Label>
-                        <Input
-                          id={`flight-${booking.id}`}
-                          value={booking.flightNumber || ""}
-                          onChange={(e) => handleUpdateFlightNumber(booking.id, e.target.value)}
-                          placeholder="e.g., FR1234"
-                          className="mt-1"
-                          data-testid={`input-flight-${booking.id}`}
-                        />
-                      </div>
+                      {/* Flight Number field removed as requested */}
                     </div>
                   </div>
 
@@ -335,7 +512,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
         <div className="text-center mt-12">
           <Button 
             variant="outline" 
-            onClick={onClose}
+            onClick={() => window.location.href = '/'}
             className="hover-elevate"
             data-testid="button-back-home"
           >
@@ -345,11 +522,75 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
       </div>
       </div>
 
+      {/* User Edit Dialog */}
+      <Dialog open={isUserEditDialogOpen} onOpenChange={setIsUserEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Personal Information</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-user-name">Full Name</Label>
+              <Input
+                id="edit-user-name"
+                value={editingUserInfo.name}
+                onChange={(e) => setEditingUserInfo({...editingUserInfo, name: e.target.value})}
+                placeholder="Enter your full name"
+                data-testid="input-edit-user-name"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-user-email">Email Address</Label>
+              <Input
+                id="edit-user-email"
+                type="email"
+                value={editingUserInfo.email}
+                disabled
+                data-testid="input-edit-user-email"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-user-phone">Phone Number</Label>
+              <Input
+                id="edit-user-phone"
+                value={editingUserInfo.phone}
+                onChange={(e) => setEditingUserInfo({...editingUserInfo, phone: e.target.value})}
+                placeholder="+359 88 123 4567"
+                data-testid="input-edit-user-phone"
+              />
+            </div>
+            
+
+            
+            <div className="flex gap-3 pt-4">
+              <Button 
+                onClick={handleSaveUserInfo}
+                className="flex-1 hover-elevate"
+                data-testid="button-save-user"
+              >
+                Save Changes
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsUserEditDialogOpen(false)}
+                className="flex-1 hover-elevate"
+                data-testid="button-cancel-user-edit"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Guest Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Guest Information</DialogTitle>
+            <DialogTitle>{editingGuest && editingGuest.id.startsWith('new-guest') ? 'Add New Guest' : 'Edit Guest Information'}</DialogTitle>
           </DialogHeader>
           
           {editingGuest && (
@@ -401,7 +642,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
               
               <div className="flex gap-3 pt-4">
                 <Button 
-                  onClick={handleSaveGuest}
+                  onClick={editingGuest.id.startsWith('new-guest') ? handleSaveNewGuest : handleSaveGuest}
                   className="flex-1 hover-elevate"
                   data-testid="button-save-guest"
                 >

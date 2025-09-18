@@ -96,13 +96,18 @@ export default function Navigation() {
                 >
                   TERMS
                 </a>
-                <Button
-                  className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-heading font-bold text-lg py-4 rounded-xl shadow-lg hover-elevate"
-                  onClick={() => setIsOpen(false)}
+                <a
+                  href="#"
+                  className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-heading font-bold text-lg py-4 rounded-xl shadow-lg hover-elevate flex items-center justify-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsOpen(false);
+                    window.location.href = "/booking";
+                  }}
                   data-testid="button-book-now"
                 >
                   BOOK NOW
-                </Button>
+                </a>
               </div>
             </div>
           )}

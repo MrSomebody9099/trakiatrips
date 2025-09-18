@@ -16,16 +16,18 @@ export default function HomePage() {
     const hasSeenPanel = localStorage.getItem("hasSeenAuthPanel");
     const userEmail = localStorage.getItem("userEmail");
 
-    // Show panel after 5 seconds if user hasn't seen it and doesn't have email stored
+    // Show panel only once after 5 seconds if user hasn't seen it and doesn't have email stored
     if (!hasSeenPanel && !userEmail && !hasShownPanel) {
       const timer = setTimeout(() => {
         setShowAuthPanel(true);
         setHasShownPanel(true);
+        // Set flag immediately to prevent showing again
+        localStorage.setItem("hasSeenAuthPanel", "true");
       }, 5000); // 5 seconds as requested
 
       return () => clearTimeout(timer);
     }
-  }, [hasShownPanel]);
+  }, []);
 
   const handleCloseAuthPanel = () => {
     setShowAuthPanel(false);

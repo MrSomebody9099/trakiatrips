@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Navigation from "./Navigation";
+import PaymentForm from "./PaymentForm";
 
 interface Package {
   id: string;
@@ -218,6 +219,8 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     leadBooker.name && leadBooker.email && leadBooker.phone && leadBooker.dateOfBirth &&
     guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
 
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  
   const handlePayment = async () => {
     // Calculate payment amount based on plan
     const paymentAmount = paymentPlan === 'installment' 
@@ -253,9 +256,25 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     }));
 
     console.log('Processing payment:', { bookingData, guests: allGuests, paymentAmount, paymentPlan });
-
-    // TEMPORARY: Skip payment integration and redirect to dashboard for testing
+    
+    // Store booking data for later use
+    localStorage.setItem('pendingBookingData', JSON.stringify({
+      bookingData,
+      guests: allGuests,
+      paymentAmount,
+      totalPrice
+    }));
+    
+    // Redirect to the new payment process page
+    window.location.href = '/payment-process';
+  };
+  
+  const handlePaymentSuccess = () => {
     try {
+      // Retrieve stored booking data
+      const storedData = JSON.parse(localStorage.getItem('pendingBookingData') || '{}');
+      const { bookingData, guests: allGuests, paymentAmount, totalPrice } = storedData;
+      
       // Create mock booking with unique ID for testing
       const mockBooking = {
         id: 'temp-' + Date.now(),
@@ -270,16 +289,24 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
       // Store temporary booking data for dashboard to pick up
       localStorage.setItem('tempBooking', JSON.stringify(mockBooking));
-      localStorage.setItem('userEmail', leadBooker.email);
+      localStorage.setItem('userEmail', bookingData.userEmail);
+      
+      // Store user information for admin dashboard
+      const existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      existingBookings.push(mockBooking);
+      localStorage.setItem('bookings', JSON.stringify(existingBookings));
 
       console.log('Temporary booking created:', mockBooking);
       
-      // Redirect directly to dashboard instead of payment
-      window.location.href = '/dashboard';
+      // Clear pending booking data
+      localStorage.removeItem('pendingBookingData');
+      
+      // Redirect to transaction success page
+      window.location.href = '/transaction-successful';
       
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Payment system temporarily unavailable. Please try again later.');
+      window.location.href = '/payment-failed';
     }
   };
 
@@ -647,7 +674,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                     data-testid="checkbox-terms"
                   />
                   <Label htmlFor="terms" className="cursor-pointer">
-                    I agree to the <a href="#" className="text-primary underline">Terms & Conditions</a>
+                    I agree to the <a href="/terms" className="text-primary underline" target="_blank">Terms and Conditions</a> and <a href="/privacy-policy" className="text-primary underline" target="_blank">Privacy Policy</a>
                   </Label>
                 </div>
               </CardContent>
@@ -721,17 +748,25 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   </div>
                 </div>
                 
-                <Button
-                  onClick={handlePayment}
-                  disabled={!canProceedToPayment}
-                  className="w-full hover-elevate"
-                  data-testid="button-proceed-payment"
-                >
-                  {paymentPlan === 'installment' 
-                    ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
-                    : `Proceed to Payment - €${totalPrice}`
-                  }
-                </Button>
+                {!showPaymentForm ? (
+                  <Button
+                    onClick={handlePayment}
+                    disabled={!canProceedToPayment}
+                    className="w-full hover-elevate"
+                    data-testid="button-proceed-payment"
+                  >
+                    {paymentPlan === 'installment' 
+                      ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
+                      : `Proceed to Payment - €${totalPrice}`
+                    }
+                  </Button>
+                ) : (
+                  <PaymentForm 
+                    amount={paymentPlan === 'installment' ? Math.ceil(totalPrice * 0.3) : totalPrice}
+                    onSuccess={handlePaymentSuccess}
+                    onCancel={() => setShowPaymentForm(false)}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>

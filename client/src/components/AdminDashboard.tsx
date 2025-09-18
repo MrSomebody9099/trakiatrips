@@ -20,7 +20,7 @@ interface Booking {
   status: "pending" | "confirmed" | "cancelled";
 }
 
-// Mock booking data //todo: remove mock functionality
+// Mock booking data for development
 const mockBookings: Booking[] = [
   {
     id: "TT-001",
@@ -44,6 +44,28 @@ const mockBookings: Booking[] = [
     date: "2025-01-16",
     status: "pending"
   },
+  {
+    id: "TT-003",
+    leadBooker: "Alex Johnson",
+    email: "alex@example.com",
+    phone: "+359 88 555 7890",
+    package: "Family Package",
+    guests: 5,
+    amount: 1200,
+    date: "2025-01-20",
+    status: "confirmed"
+  },
+  {
+    id: "TT-004",
+    leadBooker: "Maria Garcia",
+    email: "maria@example.com",
+    phone: "+359 88 333 2211",
+    package: "Weekend Package",
+    guests: 3,
+    amount: 520,
+    date: "2025-01-25",
+    status: "pending"
+  }
 ];
 
 interface AdminDashboardProps {
@@ -57,21 +79,40 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
 
-  // Fetch all bookings for admin dashboard
-  const { data: bookings = [], isLoading } = useQuery({
-    queryKey: ['/api/admin/bookings'],
-    queryFn: () => fetch('/api/admin/bookings').then(res => res.json()),
-    enabled: isLoggedIn
-  });
+  // For development, use mock data instead of API
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const isLoading = false;
+  
+  useEffect(() => {
+    // In a real app, this would be an API call
+    const savedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    if (savedBookings.length > 0) {
+      // Convert saved bookings to the expected format
+      const formattedBookings = savedBookings.map((booking: any) => ({
+        id: booking.id,
+        leadBooker: booking.guests[0].name,
+        email: booking.guests[0].email,
+        phone: booking.guests[0].phone,
+        package: booking.packageName,
+        guests: booking.numberOfGuests,
+        amount: parseInt(booking.totalAmount),
+        date: new Date().toISOString().split('T')[0],
+        status: "confirmed"
+      }));
+      setBookings([...formattedBookings, ...mockBookings]);
+    } else {
+      setBookings(mockBookings);
+    }
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "admin123") {
+    if (password === "MO1345") {
       setIsLoggedIn(true);
       setError("");
       onLogin?.(password);
     } else {
-      setError("Invalid password. Try 'admin123'");
+      setError("Invalid password");
     }
   };
 
@@ -98,6 +139,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   };
 
   const exportToCSV = () => {
+    // Create CSV content
     const headers = ["Booking ID", "Lead Booker", "Contact", "Package", "Guests", "Amount", "Date", "Status"];
     const csvContent = [
       headers.join(","),
@@ -107,19 +149,22 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
         `${booking.email} / ${booking.phone}`,
         booking.package,
         booking.guests,
-        `€${booking.amount}`,
+        booking.amount,
         booking.date,
         booking.status
       ].join(","))
     ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "trakia-trips-bookings.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `trakiatrips_bookings_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (!isLoggedIn) {
