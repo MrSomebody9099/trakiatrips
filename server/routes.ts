@@ -44,7 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (paymentMode === 'full') {
         // Full payment - single charge
         const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
+          automatic_payment_methods: { enabled: true },
           line_items: [
             {
               price_data: {
@@ -98,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Create checkout session for subscription with deposit payment
         const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
+          automatic_payment_methods: { enabled: true },
           mode: 'subscription',
           customer: customer.id,
           line_items: [
@@ -110,6 +110,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   description: `Deposit: €${packagePricing.deposit} (charged today), Remaining: €${packagePricing.remaining} (due Jan 6, 2026)`,
                 },
                 unit_amount: packagePricing.deposit * 100, // Deposit amount in cents
+                recurring: {
+                  interval: 'month'
+                }
               },
               quantity: 1,
             },
@@ -625,6 +628,8 @@ async function createSubscriptionSchedule(subscription: any, depositAmount: numb
               quantity: 1
             }
           ],
+          iterations: 1,
+          proration_behavior: 'none',
           end_date: finalPaymentDate
         },
         {
@@ -648,7 +653,9 @@ async function createSubscriptionSchedule(subscription: any, depositAmount: numb
                 bookingId: bookingId
               }
             }
-          ]
+          ],
+          iterations: 1,
+          proration_behavior: 'none'
         }
       ],
       metadata: {
@@ -658,10 +665,7 @@ async function createSubscriptionSchedule(subscription: any, depositAmount: numb
       }
     });
     
-    // Replace the original subscription with the scheduled one
-    await stripe.subscriptions.update(subscription.id, {
-      cancel_at_period_end: true // This will be managed by the schedule
-    });
+    // The subscription schedule will manage the lifecycle
     
     console.log(`Created subscription schedule ${schedule.id} for booking ${bookingId}, final payment on 2026-01-06`);
   } catch (error) {
