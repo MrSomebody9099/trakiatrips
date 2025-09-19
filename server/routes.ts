@@ -110,9 +110,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   description: `Deposit: €${packagePricing.deposit} (charged today), Remaining: €${packagePricing.remaining} (due Jan 6, 2026)`,
                 },
                 unit_amount: packagePricing.deposit * 100, // Deposit amount in cents
-                recurring: {
-                  interval: 'month'
-                }
               },
               quantity: 1,
             },
