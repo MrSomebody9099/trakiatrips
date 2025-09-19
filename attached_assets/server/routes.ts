@@ -7,16 +7,23 @@ import Stripe from "stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Stripe with environment variable - javascript_stripe integration
-  if (!process.env.STRIPE_SECRET_KEY) {
+  // In development, Stripe is optional to allow the app to start without secrets
+  let stripe: Stripe | null = null;
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-08-27.basil',
+    });
+  } else if (process.env.NODE_ENV === 'production') {
     throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
   }
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-08-27.basil',
-  });
 
   // Create a Stripe checkout session
   app.post('/api/create-checkout-session', async (req, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ error: 'Payment processing is not configured. Please contact support.' });
+      }
+
       const { packageName, packageType, paymentMode, totalAmount, depositAmount, bookingData } = req.body;
 
       // Determine the amount to charge based on payment mode
