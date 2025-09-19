@@ -10,9 +10,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // In development, Stripe is optional to allow the app to start without secrets
   let stripe: Stripe | null = null;
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-08-27.basil',
-    });
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   } else if (process.env.NODE_ENV === 'production') {
     throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
   }
@@ -93,7 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!merchantId || !secretKey) {
         console.error('Fondy credentials not configured');
-        return res.status(500).json({ error: 'Payment configuration error' });
+        return res.status(503).json({ error: 'Fondy payment processing is not configured. Please contact support.' });
       }
 
       const webhookData = req.body;
@@ -152,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const secretKey = process.env.FONDY_SECRET_KEY;
       
       if (!merchantId || !secretKey) {
-        return res.status(500).json({ error: 'Payment configuration not found' });
+        return res.status(503).json({ error: 'Fondy payment processing is not configured. Please contact support.' });
       }
 
       // Validate booking data

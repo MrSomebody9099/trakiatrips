@@ -1,7 +1,12 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-// Stripe live keys
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_51S1VA0Lb8rPy9vMDy4jdzYaXKxvd5NawJ3GsGRUnMnKGLgSIj0GsqJ1bVidhzQXq7WbLo2JD88HsMivfOZ9ddXyU00uI1Zy6t3';
+// Stripe publishable key from environment variable
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
+// Validate that the Stripe publishable key is available
+if (!STRIPE_PUBLISHABLE_KEY) {
+  console.error('Missing VITE_STRIPE_PUBLISHABLE_KEY environment variable');
+}
 
 // Package prices
 export const PACKAGES = {
@@ -27,8 +32,10 @@ export const PAYMENT_MODES = {
   INSTALLMENT: 'installment'
 };
 
-// Initialize Stripe
-export const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+// Initialize Stripe only if publishable key is available
+export const stripePromise = STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(STRIPE_PUBLISHABLE_KEY)
+  : Promise.resolve(null);
 
 // Helper function to format price in EUR
 export const formatPrice = (amount: number): string => {
