@@ -10,19 +10,19 @@ if (!STRIPE_PUBLISHABLE_KEY) {
 
 // Package prices
 export const PACKAGES = {
-  TWO_DAY_DEAL: {
-    name: '2 Day Deal',
+  PACKAGE_A: {
+    name: 'Package A',
     fullAmount: 18500, // €185 in cents
     deposit: 5600,     // €56 in cents
     remaining: 12900,  // €129 in cents
-    dueDate: '2025-01-06'
+    dueDate: '2026-01-06'
   },
-  FULL_WEEKEND: {
-    name: 'Full Weekend Package',
+  PACKAGE_B: {
+    name: 'Package B',
     fullAmount: 24500, // €245 in cents
     deposit: 7400,     // €74 in cents
     remaining: 17100,  // €171 in cents
-    dueDate: '2025-01-06'
+    dueDate: '2026-01-06'
   }
 };
 

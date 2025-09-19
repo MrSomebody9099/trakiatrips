@@ -33,12 +33,12 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
         // Mock data for now - this should be replaced with actual API calls
         setUser({ id: 'user-1', email: 'user@example.com' });
         
-        // Mock package data
+        // Mock package data - use Package A as default
         setPackageData({
           id: packageId,
-          name: 'Ski Festival Package',
-          price: 499,
-          payment_deadline: '2025-02-28'
+          name: packageId === 'package-a' ? 'Package A' : 'Package B',
+          price: packageId === 'package-a' ? 185 : 245,
+          payment_deadline: '2026-01-06'
         });
         
         // Mock experiences data if any
@@ -85,16 +85,22 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
     
     try {
       // Call our API to create a Stripe checkout session
-      const response = await fetch('/api/stripe/create-checkout-session', {
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          packageId,
-          experienceIds,
-          userId: user.id,
-          paymentMode
+          packageName: packageData.name,
+          paymentMode,
+          bookingData: {
+            userEmail: user.email,
+            userName: user.name || user.email,
+            dates: '6-9 March 2025',
+            numberOfGuests: 1,
+            roomType: 'standard',
+            addOns: []
+          }
         }),
       });
       
@@ -162,7 +168,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="installment" id="installment" />
                       <Label htmlFor="installment">
-                        Pay deposit ({formatPrice(totalAmount * 0.3)}) now, remainder later
+                        Pay deposit ({formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}) now, remaining ({formatPrice(packageData.name === 'Package A' ? 12900 : 17100)}) due Jan 6, 2026
                       </Label>
                     </div>
                   </RadioGroup>
@@ -176,13 +182,13 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                     </span>
                     <span>
                       {paymentMode === 'full' 
-                        ? formatPrice(totalAmount) 
-                        : formatPrice(totalAmount * 0.3)}
+                        ? formatPrice(totalAmount * 100) 
+                        : formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}
                     </span>
                   </div>
                   {paymentMode === 'installment' && (
                     <div className="text-sm text-gray-500 mt-1">
-                      Remaining balance of {formatPrice(totalAmount * 0.7)} due by {packageData.payment_deadline || 'trip date'}
+                      Remaining balance of {formatPrice(packageData.name === 'Package A' ? 12900 : 17100)} due January 6, 2026
                     </div>
                   )}
                 </div>
