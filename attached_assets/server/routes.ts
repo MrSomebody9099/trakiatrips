@@ -73,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } 
       
       if (paymentMode === 'installment') {
-        // Installment payment using deposit + scheduled invoice approach
+        // Installment payment using Stripe Subscription Schedules
         
         // Create or retrieve customer
         let customer;
@@ -96,10 +96,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ error: 'Failed to set up installment payment' });
         }
 
-        // Create checkout session for deposit with setup_future_usage
+        // Create checkout session for subscription with deposit payment
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
-          mode: 'payment',
+          mode: 'subscription',
           customer: customer.id,
           line_items: [
             {
@@ -107,21 +107,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 currency: 'eur',
                 product_data: {
                   name: packageName,
-                  description: `${packageName} - Deposit Payment\nDeposit: €${packagePricing.deposit} (charged today)\nRemaining: €${packagePricing.remaining} (due Jan 6, 2026)`,
+                  description: `${packageName} - Installment Plan\nDeposit: €${packagePricing.deposit} (charged today)\nRemaining: €${packagePricing.remaining} (due Jan 6, 2026)`,
                 },
                 unit_amount: packagePricing.deposit * 100, // Deposit amount in cents
+                recurring: {
+                  interval: 'month'
+                }
               },
               quantity: 1,
             },
           ],
-          payment_intent_data: {
-            setup_future_usage: 'off_session', // Save payment method for future use
-            metadata: {
-              paymentType: 'deposit',
-              finalPaymentAmount: packagePricing.remaining.toString(),
-              finalPaymentDate: '2026-01-06',
-            },
-          },
           metadata: {
             paymentMode: 'installment',
             packageName: packageName,
@@ -168,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Webhook signature verification failed' });
       }
 
-      // Handle checkout session completion for both full and installment payments
+      // Handle checkout session completion for full payments
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         console.log('Checkout session completed:', session.id, 'Payment mode:', session.metadata?.paymentMode);
@@ -177,18 +172,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Full payment completed - create booking record
           await handleFullPaymentSuccess(session);
         } else if (session.metadata?.paymentMode === 'installment') {
-          // Installment deposit payment completed - create booking and schedule final payment
-          await handleInstallmentDepositSuccess(session, stripe);
+          // For subscription mode, we handle this in customer.subscription.created
+          console.log('Installment checkout completed, waiting for subscription creation');
         }
       }
 
-      // Handle successful payment of scheduled invoice (final installment)
+      // Handle subscription creation for installment payments
+      if (event.type === 'customer.subscription.created') {
+        const subscription = event.data.object;
+        console.log('Subscription created:', subscription.id);
+        
+        // Check if this subscription has installment metadata
+        if (subscription.metadata?.paymentMode === 'installment') {
+          await handleInstallmentSubscriptionCreated(subscription, stripe);
+        }
+      }
+
+      // Handle successful payment of scheduled subscription invoice (final installment)
       if (event.type === 'invoice.payment_succeeded') {
         const invoice = event.data.object;
         
-        // Check if this is our scheduled final payment
-        if (invoice.metadata?.paymentType === 'final_installment') {
-          await handleFinalInstallmentSuccess(invoice);
+        // Check if this is our scheduled final payment from subscription schedule
+        if (invoice.subscription && invoice.metadata?.paymentType === 'final_installment') {
+          await handleFinalInstallmentSuccess(invoice, stripe);
         }
       }
 
@@ -199,42 +205,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // API endpoint to process scheduled installment payments (can be called by cron job)
-  app.post('/api/process-scheduled-payments', async (req, res) => {
+  // API endpoint to list subscription schedules (for debugging/monitoring)
+  app.get('/api/subscription-schedules', async (req, res) => {
     try {
       if (!stripe) {
         return res.status(503).json({ error: 'Payment processing is not configured' });
       }
 
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const schedules = await stripe.subscriptionSchedules.list({
+        limit: 50,
+        expand: ['data.subscription']
+      });
       
-      // Find all bookings with scheduled payments due today
-      const dueBookings = await storage.getBookingsDueForPayment(today);
-      
-      const results: Array<{bookingId: string, success: boolean, message: string}> = [];
-      
-      for (const booking of dueBookings) {
-        try {
-          // TODO: Implement manual processing if needed for legacy scheduled payments
-          results.push({ bookingId: booking.id, success: false, message: 'Manual processing not implemented - using subscription schedules' });
-        } catch (error) {
-          console.error(`Failed to process scheduled payment for booking ${booking.id}:`, error);
-          results.push({ 
-            bookingId: booking.id, 
-            success: false, 
-            message: error instanceof Error ? error.message : 'Unknown error' 
-          });
-        }
-      }
-
       res.json({ 
-        processed: results.length, 
-        successful: results.filter(r => r.success).length,
-        results 
+        schedules: schedules.data.map(schedule => ({
+          id: schedule.id,
+          status: schedule.status,
+          customer: schedule.customer,
+          created: schedule.created,
+          phases: schedule.phases.map(phase => ({
+            start_date: phase.start_date,
+            end_date: phase.end_date,
+            items: phase.items
+          }))
+        }))
       });
     } catch (error) {
-      console.error('Error processing scheduled payments:', error);
-      res.status(500).json({ error: 'Failed to process scheduled payments' });
+      console.error('Error fetching subscription schedules:', error);
+      res.status(500).json({ error: 'Failed to fetch subscription schedules' });
     }
   });
 
@@ -537,11 +535,26 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
   }
 }
 
-// Helper function to handle installment deposit payment success
-async function handleInstallmentDepositSuccess(session: any, stripe: any): Promise<void> {
+// Helper function to handle subscription creation for installment payments
+async function handleInstallmentSubscriptionCreated(subscription: any, stripe: any): Promise<void> {
   try {
+    // Find the checkout session that created this subscription
+    const sessions = await stripe.checkout.sessions.list({
+      subscription: subscription.id,
+      limit: 1
+    });
+    
+    if (sessions.data.length === 0) {
+      throw new Error('No checkout session found for subscription');
+    }
+    
+    const session = sessions.data[0];
     const bookingData = JSON.parse(session.metadata.bookingData);
-    const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+    
+    // Get pricing from the metadata
+    const depositAmount = parseFloat(session.metadata.depositAmount);
+    const remainingAmount = parseFloat(session.metadata.remainingAmount);
+    const totalAmount = parseFloat(session.metadata.totalAmount);
     
     // Create booking record for installment payment
     const booking = await storage.createBooking({
@@ -561,8 +574,7 @@ async function handleInstallmentDepositSuccess(session: any, stripe: any): Promi
         dueDate: '2026-01-06'
       }),
       stripeSessionId: session.id,
-      stripeCustomerId: session.metadata.customerId,
-      stripePaymentMethodId: paymentIntent.payment_method,
+      stripeCustomerId: subscription.customer,
       remainingAmount: session.metadata.remainingAmount,
       balanceDueDate: '2026-01-06',
     });
@@ -570,76 +582,114 @@ async function handleInstallmentDepositSuccess(session: any, stripe: any): Promi
     // Create payment transaction record for the deposit
     await storage.createPaymentTransaction({
       bookingId: booking.id,
-      stripePaymentIntentId: session.payment_intent,
       amount: session.metadata.depositAmount,
       paymentType: 'deposit',
       status: 'succeeded',
       paymentProvider: 'stripe',
-      stripeResponse: JSON.stringify(paymentIntent),
       processedAt: new Date(),
     });
 
-    // Create scheduled invoice for the final payment
-    await scheduleFinalInstallment(booking, stripe);
+    // Create subscription schedule with two phases
+    await createSubscriptionSchedule(subscription, depositAmount, remainingAmount, session.metadata.packageName, booking.id, stripe);
 
     console.log(`Installment booking created ${booking.id}, scheduled final payment for 2026-01-06`);
   } catch (error) {
-    console.error('Error handling installment deposit success:', error);
+    console.error('Error handling installment subscription creation:', error);
     throw error;
   }
 }
 
-// Helper function to schedule the final installment payment
-async function scheduleFinalInstallment(booking: any, stripe: any): Promise<void> {
+// Helper function to create subscription schedule with 2 phases
+async function createSubscriptionSchedule(subscription: any, depositAmount: number, remainingAmount: number, packageName: string, bookingId: string, stripe: any): Promise<void> {
   try {
-    const finalPaymentDate = new Date('2026-01-06');
-    const remainingAmount = parseFloat(booking.remainingAmount);
+    const finalPaymentDate = Math.floor(new Date('2026-01-06').getTime() / 1000); // Convert to Unix timestamp
     
-    // Create an invoice item for the final payment
-    await stripe.invoiceItems.create({
-      customer: booking.stripeCustomerId,
-      amount: Math.round(remainingAmount * 100), // Convert to cents
-      currency: 'eur',
-      description: `${booking.packageName} - Final Payment`,
+    // Create subscription schedule
+    const schedule = await stripe.subscriptionSchedules.create({
+      customer: subscription.customer,
+      start_date: subscription.current_period_start,
+      end_behavior: 'cancel', // Cancel subscription after final payment
+      phases: [
+        {
+          // Phase 1: Deposit (immediate)
+          items: [
+            {
+              price_data: {
+                currency: 'eur',
+                product_data: {
+                  name: packageName,
+                  description: `${packageName} - Deposit Payment`
+                },
+                unit_amount: Math.round(depositAmount * 100), // Convert to cents
+                recurring: {
+                  interval: 'month'
+                }
+              },
+              quantity: 1
+            }
+          ],
+          end_date: finalPaymentDate
+        },
+        {
+          // Phase 2: Final payment (Jan 6, 2026)
+          items: [
+            {
+              price_data: {
+                currency: 'eur',
+                product_data: {
+                  name: packageName,
+                  description: `${packageName} - Final Payment`
+                },
+                unit_amount: Math.round(remainingAmount * 100), // Convert to cents
+                recurring: {
+                  interval: 'month'
+                }
+              },
+              quantity: 1,
+              metadata: {
+                paymentType: 'final_installment',
+                bookingId: bookingId
+              }
+            }
+          ]
+        }
+      ],
       metadata: {
-        bookingId: booking.id,
-        paymentType: 'final_installment',
-        packageName: booking.packageName,
-      },
+        bookingId: bookingId,
+        packageName: packageName,
+        paymentType: 'installment_schedule'
+      }
     });
-
-    // Create invoice and schedule auto-payment  
-    const invoice = await stripe.invoices.create({
-      customer: booking.stripeCustomerId,
-      collection_method: 'charge_automatically',
-      default_payment_method: booking.stripePaymentMethodId,
-      metadata: {
-        bookingId: booking.id,
-        paymentType: 'final_installment',
-        packageName: booking.packageName,
-      },
+    
+    // Replace the original subscription with the scheduled one
+    await stripe.subscriptions.update(subscription.id, {
+      cancel_at_period_end: true // This will be managed by the schedule
     });
-
-    // Finalize and attempt to pay the invoice immediately for testing
-    // In production, you'd schedule this for Jan 6, 2026
-    const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
-      auto_advance: true, // Attempt to charge automatically
-    });
-
-    // Schedule the invoice to be finalized and charged on the due date
-    console.log(`Created invoice ${invoice.id} for final payment of €${remainingAmount} on ${finalPaymentDate.toISOString().split('T')[0]}`);
+    
+    console.log(`Created subscription schedule ${schedule.id} for booking ${bookingId}, final payment on 2026-01-06`);
   } catch (error) {
-    console.error('Error scheduling final installment:', error);
+    console.error('Error creating subscription schedule:', error);
     throw error;
   }
 }
 
 // Helper function to handle final installment payment success
-async function handleFinalInstallmentSuccess(invoice: any): Promise<void> {
+async function handleFinalInstallmentSuccess(invoice: any, stripe: any): Promise<void> {
   try {
-    const bookingId = invoice.metadata?.bookingId;
+    // Check if this invoice has booking metadata or get it from subscription schedule
+    let bookingId = invoice.metadata?.bookingId;
+    
+    if (!bookingId && invoice.subscription) {
+      // Try to find booking ID from subscription schedule
+      const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+      if (subscription.schedule) {
+        const schedule = await stripe.subscriptionSchedules.retrieve(subscription.schedule);
+        bookingId = schedule.metadata?.bookingId;
+      }
+    }
+    
     if (!bookingId) {
-      console.log('No booking ID in invoice metadata');
+      console.log('No booking ID found in invoice or subscription schedule metadata');
       return;
     }
 
@@ -662,7 +712,7 @@ async function handleFinalInstallmentSuccess(invoice: any): Promise<void> {
         bookingId: booking.id,
         stripePaymentIntentId: invoice.payment_intent,
         amount: (invoice.amount_paid / 100).toString(),
-        paymentType: 'balance',
+        paymentType: 'final_installment',
         status: 'succeeded',
         paymentProvider: 'stripe',
         stripeResponse: JSON.stringify(invoice),
