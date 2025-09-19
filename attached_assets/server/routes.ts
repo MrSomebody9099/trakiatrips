@@ -15,12 +15,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Canonical server-side package pricing (amounts in EUR)
   const PACKAGE_PRICING = {
-    'Package A': {
+    '2 Day Deal': {
       total: 185,
       deposit: 56,
       remaining: 129
     },
-    'Package B': {
+    'Full Weekend Package': {
       total: 245,
       deposit: 74,
       remaining: 171
@@ -608,12 +608,10 @@ async function scheduleFinalInstallment(booking: any, stripe: any): Promise<void
       },
     });
 
-    // Create invoice and schedule auto-payment
+    // Create invoice and schedule auto-payment  
     const invoice = await stripe.invoices.create({
       customer: booking.stripeCustomerId,
-      auto_advance: false, // Don't auto-finalize until due date
       collection_method: 'charge_automatically',
-      days_until_due: Math.ceil((finalPaymentDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
       default_payment_method: booking.stripePaymentMethodId,
       metadata: {
         bookingId: booking.id,
@@ -622,8 +620,14 @@ async function scheduleFinalInstallment(booking: any, stripe: any): Promise<void
       },
     });
 
+    // Finalize and attempt to pay the invoice immediately for testing
+    // In production, you'd schedule this for Jan 6, 2026
+    const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+      auto_advance: true, // Attempt to charge automatically
+    });
+
     // Schedule the invoice to be finalized and charged on the due date
-    console.log(`Scheduled invoice ${invoice.id} for final payment of €${remainingAmount} on ${finalPaymentDate.toISOString().split('T')[0]}`);
+    console.log(`Created invoice ${invoice.id} for final payment of €${remainingAmount} on ${finalPaymentDate.toISOString().split('T')[0]}`);
   } catch (error) {
     console.error('Error scheduling final installment:', error);
     throw error;
