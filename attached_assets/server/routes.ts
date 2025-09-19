@@ -8,13 +8,12 @@ import Stripe from "stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Stripe with environment variable - javascript_stripe integration
-  // In development, Stripe is optional to allow the app to start without secrets
-  let stripe: Stripe | null = null;
-  if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  } else if (process.env.NODE_ENV === 'production') {
+  if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
   }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-08-27.basil',
+  });
 
   // Canonical server-side package pricing (amounts in EUR)
   const PACKAGE_PRICING = {

@@ -1,11 +1,11 @@
 import { loadStripe } from '@stripe/stripe-js';
 
 // Stripe publishable key from environment variable
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
 // Validate that the Stripe publishable key is available
 if (!STRIPE_PUBLISHABLE_KEY) {
-  console.error('Missing VITE_STRIPE_PUBLISHABLE_KEY environment variable');
+  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable');
 }
 
 // Package prices
