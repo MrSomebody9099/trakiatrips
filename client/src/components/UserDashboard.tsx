@@ -500,7 +500,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                 <p className="text-muted-foreground mb-6">
                   Ready to book your next epic ski adventure?
                 </p>
-                <Button onClick={onClose} className="hover-elevate">
+                <Button onClick={() => { onClose(); window.location.href = '/'; }} className="hover-elevate">
                   Browse Packages
                 </Button>
               </CardContent>
