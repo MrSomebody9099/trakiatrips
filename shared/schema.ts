@@ -30,8 +30,15 @@ export const bookings = pgTable("bookings", {
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   paymentStatus: text("payment_status").notNull().default("pending"), // pending, paid, failed
   paymentPlan: text("payment_plan").default("full"), // full, installment
-  installmentStatus: jsonb("installment_status").default(null), // { deposit: paid/pending, balance: paid/pending }
+  installmentStatus: jsonb("installment_status").default(null), // { deposit: paid/pending, balance: paid/pending, dueDate: string }
   fondyOrderId: text("fondy_order_id"),
+  // Stripe fields for installment payments
+  stripeCustomerId: text("stripe_customer_id"),
+  stripePaymentMethodId: text("stripe_payment_method_id"), 
+  stripeSessionId: text("stripe_session_id"), // For idempotency
+  scheduledPaymentIntentId: text("scheduled_payment_intent_id"),
+  remainingAmount: decimal("remaining_amount", { precision: 10, scale: 2 }),
+  balanceDueDate: text("balance_due_date"), // Due date for remaining balance
   flightNumber: text("flight_number"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -71,11 +78,16 @@ export type Guest = typeof guests.$inferSelect;
 export const paymentTransactions = pgTable("payment_transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   bookingId: varchar("booking_id").notNull().references(() => bookings.id, { onDelete: "cascade" }),
-  fondyOrderId: text("fondy_order_id").notNull(),
+  fondyOrderId: text("fondy_order_id"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   paymentType: text("payment_type").notNull(), // deposit, balance, full
-  status: text("status").notNull(), // pending, approved, declined
+  status: text("status").notNull(), // pending, approved, declined, succeeded
+  paymentProvider: text("payment_provider").notNull().default("fondy"), // fondy, stripe
   fondyResponse: jsonb("fondy_response"),
+  stripeResponse: jsonb("stripe_response"),
+  scheduledAt: timestamp("scheduled_at"), // For scheduled payments
+  processedAt: timestamp("processed_at"), // When payment was actually processed
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

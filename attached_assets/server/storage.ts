@@ -15,8 +15,12 @@ export interface IStorage {
   getBooking(id: string): Promise<Booking | undefined>;
   getAllBookings(): Promise<Booking[]>;
   getBookingsByUserEmail(userEmail: string): Promise<Booking[]>;
+  getBookingByEmail(userEmail: string): Promise<Booking | undefined>;
+  getBookingByStripeSession(sessionId: string): Promise<Booking | undefined>;
+  getBookingsDueForPayment(dueDate: string): Promise<Booking[]>;
   updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined>;
   updateBookingPaymentStatus(fondyOrderId: string, status: string): Promise<Booking | undefined>;
+  updateBookingStatusById(bookingId: string, status: string): Promise<Booking | undefined>;
   
   // Guest operations
   createGuest(guest: InsertGuest): Promise<Guest>;
@@ -28,6 +32,7 @@ export interface IStorage {
   createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
   getPaymentTransactionByFondyOrderId(fondyOrderId: string): Promise<PaymentTransaction | undefined>;
   updatePaymentTransaction(id: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined>;
+  updatePaymentTransactionByStripeIntent(stripePaymentIntentId: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -74,7 +79,13 @@ export class MemStorage implements IStorage {
       paymentStatus: insertBooking.paymentStatus || "pending",
       paymentPlan: insertBooking.paymentPlan || "full",
       fondyOrderId: insertBooking.fondyOrderId || null,
-      flightNumber: insertBooking.flightNumber || null
+      flightNumber: insertBooking.flightNumber || null,
+      stripeCustomerId: insertBooking.stripeCustomerId || null,
+      stripePaymentMethodId: insertBooking.stripePaymentMethodId || null,
+      stripeSessionId: insertBooking.stripeSessionId || null,
+      scheduledPaymentIntentId: insertBooking.scheduledPaymentIntentId || null,
+      remainingAmount: insertBooking.remainingAmount || null,
+      balanceDueDate: insertBooking.balanceDueDate || null
     };
     this.bookings.set(id, booking);
     return booking;
@@ -91,6 +102,26 @@ export class MemStorage implements IStorage {
   async getBookingsByUserEmail(userEmail: string): Promise<Booking[]> {
     return Array.from(this.bookings.values()).filter(
       (booking) => booking.userEmail === userEmail
+    );
+  }
+
+  async getBookingByEmail(userEmail: string): Promise<Booking | undefined> {
+    return Array.from(this.bookings.values()).find(
+      (booking) => booking.userEmail === userEmail
+    );
+  }
+
+  async getBookingByStripeSession(sessionId: string): Promise<Booking | undefined> {
+    return Array.from(this.bookings.values()).find(
+      (booking) => booking.stripeSessionId === sessionId
+    );
+  }
+
+  async getBookingsDueForPayment(dueDate: string): Promise<Booking[]> {
+    return Array.from(this.bookings.values()).filter(
+      (booking) => booking.balanceDueDate === dueDate && 
+                   booking.paymentPlan === 'installment' &&
+                   booking.paymentStatus !== 'paid'
     );
   }
 
@@ -114,6 +145,10 @@ export class MemStorage implements IStorage {
     if (!booking) return undefined;
     
     return this.updateBooking(booking.id, { paymentStatus: status });
+  }
+
+  async updateBookingStatusById(bookingId: string, status: string): Promise<Booking | undefined> {
+    return this.updateBooking(bookingId, { paymentStatus: status });
   }
 
   // Guest operations
@@ -157,7 +192,13 @@ export class MemStorage implements IStorage {
       id, 
       createdAt: now, 
       updatedAt: now,
-      fondyResponse: insertTransaction.fondyResponse || null
+      fondyResponse: insertTransaction.fondyResponse || null,
+      stripeResponse: insertTransaction.stripeResponse || null,
+      scheduledAt: insertTransaction.scheduledAt || null,
+      processedAt: insertTransaction.processedAt || null,
+      paymentProvider: insertTransaction.paymentProvider || 'fondy',
+      fondyOrderId: insertTransaction.fondyOrderId || null,
+      stripePaymentIntentId: insertTransaction.stripePaymentIntentId || null
     };
     this.paymentTransactions.set(id, transaction);
     return transaction;
@@ -180,6 +221,15 @@ export class MemStorage implements IStorage {
     };
     this.paymentTransactions.set(id, updatedTransaction);
     return updatedTransaction;
+  }
+
+  async updatePaymentTransactionByStripeIntent(stripePaymentIntentId: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined> {
+    const transaction = Array.from(this.paymentTransactions.values()).find(
+      (t) => t.stripePaymentIntentId === stripePaymentIntentId
+    );
+    if (!transaction) return undefined;
+    
+    return this.updatePaymentTransaction(transaction.id, updates);
   }
 }
 
