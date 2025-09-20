@@ -107,7 +107,7 @@ router.post('/validate-coupon', async (req, res) => {
     }
 
     const promotionCode = promotionCodes.data[0];
-    const coupon = await stripe.coupons.retrieve(promotionCode.coupon as string);
+    const coupon = await stripe.coupons.retrieve(promotionCode.coupon.toString());
     
     // Special validation for 4ORMORE coupon
     if (couponCode === '4ORMORE' && groupSize < 4) {
