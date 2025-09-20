@@ -253,7 +253,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             paymentMode: 'full',
             packageName: packageName,
             totalAmount: packagePricing.total.toString(),
-            bookingData: JSON.stringify(bookingData),
+            bookingId: bookingData.bookingId,
+            userEmail: bookingData.userEmail,
           },
         });
 
@@ -311,7 +312,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             totalAmount: packagePricing.total.toString(),
             depositAmount: packagePricing.deposit.toString(),
             remainingAmount: packagePricing.remaining.toString(),
-            bookingData: JSON.stringify(bookingData),
+            bookingId: bookingData.bookingId,
+            userEmail: bookingData.userEmail,
             customerId: customer.id,
           },
           success_url: `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}&type=installment`,
@@ -687,26 +689,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 // Helper function to handle successful full payment
 async function handleFullPaymentSuccess(session: any): Promise<void> {
   try {
-    const bookingData = JSON.parse(session.metadata.bookingData);
+    const bookingId = session.metadata.bookingId;
     
-    // Create booking record for full payment
-    const booking = await storage.createBooking({
-      userEmail: bookingData.userEmail,
-      packageName: session.metadata.packageName,
-      packagePrice: session.metadata.totalAmount,
-      dates: bookingData.dates,
-      numberOfGuests: bookingData.numberOfGuests,
-      roomType: bookingData.roomType,
-      addOns: bookingData.addOns || [],
-      totalAmount: session.metadata.totalAmount,
-      paymentStatus: 'paid',
-      paymentPlan: 'full',
-      stripeSessionId: session.id,
-    });
+    if (!bookingId) {
+      console.error('No bookingId found in session metadata');
+      return;
+    }
+    
+    // Update existing booking to paid status
+    const updatedBooking = await storage.updateBookingStatusById(bookingId, 'paid');
+    
+    if (!updatedBooking) {
+      console.error(`Booking ${bookingId} not found for payment completion`);
+      return;
+    }
 
     // Create payment transaction record
     await storage.createPaymentTransaction({
-      bookingId: booking.id,
+      bookingId: bookingId,
       stripePaymentIntentId: session.payment_intent,
       amount: session.metadata.totalAmount,
       paymentType: 'full',
@@ -715,7 +715,7 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
       processedAt: new Date(),
     });
 
-    console.log(`Full payment completed for booking ${booking.id}`);
+    console.log(`Full payment completed for booking ${bookingId}`);
   } catch (error) {
     console.error('Error handling full payment success:', error);
     throw error;
@@ -744,7 +744,12 @@ async function handleInstallmentSubscriptionCreated(subscription: any, stripe: a
       return;
     }
     
-    const bookingData = JSON.parse(session.metadata.bookingData);
+    const bookingId = session.metadata.bookingId;
+    
+    if (!bookingId) {
+      console.error('No bookingId found in session metadata');
+      return;
+    }
     
     // Get pricing from the metadata
     const depositAmount = parseFloat(session.metadata.depositAmount);
@@ -753,18 +758,9 @@ async function handleInstallmentSubscriptionCreated(subscription: any, stripe: a
     
     console.log(`Processing installment subscription for ${session.metadata.packageName}, deposit: €${depositAmount}, remaining: €${remainingAmount}`);
     
-    // Create booking record for installment payment
-    const booking = await storage.createBooking({
-      userEmail: bookingData.userEmail,
-      packageName: session.metadata.packageName,
-      packagePrice: session.metadata.depositAmount,
-      dates: bookingData.dates,
-      numberOfGuests: bookingData.numberOfGuests,
-      roomType: bookingData.roomType,
-      addOns: bookingData.addOns || [],
-      totalAmount: session.metadata.totalAmount,
+    // Update existing booking to deposit_paid status with installment details
+    const updatedBooking = await storage.updateBooking(bookingId, {
       paymentStatus: 'deposit_paid',
-      paymentPlan: 'installment',
       installmentStatus: JSON.stringify({
         deposit: 'paid',
         balance: 'pending',
@@ -775,6 +771,13 @@ async function handleInstallmentSubscriptionCreated(subscription: any, stripe: a
       remainingAmount: session.metadata.remainingAmount,
       balanceDueDate: '2026-01-06',
     });
+    
+    if (!updatedBooking) {
+      console.error(`Booking ${bookingId} not found for installment payment completion`);
+      return;
+    }
+    
+    const booking = updatedBooking;
 
     // Create payment transaction record for the deposit
     await storage.createPaymentTransaction({
