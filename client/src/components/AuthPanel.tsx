@@ -59,31 +59,31 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
     }
 
     try {
-      // Save email to Supabase leads table - only if it doesn't exist to prevent status downgrade
-      const { data, error } = await supabase
-        .from('leads')
-        .insert({ 
-          email: formData.email, 
-          status: 'email_only' 
-        })
-        .select();
+      // Save email via backend API
+      const response = await fetch('/api/collect-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          status: 'email_only'
+        }),
+      });
 
-      if (error) {
-        // If duplicate key error, it's okay - email already exists  
-        if (error.code === '23505') {
-          console.log('Email already exists in database:', formData.email);
-        } else {
-          console.error('Error saving email to Supabase:', error);
-          setErrors({ general: "Failed to save email. Please try again." });
-          return;
-        }
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('Error saving email via API:', result);
+        setErrors({ general: result.error || "Failed to save email. Please try again." });
+        return;
       }
-      
-      // Also store in localStorage for immediate UI updates
+
+      // Store in localStorage for immediate UI updates
       localStorage.setItem("userEmail", formData.email);
       onEmailCollected?.(formData.email);
       
-      console.log(`${mode} successful for:`, formData.email, 'Saved to Supabase:', data);
+      console.log(`${mode} successful for:`, formData.email, 'Saved via API:', result);
       onClose();
     } catch (error) {
       console.error('Error:', error);

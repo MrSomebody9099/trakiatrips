@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction } from "../shared/schema.js";
+import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
@@ -33,6 +33,11 @@ export interface IStorage {
   getPaymentTransactionByFondyOrderId(fondyOrderId: string): Promise<PaymentTransaction | undefined>;
   updatePaymentTransaction(id: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined>;
   updatePaymentTransactionByStripeIntent(stripePaymentIntentId: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined>;
+
+  // Lead operations
+  createLead(lead: InsertLead): Promise<Lead>;
+  getAllLeads(): Promise<Lead[]>;
+  getLeadByEmail(email: string): Promise<Lead | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -40,12 +45,14 @@ export class MemStorage implements IStorage {
   private bookings: Map<string, Booking>;
   private guests: Map<string, Guest>;
   private paymentTransactions: Map<string, PaymentTransaction>;
+  private leads: Map<string, Lead>;
 
   constructor() {
     this.users = new Map();
     this.bookings = new Map();
     this.guests = new Map();
     this.paymentTransactions = new Map();
+    this.leads = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -230,6 +237,30 @@ export class MemStorage implements IStorage {
     if (!transaction) return undefined;
     
     return this.updatePaymentTransaction(transaction.id, updates);
+  }
+
+  // Lead operations
+  async createLead(insertLead: InsertLead): Promise<Lead> {
+    const id = randomUUID();
+    const now = new Date();
+    const lead: Lead = {
+      ...insertLead,
+      id,
+      createdAt: now,
+      status: insertLead.status || "email_only"
+    };
+    this.leads.set(id, lead);
+    return lead;
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return Array.from(this.leads.values());
+  }
+
+  async getLeadByEmail(email: string): Promise<Lead | undefined> {
+    return Array.from(this.leads.values()).find(
+      (lead) => lead.email === email
+    );
   }
 }
 
