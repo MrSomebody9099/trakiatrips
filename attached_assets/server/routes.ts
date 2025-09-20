@@ -382,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Check if this is our scheduled final payment from subscription schedule
         // Look for final_installment in line item metadata since Stripe doesn't promote item metadata to invoice metadata
-        const isFinalInstallment = invoice.subscription && invoice.lines?.data?.some(
+        const isFinalInstallment = (invoice as any).subscription && invoice.lines?.data?.some(
           (line: any) => line.metadata?.paymentType === 'final_installment'
         );
         
