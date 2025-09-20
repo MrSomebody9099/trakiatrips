@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Navigation from "./Navigation";
-import PaymentForm from "./PaymentForm";
+import { supabase } from "@/lib/supabase";
 
 interface Package {
   id: string;
@@ -219,54 +219,114 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     leadBooker.name && leadBooker.email && leadBooker.phone && leadBooker.dateOfBirth &&
     guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
 
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
   
   const handlePayment = async () => {
-    // Calculate payment amount based on plan
-    const paymentAmount = paymentPlan === 'installment' 
-      ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
-      : totalPrice;
+    try {
+      // Calculate payment amount based on plan
+      const paymentAmount = paymentPlan === 'installment' 
+        ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
+        : totalPrice;
 
-    const bookingData = {
-      userEmail: leadBooker.email,
-      packageName: selectedPackage?.name || '',
-      packagePrice: (selectedPackage?.price || 0).toString(),
-      dates: selectedPackage?.dates || '',
-      numberOfGuests: numberOfPeople,
-      roomType: selectedRoomOption?.name || '',
-      addOns: selectedAddOns.map(addon => {
-        const addOnInfo = addOns.find(a => a.id === addon.id);
-        const isPerDay = (addOnInfo as any)?.isPerDay;
-        const days = isPerDay ? (addon.days || 1) : 1;
-        return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
-      }),
-      totalAmount: totalPrice.toString(),
-      paymentPlan: paymentPlan,
-      installmentStatus: paymentPlan === 'installment' 
-        ? { deposit: 'pending', balance: 'pending' }
-        : null,
-      flightNumber: flightNumber || undefined,
-    };
+      const allGuests = [leadBooker, ...guests].map(guest => ({
+        name: guest.name,
+        email: guest.email,
+        phone: guest.phone,
+        date_of_birth: guest.dateOfBirth
+      }));
 
-    const allGuests = [leadBooker, ...guests].map(guest => ({
-      name: guest.name,
-      email: guest.email,
-      phone: guest.phone,
-      dateOfBirth: guest.dateOfBirth
-    }));
+      console.log('Saving booking to Supabase...');
 
-    console.log('Processing payment:', { bookingData, guests: allGuests, paymentAmount, paymentPlan });
-    
-    // Store booking data for later use
-    localStorage.setItem('pendingBookingData', JSON.stringify({
-      bookingData,
-      guests: allGuests,
-      paymentAmount,
-      totalPrice
-    }));
-    
-    // Redirect to the new payment process page
-    window.location.href = '/payment-process';
+      // 1. Update lead status to 'booking_started'
+      const { error: leadUpdateError } = await supabase
+        .from('leads')
+        .update({ status: 'booking_started' })
+        .eq('email', leadBooker.email);
+
+      if (leadUpdateError) {
+        console.error('Error updating lead status:', leadUpdateError);
+      }
+
+      // 2. Save booking to Supabase
+      const { data: bookingData, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          lead_email: leadBooker.email,
+          package_name: selectedPackage?.name || '',
+          package_type: selectedPackage?.dates || '',
+          number_of_guests: numberOfPeople,
+          total_amount: totalPrice * 100, // Convert to cents
+          payment_plan: paymentPlan,
+          status: 'pending',
+          lead_booker_name: leadBooker.name,
+          lead_booker_phone: leadBooker.phone
+        })
+        .select()
+        .single();
+
+      if (bookingError) {
+        console.error('Error saving booking:', bookingError);
+        alert('Failed to save booking. Please try again.');
+        return;
+      }
+
+      console.log('Booking saved:', bookingData);
+
+      // 3. Save guests to Supabase
+      if (bookingData && allGuests.length > 0) {
+        const guestRecords = allGuests.map((guest, index) => ({
+          booking_id: bookingData.id,
+          name: guest.name,
+          email: guest.email,
+          phone: guest.phone,
+          date_of_birth: guest.date_of_birth || null,
+          is_lead_booker: index === 0 // First guest is lead booker
+        }));
+
+        const { error: guestError } = await supabase
+          .from('guests')
+          .insert(guestRecords);
+
+        if (guestError) {
+          console.error('Error saving guests:', guestError);
+        } else {
+          console.log('Guests saved successfully');
+        }
+      }
+
+      // Store minimal data in localStorage for payment process
+      const legacyBookingData = {
+        userEmail: leadBooker.email,
+        packageName: selectedPackage?.name || '',
+        packagePrice: (selectedPackage?.price || 0).toString(),
+        dates: selectedPackage?.dates || '',
+        numberOfGuests: numberOfPeople,
+        roomType: selectedRoomOption?.name || '',
+        addOns: selectedAddOns.map(addon => {
+          const addOnInfo = addOns.find(a => a.id === addon.id);
+          const isPerDay = (addOnInfo as any)?.isPerDay;
+          const days = isPerDay ? (addon.days || 1) : 1;
+          return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
+        }),
+        totalAmount: totalPrice.toString(),
+        paymentPlan: paymentPlan,
+        flightNumber: flightNumber || undefined,
+        supabaseBookingId: bookingData.id // Store Supabase booking ID
+      };
+
+      localStorage.setItem('pendingBookingData', JSON.stringify({
+        bookingData: legacyBookingData,
+        guests: allGuests,
+        paymentAmount,
+        totalPrice
+      }));
+      
+      // Redirect to the new payment process page
+      window.location.href = '/payment-process';
+
+    } catch (error) {
+      console.error('Unexpected error during booking:', error);
+      alert('An unexpected error occurred. Please try again.');
+    }
   };
   
   const handlePaymentSuccess = () => {
@@ -748,25 +808,17 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   </div>
                 </div>
                 
-                {!showPaymentForm ? (
-                  <Button
-                    onClick={handlePayment}
-                    disabled={!canProceedToPayment}
-                    className="w-full hover-elevate"
-                    data-testid="button-proceed-payment"
-                  >
-                    {paymentPlan === 'installment' 
-                      ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
-                      : `Proceed to Payment - €${totalPrice}`
-                    }
-                  </Button>
-                ) : (
-                  <PaymentForm 
-                    amount={paymentPlan === 'installment' ? Math.ceil(totalPrice * 0.3) : totalPrice}
-                    onSuccess={handlePaymentSuccess}
-                    onCancel={() => setShowPaymentForm(false)}
-                  />
-                )}
+                <Button
+                  onClick={handlePayment}
+                  disabled={!canProceedToPayment}
+                  className="w-full hover-elevate"
+                  data-testid="button-proceed-payment"
+                >
+                  {paymentPlan === 'installment' 
+                    ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
+                    : `Proceed to Payment - €${totalPrice}`
+                  }
+                </Button>
               </CardContent>
             </Card>
           </div>
