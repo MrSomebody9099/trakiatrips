@@ -1,3 +1,12 @@
+If project is pulled from github or mirated ask for stripe and supabase APIs and url right away.
+# Stripe Configuration STRIPE_SECRET_KEY=sk_test_or_live_your_stripe_secret_key_here 
+STRIPE_PUBLISHABLE_KEY=pk_test_or_live_your_stripe_publishable_key_here 
+VITE_STRIPE_PUBLIC_KEY=pk_test_or_live_your_stripe_publishable_key_here 
+
+# Supabase Configuration SUPABASE_URL=https://your-project-id.supabase.co 
+SUPABASE_ANON_KEY=your_anon_key_here VITE_SUPABASE_URL=https://your-project-id.supabase.co 
+VITE_SUPABASE_ANON_KEY=your_anon_key_here
+
 # Trakia Trips Travel Agency Platform
 
 ## Overview
