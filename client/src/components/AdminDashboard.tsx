@@ -27,6 +27,7 @@ interface Booking {
   amount: number;
   date: string;
   status: "pending" | "confirmed" | "completed";
+  flightNumber?: string;
 }
 
 interface DashboardData {
@@ -57,6 +58,7 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
         payment_plan,
         payment_status,
         room_type,
+        flight_number,
         created_at,
         guests!inner (
           name,
@@ -81,7 +83,8 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
         guests: booking.number_of_guests,
         amount: Math.round(parseFloat(booking.total_amount)), // Amount is already in euros
         date: new Date(booking.created_at).toLocaleDateString(),
-        status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed"
+        status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed",
+        flightNumber: booking.flight_number || null
       };
     });
 
@@ -161,7 +164,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
 
   const exportToCSV = () => {
     // Create CSV content
-    const headers = ["Booking ID", "Lead Booker", "Contact", "Package", "Guests", "Amount", "Date", "Status"];
+    const headers = ["Booking ID", "Lead Booker", "Contact", "Package", "Guests", "Flight Number", "Amount", "Date", "Status"];
     const csvContent = [
       headers.join(","),
       ...filteredBookings.map((booking: Booking) => [
@@ -170,6 +173,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
         `${booking.email} / ${booking.phone}`,
         booking.package,
         booking.guests,
+        booking.flightNumber || 'Not provided',
         booking.amount,
         booking.date,
         booking.status
@@ -364,6 +368,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                         <th className="text-left p-3 font-heading font-semibold">Contact</th>
                         <th className="text-left p-3 font-heading font-semibold">Package</th>
                         <th className="text-left p-3 font-heading font-semibold">Guests</th>
+                        <th className="text-left p-3 font-heading font-semibold">Flight</th>
                         <th className="text-left p-3 font-heading font-semibold">Amount</th>
                         <th className="text-left p-3 font-heading font-semibold">Date</th>
                         <th className="text-left p-3 font-heading font-semibold">Status</th>
@@ -386,6 +391,11 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                           </td>
                           <td className="p-3 font-body">{booking.package}</td>
                           <td className="p-3 font-body">{booking.guests}</td>
+                          <td className="p-3 font-body">
+                            <span className="text-sm font-medium" data-testid={`flight-${booking.id}`}>
+                              {booking.flightNumber || '-'}
+                            </span>
+                          </td>
                           <td className="p-3 font-body font-semibold">€{booking.amount}</td>
                           <td className="p-3 font-body">{booking.date}</td>
                           <td className="p-3">

@@ -208,7 +208,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
       address: editingUserInfo.address.trim() || ""
     };
     
-    setUserInfo(updatedUserInfo);
+    setUserInfo({...userInfo, ...updatedUserInfo});
     localStorage.setItem("userName", updatedUserInfo.name);
     localStorage.setItem("userPhone", updatedUserInfo.phone);
     localStorage.setItem("userAddress", updatedUserInfo.address);
@@ -500,7 +500,7 @@ export default function UserDashboard({ onClose }: UserDashboardProps) {
                 <p className="text-muted-foreground mb-6">
                   Ready to book your next epic ski adventure?
                 </p>
-                <Button onClick={() => { onClose(); window.location.href = '/'; }} className="hover-elevate">
+                <Button onClick={() => { onClose?.(); window.location.href = '/'; }} className="hover-elevate">
                   Browse Packages
                 </Button>
               </CardContent>
