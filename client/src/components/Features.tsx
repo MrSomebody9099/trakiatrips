@@ -112,6 +112,10 @@ export default function Features() {
                     <div className="w-2 h-2 bg-red-400 rounded-full"></div>
                     <span className="font-body text-lg text-muted-foreground">Daily ski passes</span>
                   </div>
+                  <div className="flex items-center space-x-3 mt-2">
+                    <div className="w-1 h-1 bg-red-300 rounded-full"></div>
+                    <span className="font-body text-xs text-muted-foreground/70">anything that is not mentioned</span>
+                  </div>
                 </div>
               </div>
               

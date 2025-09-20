@@ -91,7 +91,7 @@ export default function Hero({ onBookingClick }: HeroProps) {
                 
                 <div className="pt-8 border-t border-blue-300/30">
                   <p className="text-blue-100 font-medium text-base sm:text-lg md:text-xl">
-                    Limited to 100 adventurers
+                    limited bookings only
                   </p>
                   <p className="text-blue-200/80 text-xs sm:text-sm md:text-base mt-2">
                     March 6-9, 2025 • Bansko, Bulgaria
