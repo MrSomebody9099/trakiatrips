@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabase";
 
 interface AuthPanelProps {
   isOpen: boolean;
@@ -58,16 +59,34 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
     }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save email to Supabase leads table - only if it doesn't exist to prevent status downgrade
+      const { data, error } = await supabase
+        .from('leads')
+        .insert({ 
+          email: formData.email, 
+          status: 'email_only' 
+        })
+        .select();
+
+      if (error) {
+        // If duplicate key error, it's okay - email already exists  
+        if (error.code === '23505') {
+          console.log('Email already exists in database:', formData.email);
+        } else {
+          console.error('Error saving email to Supabase:', error);
+          setErrors({ general: "Failed to save email. Please try again." });
+          return;
+        }
+      }
       
-      // Store email for demo purposes
+      // Also store in localStorage for immediate UI updates
       localStorage.setItem("userEmail", formData.email);
       onEmailCollected?.(formData.email);
       
-      console.log(`${mode} successful for:`, formData.email);
+      console.log(`${mode} successful for:`, formData.email, 'Saved to Supabase:', data);
       onClose();
     } catch (error) {
+      console.error('Error:', error);
       setErrors({ general: "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
