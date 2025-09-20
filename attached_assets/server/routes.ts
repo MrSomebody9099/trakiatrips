@@ -2,7 +2,7 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema } from "../../shared/schema.js";
+import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema, insertLeadSchema } from "../../shared/schema.js";
 import crypto from "crypto";
 import Stripe from "stripe";
 
@@ -29,6 +29,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Configure raw body parsing for Stripe webhook
   app.use('/api/stripe/webhook', express.raw({type: 'application/json'}));
+
+  // Email collection API endpoint
+  app.post('/api/collect-email', async (req, res) => {
+    try {
+      const { email, status = 'email_only' } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      // Validate email format
+      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+
+      // Check if email already exists
+      const existingLead = await storage.getLeadByEmail(email);
+      if (existingLead) {
+        return res.json({ 
+          success: true, 
+          message: 'Email already collected',
+          lead: existingLead
+        });
+      }
+
+      // Create new lead
+      const newLead = await storage.createLead({ email, status });
+      
+      return res.json({ 
+        success: true, 
+        message: 'Email collected successfully',
+        lead: newLead
+      });
+
+    } catch (error) {
+      console.error('Error collecting email:', error);
+      return res.status(500).json({ error: 'Failed to save email. Please try again.' });
+    }
+  });
 
   // Create a Stripe checkout session with subscription support for installments
   app.post('/api/create-checkout-session', async (req, res) => {
