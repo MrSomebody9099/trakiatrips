@@ -370,10 +370,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const subscription = event.data.object;
         console.log('Subscription created:', subscription.id);
         
-        // Check if this subscription has installment metadata
-        if (subscription.metadata?.paymentMode === 'installment') {
-          await handleInstallmentSubscriptionCreated(subscription, stripe);
-        }
+        // CRITICAL FIX: Subscriptions don't inherit metadata from sessions
+        // Always check if this is an installment subscription by looking up the session
+        await handleInstallmentSubscriptionCreated(subscription, stripe);
       }
 
       // Handle successful payment of scheduled subscription invoice (final installment)
@@ -733,16 +732,26 @@ async function handleInstallmentSubscriptionCreated(subscription: any, stripe: a
     });
     
     if (sessions.data.length === 0) {
-      throw new Error('No checkout session found for subscription');
+      console.error('No checkout session found for subscription:', subscription.id);
+      return; // Skip if not an installment subscription
     }
     
     const session = sessions.data[0];
+    
+    // Check if this is actually an installment subscription
+    if (session.metadata?.paymentMode !== 'installment') {
+      console.log('Subscription is not for installment payment, skipping:', subscription.id);
+      return;
+    }
+    
     const bookingData = JSON.parse(session.metadata.bookingData);
     
     // Get pricing from the metadata
     const depositAmount = parseFloat(session.metadata.depositAmount);
     const remainingAmount = parseFloat(session.metadata.remainingAmount);
     const totalAmount = parseFloat(session.metadata.totalAmount);
+    
+    console.log(`Processing installment subscription for ${session.metadata.packageName}, deposit: €${depositAmount}, remaining: €${remainingAmount}`);
     
     // Create booking record for installment payment
     const booking = await storage.createBooking({
