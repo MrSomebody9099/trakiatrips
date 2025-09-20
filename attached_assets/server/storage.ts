@@ -1,5 +1,8 @@
-import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead } from "../../shared/schema";
+import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead, users, bookings, guests, paymentTransactions, leads } from "../../shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { eq } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -264,4 +267,155 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database storage implementation using Drizzle ORM
+class DatabaseStorage implements IStorage {
+  private db: any;
+  
+  constructor() {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is required for database storage");
+    }
+    
+    // Create postgres connection
+    const connectionString = process.env.DATABASE_URL;
+    const sql = postgres(connectionString);
+    this.db = drizzle(sql);
+  }
+
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const result = await this.db.insert(users).values(insertUser).returning();
+    return result[0];
+  }
+
+  // Lead operations
+  async createLead(insertLead: InsertLead): Promise<Lead> {
+    const result = await this.db.insert(leads).values(insertLead).returning();
+    return result[0];
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return await this.db.select().from(leads);
+  }
+
+  async getLeadByEmail(email: string): Promise<Lead | undefined> {
+    const result = await this.db.select().from(leads).where(eq(leads.email, email)).limit(1);
+    return result[0];
+  }
+
+  // Booking operations
+  async createBooking(insertBooking: InsertBooking): Promise<Booking> {
+    const result = await this.db.insert(bookings).values(insertBooking).returning();
+    return result[0];
+  }
+
+  async getBooking(id: string): Promise<Booking | undefined> {
+    const result = await this.db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return await this.db.select().from(bookings);
+  }
+
+  async getBookingsByUserEmail(userEmail: string): Promise<Booking[]> {
+    return await this.db.select().from(bookings).where(eq(bookings.userEmail, userEmail));
+  }
+
+  async getBookingByEmail(userEmail: string): Promise<Booking | undefined> {
+    const result = await this.db.select().from(bookings).where(eq(bookings.userEmail, userEmail)).limit(1);
+    return result[0];
+  }
+
+  async getBookingByStripeSession(sessionId: string): Promise<Booking | undefined> {
+    const result = await this.db.select().from(bookings).where(eq(bookings.stripeSessionId, sessionId)).limit(1);
+    return result[0];
+  }
+
+  async getBookingsDueForPayment(dueDate: string): Promise<Booking[]> {
+    return await this.db.select().from(bookings).where(eq(bookings.balanceDueDate, dueDate));
+  }
+
+  async updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined> {
+    const result = await this.db.update(bookings).set(updates).where(eq(bookings.id, id)).returning();
+    return result[0];
+  }
+
+  async updateBookingPaymentStatus(fondyOrderId: string, status: string): Promise<Booking | undefined> {
+    const result = await this.db.update(bookings)
+      .set({ paymentStatus: status })
+      .where(eq(bookings.fondyOrderId, fondyOrderId))
+      .returning();
+    return result[0];
+  }
+
+  async updateBookingStatusById(bookingId: string, status: string): Promise<Booking | undefined> {
+    const result = await this.db.update(bookings)
+      .set({ paymentStatus: status })
+      .where(eq(bookings.id, bookingId))
+      .returning();
+    return result[0];
+  }
+
+  // Guest operations
+  async createGuest(insertGuest: InsertGuest): Promise<Guest> {
+    const result = await this.db.insert(guests).values(insertGuest).returning();
+    return result[0];
+  }
+
+  async getGuestsByBookingId(bookingId: string): Promise<Guest[]> {
+    return await this.db.select().from(guests).where(eq(guests.bookingId, bookingId));
+  }
+
+  async updateGuest(id: string, updates: Partial<Guest>): Promise<Guest | undefined> {
+    const result = await this.db.update(guests).set(updates).where(eq(guests.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteGuest(id: string): Promise<boolean> {
+    const result = await this.db.delete(guests).where(eq(guests.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // Payment transaction operations
+  async createPaymentTransaction(insertTransaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
+    const result = await this.db.insert(paymentTransactions).values(insertTransaction).returning();
+    return result[0];
+  }
+
+  async getPaymentTransactionByFondyOrderId(fondyOrderId: string): Promise<PaymentTransaction | undefined> {
+    const result = await this.db.select().from(paymentTransactions)
+      .where(eq(paymentTransactions.fondyOrderId, fondyOrderId))
+      .limit(1);
+    return result[0];
+  }
+
+  async updatePaymentTransaction(id: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined> {
+    const result = await this.db.update(paymentTransactions)
+      .set(updates)
+      .where(eq(paymentTransactions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updatePaymentTransactionByStripeIntent(stripePaymentIntentId: string, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined> {
+    const result = await this.db.update(paymentTransactions)
+      .set(updates)
+      .where(eq(paymentTransactions.stripePaymentIntentId, stripePaymentIntentId))
+      .returning();
+    return result[0];
+  }
+}
+
+// Switch to database storage
+export const storage = new DatabaseStorage();
