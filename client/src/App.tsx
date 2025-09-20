@@ -13,6 +13,7 @@ import UserDashboard from "./components/UserDashboard";
 import SuccessPage from "./pages/SuccessPage";
 import TransactionSuccess from "./pages/TransactionSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentProcess from "./pages/PaymentProcess";
 import NotFound from "@/pages/not-found";
 import AuthProvider from "./components/AuthProvider";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/privacy-policy" component={() => <PrivacyPolicy />} />
       <Route path="/booking" component={() => <BookingFlow />} />
       <Route path="/payment-process" component={() => <PaymentProcess />} />
+      <Route path="/payment-success" component={() => <PaymentSuccess />} />
       <Route path="/success" component={() => <SuccessPage />} />
       <Route path="/payment-failed" component={() => <PaymentFailed />} />
       <Route path="/transaction-successful" component={() => <TransactionSuccess />} />
