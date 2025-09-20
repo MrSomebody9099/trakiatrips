@@ -2,6 +2,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Load environment variables
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 const app = express();
 
 // Configure raw body parsing for Stripe webhook BEFORE express.json()
