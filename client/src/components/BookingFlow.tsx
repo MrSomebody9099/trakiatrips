@@ -252,6 +252,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         .insert({
           user_email: leadBooker.email,
           package_name: selectedPackage?.name || '',
+          package_price: selectedPackage?.price.toString() || '0',
           number_of_guests: numberOfPeople,
           total_amount: totalPrice.toString(), // Store in euros as decimal string
           payment_plan: paymentPlan,
