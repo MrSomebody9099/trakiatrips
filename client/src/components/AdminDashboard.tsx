@@ -50,15 +50,13 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
       .from('bookings')
       .select(`
         id,
-        lead_email,
+        user_email,
         package_name,
-        package_type,
         number_of_guests,
         total_amount,
         payment_plan,
-        status,
-        lead_booker_name,
-        lead_booker_phone,
+        payment_status,
+        room_type,
         created_at
       `)
       .order('created_at', { ascending: false });
@@ -68,14 +66,14 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
     // Transform bookings data to match UI format
     const transformedBookings: Booking[] = (bookingsData || []).map(booking => ({
       id: booking.id.substring(0, 8), // Show first 8 chars of UUID
-      leadBooker: booking.lead_booker_name || 'N/A',
-      email: booking.lead_email,
-      phone: booking.lead_booker_phone || 'N/A',
-      package: booking.package_name,
+      leadBooker: booking.user_email.split('@')[0] || 'N/A', // Use email username as name
+      email: booking.user_email,
+      phone: 'N/A', // Phone number not stored in bookings table
+      package: `${booking.package_name} (${booking.room_type})`,
       guests: booking.number_of_guests,
-      amount: Math.round(booking.total_amount / 100), // Convert from cents to euros
+      amount: Math.round(parseFloat(booking.total_amount)), // Amount is already in euros
       date: new Date(booking.created_at).toLocaleDateString(),
-      status: booking.status as "pending" | "confirmed" | "completed"
+      status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed"
     }));
 
     return {
