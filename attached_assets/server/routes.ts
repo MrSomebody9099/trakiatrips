@@ -27,8 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   } as const;
 
-  // Configure raw body parsing for Stripe webhook
-  app.use('/api/stripe/webhook', express.raw({type: 'application/json'}));
+  // Raw body parsing for Stripe webhook is configured in server/index.ts
 
   // Email collection API endpoint
   app.post('/api/collect-email', async (req, res) => {
@@ -362,8 +361,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Full payment completed - create booking record
           await handleFullPaymentSuccess(session);
         } else if (session.metadata?.paymentMode === 'installment') {
-          // For subscription mode, we handle this in customer.subscription.created
-          console.log('Installment checkout completed, waiting for subscription creation');
+          // Handle deposit payment for installment subscriptions
+          await handleInstallmentDepositSuccess(session);
         }
       }
 
@@ -394,8 +393,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // API endpoint to list subscription schedules (for debugging/monitoring)
+  // API endpoint to list subscription schedules (for debugging/monitoring) - DEVELOPMENT ONLY
   app.get('/api/subscription-schedules', async (req, res) => {
+    // Only allow in development environment
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(404).json({ error: 'Not found' });
+    }
     try {
       if (!stripe) {
         return res.status(503).json({ error: 'Payment processing is not configured' });
@@ -696,6 +699,13 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
       return;
     }
     
+    // Idempotency check: check if booking is already paid
+    const existingBooking = await storage.getBooking(bookingId);
+    if (existingBooking?.paymentStatus === 'paid') {
+      console.log(`Booking ${bookingId} already marked as paid, skipping duplicate processing`);
+      return;
+    }
+    
     // Update existing booking to paid status
     const updatedBooking = await storage.updateBookingStatusById(bookingId, 'paid');
     
@@ -704,20 +714,69 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
       return;
     }
 
+    // Use authoritative Stripe amount (in cents) converted to euros
+    const actualAmount = session.amount_total ? (session.amount_total / 100).toString() : session.metadata.totalAmount;
+
     // Create payment transaction record
     await storage.createPaymentTransaction({
       bookingId: bookingId,
       stripePaymentIntentId: session.payment_intent,
-      amount: session.metadata.totalAmount,
+      amount: actualAmount,
       paymentType: 'full',
       status: 'succeeded',
       paymentProvider: 'stripe',
       processedAt: new Date(),
     });
 
-    console.log(`Full payment completed for booking ${bookingId}`);
+    console.log(`Full payment completed for booking ${bookingId}, amount: €${actualAmount}`);
   } catch (error) {
     console.error('Error handling full payment success:', error);
+    throw error;
+  }
+}
+
+// Helper function to handle deposit payment for installment subscriptions
+async function handleInstallmentDepositSuccess(session: any): Promise<void> {
+  try {
+    const bookingId = session.metadata.bookingId;
+    
+    if (!bookingId) {
+      console.error('No bookingId found in session metadata for installment deposit');
+      return;
+    }
+    
+    // Idempotency check: check if booking already has deposit paid status
+    const existingBooking = await storage.getBooking(bookingId);
+    if (existingBooking?.paymentStatus === 'deposit_paid') {
+      console.log(`Booking ${bookingId} already has deposit paid, skipping duplicate processing`);
+      return;
+    }
+    
+    // Update booking to deposit_paid status
+    const updatedBooking = await storage.updateBookingStatusById(bookingId, 'deposit_paid');
+    
+    if (!updatedBooking) {
+      console.error(`Booking ${bookingId} not found for deposit payment completion`);
+      return;
+    }
+
+    // Use authoritative Stripe amount for deposit (in cents) converted to euros
+    const actualDepositAmount = session.amount_total ? (session.amount_total / 100).toString() : session.metadata.depositAmount;
+
+    // Create payment transaction record for deposit
+    await storage.createPaymentTransaction({
+      bookingId: bookingId,
+      stripePaymentIntentId: session.payment_intent,
+      amount: actualDepositAmount,
+      paymentType: 'deposit',
+      status: 'succeeded',
+      paymentProvider: 'stripe',
+      processedAt: new Date(),
+    });
+
+    console.log(`Installment deposit completed for booking ${bookingId}, amount: €${actualDepositAmount}`);
+  } catch (error) {
+    console.error('Error handling installment deposit success:', error);
     throw error;
   }
 }
@@ -744,36 +803,53 @@ async function handleInstallmentSubscriptionCreated(subscription: any, stripe: a
       return;
     }
     
-    const bookingId = session.metadata.bookingId;
+    console.log('Subscription created, checking for installment payment session...');
+    
+    // Find the checkout session to get booking information
+    const subscriptionSessions = await stripe.checkout.sessions.list({
+      subscription: subscription.id,
+      limit: 1
+    });
+    
+    if (subscriptionSessions.data.length === 0 || subscriptionSessions.data[0].metadata?.paymentMode !== 'installment') {
+      console.log('Subscription is not for installment payment, skipping');
+      return;
+    }
+    
+    const subscriptionSession = subscriptionSessions.data[0];
+    const bookingId = subscriptionSession.metadata.bookingId;
     
     if (!bookingId) {
       console.error('No bookingId found in session metadata');
       return;
     }
     
+    // Check if this subscription was already processed
+    const existingBooking = await storage.getBooking(bookingId);
+    if (existingBooking?.stripeCustomerId === subscription.customer) {
+      console.log(`Subscription ${subscription.id} already processed for booking ${bookingId}`);
+      return;
+    }
+    
     // Get pricing from the metadata
-    const depositAmount = parseFloat(session.metadata.depositAmount);
-    const remainingAmount = parseFloat(session.metadata.remainingAmount);
-    const totalAmount = parseFloat(session.metadata.totalAmount);
+    const depositAmount = parseFloat(subscriptionSession.metadata.depositAmount);
+    const remainingAmount = parseFloat(subscriptionSession.metadata.remainingAmount);
     
-    console.log(`Processing installment subscription for ${session.metadata.packageName}, deposit: €${depositAmount}, remaining: €${remainingAmount}`);
+    console.log(`Processing installment subscription for ${subscriptionSession.metadata.packageName}, deposit: €${depositAmount}, remaining: €${remainingAmount}`);
     
-    // Update existing booking to deposit_paid status with installment details
+    // Update existing booking with subscription details
     const updatedBooking = await storage.updateBooking(bookingId, {
-      paymentStatus: 'deposit_paid',
+      stripeCustomerId: subscription.customer,
       installmentStatus: JSON.stringify({
         deposit: 'paid',
-        balance: 'pending',
+        balance: 'pending', 
         dueDate: '2026-01-06'
       }),
-      stripeSessionId: session.id,
-      stripeCustomerId: subscription.customer,
-      remainingAmount: session.metadata.remainingAmount,
       balanceDueDate: '2026-01-06',
     });
     
     if (!updatedBooking) {
-      console.error(`Booking ${bookingId} not found for installment payment completion`);
+      console.error(`Booking ${bookingId} not found for installment subscription setup`);
       return;
     }
     
