@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema, insertLeadSchema } from "../../shared/schema";
 import crypto from "crypto";
 import Stripe from "stripe";
+import stripeRoutes from "./routes/stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Stripe with environment variable - javascript_stripe integration
@@ -12,6 +13,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+  // Register Stripe coupon routes
+  app.use('/api/stripe', stripeRoutes);
 
   // Canonical server-side package pricing (amounts in EUR)
   const PACKAGE_PRICING = {

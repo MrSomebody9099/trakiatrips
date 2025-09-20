@@ -107,7 +107,9 @@ router.post('/validate-coupon', async (req, res) => {
     }
 
     const promotionCode = promotionCodes.data[0];
-    const coupon = await stripe.coupons.retrieve(promotionCode.coupon.toString());
+    // Retrieve the coupon using the coupon ID from the promotion code
+    const couponId = typeof promotionCode.coupon === 'string' ? promotionCode.coupon : promotionCode.coupon.id;
+    const coupon = await stripe.coupons.retrieve(couponId);
     
     // Special validation for 4ORMORE coupon
     if (couponCode === '4ORMORE' && groupSize < 4) {
@@ -219,7 +221,9 @@ router.post('/create-checkout-session', async (req, res) => {
         }
 
         const promotionCode = promotionCodes.data[0];
-        const coupon = await stripe.coupons.retrieve(promotionCode.coupon.toString());
+        // Retrieve the coupon using the coupon ID from the promotion code
+        const couponId = typeof promotionCode.coupon === 'string' ? promotionCode.coupon : promotionCode.coupon.id;
+        const coupon = await stripe.coupons.retrieve(couponId);
 
         // Validate group size for 4ORMORE coupon
         if (couponCode === '4ORMORE' && (!groupSize || groupSize < 4)) {
