@@ -6,12 +6,17 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  hashedPassword: text("hashed_password").notNull(),
+  email: text("email").unique(), // Add email field for better user management
 });
 
+// Note: This schema should not include hashedPassword for API inputs
+// Password hashing should be handled on the server side
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  password: true,
+  email: true,
+}).extend({
+  password: z.string().min(8, "Password must be at least 8 characters"), // This will be hashed server-side
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
