@@ -22,7 +22,7 @@ export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
   status: text("status").notNull().default("email_only"),
-  bookingId: varchar("booking_id").references(() => bookings.id),
+  bookingId: varchar("booking_id").references(() => bookings.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
