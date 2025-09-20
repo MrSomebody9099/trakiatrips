@@ -250,15 +250,19 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
         .insert({
-          lead_email: leadBooker.email,
+          user_email: leadBooker.email,
           package_name: selectedPackage?.name || '',
-          package_type: selectedPackage?.dates || '',
           number_of_guests: numberOfPeople,
-          total_amount: totalPrice * 100, // Convert to cents
+          total_amount: totalPrice.toString(), // Store in euros as decimal string
           payment_plan: paymentPlan,
-          status: 'pending',
-          lead_booker_name: leadBooker.name,
-          lead_booker_phone: leadBooker.phone
+          payment_status: 'pending',
+          room_type: selectedRoomOption?.name || 'Standard',
+          add_ons: selectedAddOns.map(addon => {
+            const addOnInfo = addOns.find(a => a.id === addon.id);
+            const isPerDay = (addOnInfo as any)?.isPerDay;
+            const days = isPerDay ? (addon.days || 1) : 1;
+            return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
+          })
         })
         .select()
         .single();
@@ -273,13 +277,12 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
       // 3. Save guests to Supabase
       if (bookingData && allGuests.length > 0) {
-        const guestRecords = allGuests.map((guest, index) => ({
+        const guestRecords = allGuests.map((guest) => ({
           booking_id: bookingData.id,
           name: guest.name,
           email: guest.email,
           phone: guest.phone,
-          date_of_birth: guest.date_of_birth || null,
-          is_lead_booker: index === 0 // First guest is lead booker
+          date_of_birth: guest.date_of_birth || new Date().toISOString().split('T')[0] // Provide default date if missing
         }));
 
         const { error: guestError } = await supabase

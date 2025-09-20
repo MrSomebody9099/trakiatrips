@@ -20,25 +20,23 @@ export interface Lead {
 
 export interface Booking {
   id?: string;
-  lead_email: string;
+  user_email: string;
   package_name: string;
-  package_type: string;
   number_of_guests: number;
-  total_amount: number;
+  total_amount: string; // Decimal stored as string
   payment_plan: 'full' | 'installment';
-  status: 'pending' | 'confirmed' | 'completed';
+  payment_status: 'pending' | 'paid' | 'failed';
+  room_type: string;
+  add_ons?: any[]; // JSONB array
   created_at?: string;
-  lead_booker_name?: string;
-  lead_booker_phone?: string;
 }
 
 export interface Guest {
   id?: string;
   booking_id: string;
   name: string;
-  email?: string;
-  phone?: string;
-  date_of_birth?: string;
-  is_lead_booker: boolean;
+  email: string;
+  phone: string;
+  date_of_birth: string;
   created_at?: string;
 }

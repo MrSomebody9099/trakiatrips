@@ -45,8 +45,8 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
 
     if (leadsError) throw leadsError;
 
-    // Fetch bookings with left join to get all bookings regardless of lead status
-    const { data: bookingsData, error: bookingsError } = await supabase
+    // Fetch bookings with first guest (lead booker) information
+    const { data: bookingsWithGuests, error: bookingsError } = await supabase
       .from('bookings')
       .select(`
         id,
@@ -57,24 +57,33 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
         payment_plan,
         payment_status,
         room_type,
-        created_at
+        created_at,
+        guests!inner (
+          name,
+          phone
+        )
       `)
       .order('created_at', { ascending: false });
 
     if (bookingsError) throw bookingsError;
 
     // Transform bookings data to match UI format
-    const transformedBookings: Booking[] = (bookingsData || []).map(booking => ({
-      id: booking.id.substring(0, 8), // Show first 8 chars of UUID
-      leadBooker: booking.user_email.split('@')[0] || 'N/A', // Use email username as name
-      email: booking.user_email,
-      phone: 'N/A', // Phone number not stored in bookings table
-      package: `${booking.package_name} (${booking.room_type})`,
-      guests: booking.number_of_guests,
-      amount: Math.round(parseFloat(booking.total_amount)), // Amount is already in euros
-      date: new Date(booking.created_at).toLocaleDateString(),
-      status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed"
-    }));
+    const transformedBookings: Booking[] = (bookingsWithGuests || []).map(booking => {
+      // Get the first guest as the lead booker
+      const leadGuest = booking.guests[0];
+      
+      return {
+        id: booking.id.substring(0, 8), // Show first 8 chars of UUID
+        leadBooker: leadGuest?.name || booking.user_email.split('@')[0] || 'N/A',
+        email: booking.user_email,
+        phone: leadGuest?.phone || 'N/A',
+        package: `${booking.package_name} (${booking.room_type})`,
+        guests: booking.number_of_guests,
+        amount: Math.round(parseFloat(booking.total_amount)), // Amount is already in euros
+        date: new Date(booking.created_at).toLocaleDateString(),
+        status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed"
+      };
+    });
 
     return {
       leads: leadsData || [],
