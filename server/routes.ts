@@ -27,8 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   } as const;
 
-  // Configure raw body parsing for Stripe webhook
-  app.use('/api/stripe/webhook', express.raw({type: 'application/json'}));
+  // Raw body parsing for Stripe webhook is configured in server/index.ts
 
   // Email collection API endpoint
   app.post('/api/collect-email', async (req, res) => {
@@ -84,7 +83,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (paymentMode === 'full') {
         // Full payment - single charge
         const session = await stripe.checkout.sessions.create({
-          automatic_payment_methods: { enabled: true },
+          payment_method_types: ['card'],
           line_items: [
             {
               price_data: {
@@ -138,7 +137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Create checkout session for subscription with deposit payment
         const session = await stripe.checkout.sessions.create({
-          automatic_payment_methods: { enabled: true },
+          payment_method_types: ['card'],
           mode: 'subscription',
           customer: customer.id,
           line_items: [
@@ -230,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const invoice = event.data.object;
         
         // Check if this is our scheduled final payment from subscription schedule
-        if (invoice.subscription && invoice.metadata?.paymentType === 'final_installment') {
+        if ((invoice as any).subscription && invoice.metadata?.paymentType === 'final_installment') {
           await handleFinalInstallmentSuccess(invoice, stripe);
         }
       }
