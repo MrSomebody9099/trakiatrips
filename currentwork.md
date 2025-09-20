@@ -26,9 +26,10 @@
 6. ✅ Fixed AdminDashboard to get lead info from guests table join
 7. ✅ Application is running on port 5000 without SQL errors
 8. ✅ Fixed booking creation error - added missing package_price field to BookingFlow.tsx
+9. ✅ **MAJOR FIX:** Fixed booking creation architecture - changed from direct Supabase calls to server API calls with correct field naming (camelCase vs snake_case)
 
 ### 🔄 IN PROGRESS TASKS
-- Testing booking creation flow (database error fixed, ready for testing)
+- ✅ Testing booking creation flow (architectural fix completed)
 - Verifying dashboard shows "Confirmed" status after Stripe payment
 
 ### ❌ PENDING TASKS

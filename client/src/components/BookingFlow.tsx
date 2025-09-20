@@ -246,56 +246,52 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         console.error('Error updating lead status:', leadUpdateError);
       }
 
-      // 2. Save booking to Supabase
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_email: leadBooker.email,
-          package_name: selectedPackage?.name || '',
-          package_price: selectedPackage?.price.toString() || '0',
-          number_of_guests: numberOfPeople,
-          total_amount: totalPrice.toString(), // Store in euros as decimal string
-          payment_plan: paymentPlan,
-          payment_status: 'pending',
-          room_type: selectedRoomOption?.name || 'Standard',
-          add_ons: selectedAddOns.map(addon => {
-            const addOnInfo = addOns.find(a => a.id === addon.id);
-            const isPerDay = (addOnInfo as any)?.isPerDay;
-            const days = isPerDay ? (addon.days || 1) : 1;
-            return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
-          })
-        })
-        .select()
-        .single();
+      // 2. Save booking using server API
+      const bookingPayload = {
+        userEmail: leadBooker.email,
+        packageName: selectedPackage?.name || '',
+        packagePrice: selectedPackage?.price.toString() || '0',
+        dates: selectedPackage?.dates || '',
+        numberOfGuests: numberOfPeople,
+        roomType: selectedRoomOption?.name || 'Standard',
+        addOns: selectedAddOns.map(addon => {
+          const addOnInfo = addOns.find(a => a.id === addon.id);
+          const isPerDay = (addOnInfo as any)?.isPerDay;
+          const days = isPerDay ? (addon.days || 1) : 1;
+          return `${addOnInfo?.name || addon.id}${isPerDay ? ` (${days} days)` : ''}`;
+        }),
+        totalAmount: totalPrice.toString(),
+        paymentPlan: paymentPlan,
+        paymentStatus: 'pending'
+      };
 
-      if (bookingError) {
-        console.error('Error saving booking:', bookingError);
-        alert('Failed to save booking. Please try again.');
+      console.log('Creating booking via API:', bookingPayload);
+
+      const bookingResponse = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingData: bookingPayload,
+          guests: allGuests.map(guest => ({
+            name: guest.name,
+            email: guest.email,
+            phone: guest.phone,
+            dateOfBirth: guest.date_of_birth || new Date().toISOString().split('T')[0]
+          }))
+        }),
+      });
+
+      if (!bookingResponse.ok) {
+        const errorData = await bookingResponse.json();
+        console.error('Error saving booking:', errorData);
+        alert(`Failed to save booking: ${errorData.error || 'Please try again.'}`);
         return;
       }
 
-      console.log('Booking saved:', bookingData);
-
-      // 3. Save guests to Supabase
-      if (bookingData && allGuests.length > 0) {
-        const guestRecords = allGuests.map((guest) => ({
-          booking_id: bookingData.id,
-          name: guest.name,
-          email: guest.email,
-          phone: guest.phone,
-          date_of_birth: guest.date_of_birth || new Date().toISOString().split('T')[0] // Provide default date if missing
-        }));
-
-        const { error: guestError } = await supabase
-          .from('guests')
-          .insert(guestRecords);
-
-        if (guestError) {
-          console.error('Error saving guests:', guestError);
-        } else {
-          console.log('Guests saved successfully');
-        }
-      }
+      const bookingResult = await bookingResponse.json();
+      console.log('Booking saved via API:', bookingResult);
 
       // Store minimal data in localStorage for payment process
       const legacyBookingData = {
@@ -314,7 +310,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         totalAmount: totalPrice.toString(),
         paymentPlan: paymentPlan,
         flightNumber: flightNumber || undefined,
-        supabaseBookingId: bookingData.id // Store Supabase booking ID
+        bookingId: bookingResult.booking_id // Store booking ID from API response
       };
 
       localStorage.setItem('pendingBookingData', JSON.stringify({
