@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Users, CheckCircle, Clock, DollarSign, Search, Download } from "lucide-react";
+import { Users, CheckCircle, Clock, DollarSign, Search, Download, Mail } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabase";
+
+interface Lead {
+  id: string;
+  email: string;
+  status: string;
+  created_at: string;
+  booking_id?: string;
+}
 
 interface Booking {
   id: string;
@@ -17,56 +26,67 @@ interface Booking {
   guests: number;
   amount: number;
   date: string;
-  status: "pending" | "confirmed" | "cancelled";
+  status: "pending" | "confirmed" | "completed";
 }
 
-// Mock booking data for development
-const mockBookings: Booking[] = [
-  {
-    id: "TT-001",
-    leadBooker: "John Doe",
-    email: "john@example.com", 
-    phone: "+359 88 123 4567",
-    package: "Weekend Package",
-    guests: 2,
-    amount: 350,
-    date: "2025-01-15",
-    status: "confirmed"
-  },
-  {
-    id: "TT-002",
-    leadBooker: "Jane Smith",
-    email: "jane@example.com",
-    phone: "+359 88 765 4321", 
-    package: "Extended Package",
-    guests: 4,
-    amount: 940,
-    date: "2025-01-16",
-    status: "pending"
-  },
-  {
-    id: "TT-003",
-    leadBooker: "Alex Johnson",
-    email: "alex@example.com",
-    phone: "+359 88 555 7890",
-    package: "Family Package",
-    guests: 5,
-    amount: 1200,
-    date: "2025-01-20",
-    status: "confirmed"
-  },
-  {
-    id: "TT-004",
-    leadBooker: "Maria Garcia",
-    email: "maria@example.com",
-    phone: "+359 88 333 2211",
-    package: "Weekend Package",
-    guests: 3,
-    amount: 520,
-    date: "2025-01-25",
-    status: "pending"
+interface DashboardData {
+  leads: Lead[];
+  bookings: Booking[];
+}
+
+// Fetch leads and bookings from Supabase
+const fetchDashboardData = async (): Promise<DashboardData> => {
+  try {
+    // Fetch leads
+    const { data: leadsData, error: leadsError } = await supabase
+      .from('leads')
+      .select('id, email, status, created_at, booking_id')
+      .order('created_at', { ascending: false });
+
+    if (leadsError) throw leadsError;
+
+    // Fetch bookings with left join to get all bookings regardless of lead status
+    const { data: bookingsData, error: bookingsError } = await supabase
+      .from('bookings')
+      .select(`
+        id,
+        lead_email,
+        package_name,
+        package_type,
+        number_of_guests,
+        total_amount,
+        payment_plan,
+        status,
+        lead_booker_name,
+        lead_booker_phone,
+        created_at
+      `)
+      .order('created_at', { ascending: false });
+
+    if (bookingsError) throw bookingsError;
+
+    // Transform bookings data to match UI format
+    const transformedBookings: Booking[] = (bookingsData || []).map(booking => ({
+      id: booking.id.substring(0, 8), // Show first 8 chars of UUID
+      leadBooker: booking.lead_booker_name || 'N/A',
+      email: booking.lead_email,
+      phone: booking.lead_booker_phone || 'N/A',
+      package: booking.package_name,
+      guests: booking.number_of_guests,
+      amount: Math.round(booking.total_amount / 100), // Convert from cents to euros
+      date: new Date(booking.created_at).toLocaleDateString(),
+      status: booking.status as "pending" | "confirmed" | "completed"
+    }));
+
+    return {
+      leads: leadsData || [],
+      bookings: transformedBookings
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    return { leads: [], bookings: [] };
   }
-];
+};
 
 interface AdminDashboardProps {
   isAuthenticated?: boolean;
@@ -78,32 +98,18 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<'leads' | 'bookings'>('bookings');
 
-  // For development, use mock data instead of API
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const isLoading = false;
-  
-  useEffect(() => {
-    // In a real app, this would be an API call
-    const savedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    if (savedBookings.length > 0) {
-      // Convert saved bookings to the expected format
-      const formattedBookings = savedBookings.map((booking: any) => ({
-        id: booking.id,
-        leadBooker: booking.guests[0].name,
-        email: booking.guests[0].email,
-        phone: booking.guests[0].phone,
-        package: booking.packageName,
-        guests: booking.numberOfGuests,
-        amount: parseInt(booking.totalAmount),
-        date: new Date().toISOString().split('T')[0],
-        status: "confirmed"
-      }));
-      setBookings([...formattedBookings, ...mockBookings]);
-    } else {
-      setBookings(mockBookings);
-    }
-  }, []);
+  // Use React Query to fetch data from Supabase
+  const { data: dashboardData, isLoading, refetch } = useQuery({
+    queryKey: ['dashboard-data'],
+    queryFn: fetchDashboardData,
+    enabled: isLoggedIn,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const leads = dashboardData?.leads || [];
+  const bookings = dashboardData?.bookings || [];
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +128,15 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
     booking.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredLeads = leads.filter((lead: Lead) =>
+    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lead.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const stats = {
+    totalLeads: leads.length,
+    emailOnlyLeads: leads.filter((l: Lead) => l.status === "email_only").length,
+    bookingStarted: leads.filter((l: Lead) => l.status === "booking_started").length,
     totalBookings: bookings.length,
     confirmed: bookings.filter((b: Booking) => b.status === "confirmed").length,
     pending: bookings.filter((b: Booking) => b.status === "pending").length,
@@ -211,15 +225,27 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <Card className="hover-elevate">
+            <CardContent className="flex items-center p-6">
+              <Mail className="h-8 w-8 text-blue-600 mr-4" />
+              <div>
+                <p className="text-2xl font-heading font-bold text-blue-600" data-testid="stat-total-leads">
+                  {stats.totalLeads}
+                </p>
+                <p className="text-muted-foreground font-body">Total Leads</p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="hover-elevate">
             <CardContent className="flex items-center p-6">
               <Users className="h-8 w-8 text-primary mr-4" />
               <div>
-                <p className="text-2xl font-heading font-bold text-primary" data-testid="stat-total-bookings">
-                  {stats.totalBookings}
+                <p className="text-2xl font-heading font-bold text-primary" data-testid="stat-email-only">
+                  {stats.emailOnlyLeads}
                 </p>
-                <p className="text-muted-foreground font-body">Total Bookings</p>
+                <p className="text-muted-foreground font-body">Email Only</p>
               </div>
             </CardContent>
           </Card>
@@ -261,12 +287,32 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
           </Card>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex space-x-1 mb-6">
+          <Button
+            variant={activeTab === 'bookings' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('bookings')}
+            className="hover-elevate"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            Bookings ({stats.totalBookings})
+          </Button>
+          <Button
+            variant={activeTab === 'leads' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('leads')}
+            className="hover-elevate"
+          >
+            <Mail className="h-4 w-4 mr-2" />
+            All Leads ({stats.totalLeads})
+          </Button>
+        </div>
+
         {/* Search and Export */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search by name, email, or booking ID..."
+              placeholder={activeTab === 'bookings' ? "Search bookings by name, email, or ID..." : "Search leads by email or status..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -284,63 +330,108 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
           </Button>
         </div>
 
-        {/* Bookings Table */}
+        {/* Data Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="font-heading">All Bookings ({filteredBookings.length})</CardTitle>
+            <CardTitle className="font-heading">
+              {activeTab === 'bookings' ? `All Bookings (${filteredBookings.length})` : `All Leads (${filteredLeads.length})`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground font-body">Loading bookings...</p>
+                <p className="text-muted-foreground font-body">Loading {activeTab}...</p>
               </div>
-            ) : filteredBookings.length === 0 ? (
+            ) : (activeTab === 'bookings' ? filteredBookings.length === 0 : filteredLeads.length === 0) ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground font-body">No bookings found.</p>
+                <p className="text-muted-foreground font-body">No {activeTab} found.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left p-3 font-heading font-semibold">Booking ID</th>
-                      <th className="text-left p-3 font-heading font-semibold">Lead Booker</th>
-                      <th className="text-left p-3 font-heading font-semibold">Contact</th>
-                      <th className="text-left p-3 font-heading font-semibold">Package</th>
-                      <th className="text-left p-3 font-heading font-semibold">Guests</th>
-                      <th className="text-left p-3 font-heading font-semibold">Amount</th>
-                      <th className="text-left p-3 font-heading font-semibold">Date</th>
-                      <th className="text-left p-3 font-heading font-semibold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredBookings.map((booking: Booking) => (
-                      <tr 
-                        key={booking.id} 
-                        className="border-b border-border/50 hover:bg-muted/50 transition-colors"
-                        data-testid={`booking-row-${booking.id}`}
-                      >
-                        <td className="p-3 font-body font-medium">{booking.id}</td>
-                        <td className="p-3 font-body">{booking.leadBooker}</td>
-                        <td className="p-3 font-body">
-                          <div className="text-sm">
-                            <div>{booking.email}</div>
-                            <div className="text-muted-foreground">{booking.phone}</div>
-                          </div>
-                        </td>
-                        <td className="p-3 font-body">{booking.package}</td>
-                        <td className="p-3 font-body">{booking.guests}</td>
-                        <td className="p-3 font-body font-semibold">€{booking.amount}</td>
-                        <td className="p-3 font-body">{booking.date}</td>
-                        <td className="p-3">
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status}
-                          </Badge>
-                        </td>
+                {activeTab === 'bookings' ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left p-3 font-heading font-semibold">Booking ID</th>
+                        <th className="text-left p-3 font-heading font-semibold">Lead Booker</th>
+                        <th className="text-left p-3 font-heading font-semibold">Contact</th>
+                        <th className="text-left p-3 font-heading font-semibold">Package</th>
+                        <th className="text-left p-3 font-heading font-semibold">Guests</th>
+                        <th className="text-left p-3 font-heading font-semibold">Amount</th>
+                        <th className="text-left p-3 font-heading font-semibold">Date</th>
+                        <th className="text-left p-3 font-heading font-semibold">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {filteredBookings.map((booking: Booking) => (
+                        <tr 
+                          key={booking.id} 
+                          className="border-b border-border/50 hover:bg-muted/50 transition-colors"
+                          data-testid={`booking-row-${booking.id}`}
+                        >
+                          <td className="p-3 font-body font-medium">{booking.id}</td>
+                          <td className="p-3 font-body">{booking.leadBooker}</td>
+                          <td className="p-3 font-body">
+                            <div className="text-sm">
+                              <div>{booking.email}</div>
+                              <div className="text-muted-foreground">{booking.phone}</div>
+                            </div>
+                          </td>
+                          <td className="p-3 font-body">{booking.package}</td>
+                          <td className="p-3 font-body">{booking.guests}</td>
+                          <td className="p-3 font-body font-semibold">€{booking.amount}</td>
+                          <td className="p-3 font-body">{booking.date}</td>
+                          <td className="p-3">
+                            <Badge className={getStatusColor(booking.status)}>
+                              {booking.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left p-3 font-heading font-semibold">Lead ID</th>
+                        <th className="text-left p-3 font-heading font-semibold">Email</th>
+                        <th className="text-left p-3 font-heading font-semibold">Status</th>
+                        <th className="text-left p-3 font-heading font-semibold">Date Collected</th>
+                        <th className="text-left p-3 font-heading font-semibold">Booking ID</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredLeads.map((lead: Lead) => (
+                        <tr 
+                          key={lead.id} 
+                          className="border-b border-border/50 hover:bg-muted/50 transition-colors"
+                          data-testid={`lead-row-${lead.id}`}
+                        >
+                          <td className="p-3 font-body font-medium">{lead.id.substring(0, 8)}</td>
+                          <td className="p-3 font-body">{lead.email}</td>
+                          <td className="p-3">
+                            <Badge className={
+                              lead.status === 'email_only' ? 'bg-blue-100 text-blue-800' :
+                              lead.status === 'booking_started' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }>
+                              {lead.status.replace('_', ' ')}
+                            </Badge>
+                          </td>
+                          <td className="p-3 font-body">{new Date(lead.created_at).toLocaleDateString()}</td>
+                          <td className="p-3 font-body">
+                            {lead.booking_id ? (
+                              <span className="text-sm text-muted-foreground">{lead.booking_id.substring(0, 8)}</span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             )}
           </CardContent>
