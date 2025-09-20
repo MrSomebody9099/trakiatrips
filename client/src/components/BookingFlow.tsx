@@ -234,19 +234,9 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         date_of_birth: guest.dateOfBirth
       }));
 
-      console.log('Saving booking to Supabase...');
+      console.log('Creating pending booking in database...');
 
-      // 1. Update lead status to 'booking_started'
-      const { error: leadUpdateError } = await supabase
-        .from('leads')
-        .update({ status: 'booking_started' })
-        .eq('email', leadBooker.email);
-
-      if (leadUpdateError) {
-        console.error('Error updating lead status:', leadUpdateError);
-      }
-
-      // 2. Save booking using server API
+      // Create pending booking immediately - this ensures no bookings are lost
       const bookingPayload = {
         userEmail: leadBooker.email,
         packageName: selectedPackage?.name || '',
@@ -262,15 +252,35 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         }),
         totalAmount: totalPrice.toString(),
         paymentPlan: paymentPlan,
-        paymentStatus: 'pending'
+        flightNumber: flightNumber || undefined,
+        guests: allGuests
       };
 
-      console.log('Creating booking via API:', bookingPayload);
+      const response = await fetch('/api/create-pending-booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingPayload)
+      });
 
-      // Note: Booking will be saved during payment process via PaymentProcess component
-      console.log('Booking data prepared for payment:', bookingPayload);
+      const result = await response.json();
 
-      // Store minimal data in localStorage for payment process
+      if (!response.ok) {
+        console.error('Error creating pending booking:', result);
+        alert('Failed to save booking data. Please try again.');
+        return;
+      }
+
+      const bookingId = result.booking.id;
+      const wasReactivated = result.reactivated;
+
+      console.log(wasReactivated 
+        ? `Reactivated existing booking ${bookingId} for ${leadBooker.email}`
+        : `Created pending booking ${bookingId} for ${leadBooker.email}`
+      );
+
+      // Store essential data in localStorage for payment process (keeping legacy support)
       const legacyBookingData = {
         userEmail: leadBooker.email,
         packageName: selectedPackage?.name || '',
@@ -287,22 +297,23 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         totalAmount: totalPrice.toString(),
         paymentPlan: paymentPlan,
         flightNumber: flightNumber || undefined,
-        // bookingId will be generated during payment process
+        bookingId: bookingId // Now we have the actual booking ID
       };
 
       localStorage.setItem('pendingBookingData', JSON.stringify({
         bookingData: legacyBookingData,
         guests: allGuests,
         paymentAmount,
-        totalPrice
+        totalPrice,
+        bookingId
       }));
       
-      // Redirect to the new payment process page
+      // Redirect to the payment process page
       window.location.href = '/payment-process';
 
     } catch (error) {
       console.error('Unexpected error during booking:', error);
-      alert('An unexpected error occurred. Please try again.');
+      alert('Failed to process booking. Please check your connection and try again.');
     }
   };
   

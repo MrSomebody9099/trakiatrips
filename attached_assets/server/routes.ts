@@ -70,6 +70,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create pending booking endpoint - saves booking data immediately when user clicks "Proceed to Pay"
+  app.post('/api/create-pending-booking', async (req, res) => {
+    try {
+      const { userEmail, packageName, packagePrice, dates, numberOfGuests, roomType, addOns, totalAmount, paymentPlan, flightNumber, guests } = req.body;
+
+      if (!userEmail || !packageName || !totalAmount) {
+        return res.status(400).json({ error: 'Required fields missing: userEmail, packageName, totalAmount' });
+      }
+
+      // Check for existing pending bookings with same email - reactivate if found
+      const existingPendingBookings = await storage.getPendingBookingsByEmail(userEmail);
+      
+      if (existingPendingBookings.length > 0) {
+        // Reactivate the most recent pending booking
+        const latestBooking = existingPendingBookings.sort((a, b) => 
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+        )[0];
+        
+        const reactivatedBooking = await storage.reactivatePendingBooking(latestBooking.id);
+        
+        // Update lead status to link to this booking
+        await storage.updateLeadStatus(userEmail, 'booking_started', reactivatedBooking?.id);
+        
+        console.log(`Reactivated existing pending booking ${reactivatedBooking?.id} for ${userEmail}`);
+        
+        return res.json({ 
+          success: true, 
+          message: 'Existing booking reactivated',
+          booking: reactivatedBooking,
+          reactivated: true
+        });
+      }
+
+      // Create new pending booking
+      const bookingData = {
+        userEmail,
+        packageName,
+        packagePrice,
+        dates,
+        numberOfGuests,
+        roomType,
+        addOns: addOns || [],
+        totalAmount,
+        paymentStatus: 'pending',
+        paymentPlan: paymentPlan || 'full',
+        flightNumber
+      };
+
+      const newBooking = await storage.createBooking(bookingData);
+      
+      // Update lead status to link to this booking
+      await storage.updateLeadStatus(userEmail, 'booking_started', newBooking.id);
+
+      // Create guest records if provided
+      if (guests && guests.length > 0) {
+        for (const guest of guests) {
+          await storage.createGuest({
+            bookingId: newBooking.id,
+            name: guest.name,
+            email: guest.email,
+            phone: guest.phone,
+            dateOfBirth: guest.date_of_birth
+          });
+        }
+      }
+
+      console.log(`Created pending booking ${newBooking.id} for ${userEmail}`);
+      
+      return res.json({ 
+        success: true, 
+        message: 'Pending booking created successfully',
+        booking: newBooking,
+        reactivated: false
+      });
+
+    } catch (error) {
+      console.error('Error creating pending booking:', error);
+      return res.status(500).json({ error: 'Failed to create pending booking' });
+    }
+  });
+
+  // Get booking details by ID - for PaymentSuccess page
+  app.get('/api/booking/:id', async (req, res) => {
+    try {
+      const bookingId = req.params.id;
+      
+      if (!bookingId) {
+        return res.status(400).json({ error: 'Booking ID is required' });
+      }
+
+      const booking = await storage.getBooking(bookingId);
+      
+      if (!booking) {
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+
+      // Get guests for this booking
+      const guests = await storage.getGuestsByBookingId(bookingId);
+      
+      return res.json({ 
+        success: true,
+        booking: {
+          ...booking,
+          guests
+        }
+      });
+
+    } catch (error) {
+      console.error('Error fetching booking:', error);
+      return res.status(500).json({ error: 'Failed to fetch booking details' });
+    }
+  });
+
+  // Update booking payment status - RESTRICTED for security (only allows 'failed' status from client)
+  app.post('/api/booking/:id/status', async (req, res) => {
+    try {
+      const bookingId = req.params.id;
+      const { paymentStatus } = req.body;
+      
+      if (!bookingId || !paymentStatus) {
+        return res.status(400).json({ error: 'Booking ID and payment status are required' });
+      }
+
+      // SECURITY: Only allow 'failed' status from client. 'paid' status must come from secure webhooks
+      if (!['failed'].includes(paymentStatus)) {
+        return res.status(400).json({ error: 'Invalid payment status. Only failed payments can be updated by client.' });
+      }
+
+      const updatedBooking = await storage.updateBookingStatusById(bookingId, paymentStatus);
+      
+      if (!updatedBooking) {
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+
+      console.log(`Updated booking ${bookingId} status to ${paymentStatus}`);
+      
+      return res.json({ 
+        success: true,
+        message: 'Booking status updated successfully',
+        booking: updatedBooking
+      });
+
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      return res.status(500).json({ error: 'Failed to update booking status' });
+    }
+  });
+
   // Create a Stripe checkout session with subscription support for installments
   app.post('/api/create-checkout-session', async (req, res) => {
     try {

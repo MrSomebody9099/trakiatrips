@@ -2,7 +2,7 @@ import { type User, type InsertUser, type Booking, type InsertBooking, type Gues
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -41,6 +41,11 @@ export interface IStorage {
   createLead(lead: InsertLead): Promise<Lead>;
   getAllLeads(): Promise<Lead[]>;
   getLeadByEmail(email: string): Promise<Lead | undefined>;
+  updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined>;
+
+  // Enhanced booking operations for pending bookings
+  getPendingBookingsByEmail(userEmail: string): Promise<Booking[]>;
+  reactivatePendingBooking(bookingId: string): Promise<Booking | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -265,6 +270,35 @@ export class MemStorage implements IStorage {
       (lead) => lead.email === email
     );
   }
+
+  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    const lead = await this.getLeadByEmail(email);
+    if (!lead) return undefined;
+    
+    lead.status = status;
+    if (bookingId !== undefined) {
+      lead.bookingId = bookingId;
+    }
+    
+    this.leads.set(lead.id, lead);
+    return lead;
+  }
+
+  async getPendingBookingsByEmail(userEmail: string): Promise<Booking[]> {
+    return Array.from(this.bookings.values())
+      .filter(booking => booking.userEmail === userEmail && booking.paymentStatus === 'pending');
+  }
+
+  async reactivatePendingBooking(bookingId: string): Promise<Booking | undefined> {
+    const booking = await this.getBooking(bookingId);
+    if (!booking) return undefined;
+    
+    booking.paymentStatus = 'pending';
+    booking.updatedAt = new Date();
+    
+    this.bookings.set(bookingId, booking);
+    return booking;
+  }
 }
 
 // Database storage implementation using Drizzle ORM
@@ -412,6 +446,36 @@ class DatabaseStorage implements IStorage {
     const result = await this.db.update(paymentTransactions)
       .set(updates)
       .where(eq(paymentTransactions.stripePaymentIntentId, stripePaymentIntentId))
+      .returning();
+    return result[0];
+  }
+
+  // Enhanced lead operations
+  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    const updates: any = { status };
+    if (bookingId) {
+      updates.bookingId = bookingId;
+    }
+    const result = await this.db.update(leads)
+      .set(updates)
+      .where(eq(leads.email, email))
+      .returning();
+    return result[0];
+  }
+
+  // Enhanced booking operations for pending bookings
+  async getPendingBookingsByEmail(userEmail: string): Promise<Booking[]> {
+    return await this.db.select().from(bookings)
+      .where(and(eq(bookings.userEmail, userEmail), eq(bookings.paymentStatus, 'pending')));
+  }
+
+  async reactivatePendingBooking(bookingId: string): Promise<Booking | undefined> {
+    const result = await this.db.update(bookings)
+      .set({ 
+        paymentStatus: 'pending',
+        updatedAt: new Date()
+      })
+      .where(eq(bookings.id, bookingId))
       .returning();
     return result[0];
   }
