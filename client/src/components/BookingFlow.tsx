@@ -267,31 +267,8 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
       console.log('Creating booking via API:', bookingPayload);
 
-      const bookingResponse = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookingData: bookingPayload,
-          guests: allGuests.map(guest => ({
-            name: guest.name,
-            email: guest.email,
-            phone: guest.phone,
-            dateOfBirth: guest.date_of_birth || new Date().toISOString().split('T')[0]
-          }))
-        }),
-      });
-
-      if (!bookingResponse.ok) {
-        const errorData = await bookingResponse.json();
-        console.error('Error saving booking:', errorData);
-        alert(`Failed to save booking: ${errorData.error || 'Please try again.'}`);
-        return;
-      }
-
-      const bookingResult = await bookingResponse.json();
-      console.log('Booking saved via API:', bookingResult);
+      // Note: Booking will be saved during payment process via PaymentProcess component
+      console.log('Booking data prepared for payment:', bookingPayload);
 
       // Store minimal data in localStorage for payment process
       const legacyBookingData = {
@@ -310,7 +287,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         totalAmount: totalPrice.toString(),
         paymentPlan: paymentPlan,
         flightNumber: flightNumber || undefined,
-        bookingId: bookingResult.booking_id // Store booking ID from API response
+        // bookingId will be generated during payment process
       };
 
       localStorage.setItem('pendingBookingData', JSON.stringify({
