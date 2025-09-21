@@ -176,6 +176,7 @@ router.post('/create-checkout-session', async (req, res) => {
     // Prepare checkout session options
     const sessionOptions: any = {
       payment_method_types: ['card'],
+      allow_promotion_codes: true,
       line_items: [
         {
           price_data: {

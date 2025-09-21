@@ -236,6 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Full payment - single charge
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
+          allow_promotion_codes: true,
           line_items: [
             {
               price_data: {
@@ -291,6 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create checkout session for subscription with deposit payment
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
+          allow_promotion_codes: true,
           mode: 'subscription',
           customer: customer.id,
           line_items: [
