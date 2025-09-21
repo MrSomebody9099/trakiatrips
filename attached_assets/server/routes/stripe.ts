@@ -13,8 +13,23 @@ const adminAuth = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-// Initialize Stripe with the secret key from environment variables
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+// Initialize Stripe with robust validation
+const initializeStripe = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY is required but not found in environment variables');
+  }
+  
+  if (!secretKey.startsWith('sk_')) {
+    throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_test_ or sk_live_');
+  }
+  
+  console.log(`[Stripe] Initializing with key: ${secretKey.substring(0, 12)}...`);
+  return new Stripe(secretKey);
+};
+
+const stripe = initializeStripe();
 
 // Create Stripe coupons and promotion codes - ADMIN PROTECTED
 router.post('/create-coupons', adminAuth, async (req, res) => {
@@ -282,7 +297,28 @@ router.post('/create-checkout-session', async (req, res) => {
     res.json({ url: session.url });
   } catch (error: any) {
     console.error('Error creating checkout session:', error);
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to create checkout session' });
+    
+    // Enhanced error handling for production reliability
+    if (error.type === 'StripeAuthenticationError') {
+      return res.status(401).json({ 
+        error: 'Payment system authentication failed. Please contact support.',
+        code: 'STRIPE_AUTH_ERROR',
+        details: error.code === 'api_key_expired' ? 'API key has expired' : 'Authentication failed'
+      });
+    }
+    
+    if (error.type === 'StripeConnectionError') {
+      return res.status(503).json({ 
+        error: 'Payment service temporarily unavailable. Please try again.',
+        code: 'STRIPE_CONNECTION_ERROR'
+      });
+    }
+    
+    // Generic fallback
+    res.status(500).json({ 
+      error: 'Failed to initialize payment. Please try again.',
+      code: 'PAYMENT_INIT_ERROR'
+    });
   }
 });
 

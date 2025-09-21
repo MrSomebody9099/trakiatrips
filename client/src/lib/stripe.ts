@@ -3,9 +3,24 @@ import { loadStripe } from '@stripe/stripe-js';
 // Stripe publishable key from environment variable
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
-// Validate that the Stripe publishable key is available
-if (!STRIPE_PUBLISHABLE_KEY) {
-  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable');
+// Robust validation for Stripe publishable key
+const validateStripeKey = () => {
+  if (!STRIPE_PUBLISHABLE_KEY) {
+    throw new Error('VITE_STRIPE_PUBLIC_KEY is required but not found in environment variables');
+  }
+  
+  if (!STRIPE_PUBLISHABLE_KEY.startsWith('pk_')) {
+    throw new Error('Invalid VITE_STRIPE_PUBLIC_KEY format. Must start with pk_test_ or pk_live_');
+  }
+  
+  console.log(`[Stripe Client] Using publishable key: ${STRIPE_PUBLISHABLE_KEY.substring(0, 12)}...`);
+};
+
+// Validate key on module load
+try {
+  validateStripeKey();
+} catch (error) {
+  console.error('[Stripe Client] Configuration error:', error);
 }
 
 // Package prices
