@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBookingSchema, insertGuestSchema, insertPaymentTransactionSchema, insertLeadSchema } from "../shared/schema";
@@ -30,6 +30,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       remaining: 171
     }
   } as const;
+
+  // Admin authentication middleware
+  const adminAuth = (req: Request, res: Response, next: NextFunction) => {
+    const password = req.headers.authorization?.replace('Bearer ', '');
+    if (password !== 'MO1345') {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    next();
+  };
 
   // Raw body parsing for Stripe webhook is configured in server/index.ts
 
@@ -726,8 +735,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin route - Get all bookings for admin dashboard
-  app.get('/api/admin/bookings', async (req, res) => {
+  // Admin dashboard data endpoint - SECURE
+  app.get('/api/admin/dashboard', adminAuth, async (req, res) => {
+    try {
+      const leads = await storage.getLeads();
+      const allBookings = await storage.getAllBookings();
+      
+      // Format bookings with guest information for dashboard
+      const bookingsWithGuests = await Promise.all(
+        allBookings.map(async (booking) => {
+          const guests = await storage.getGuestsByBookingId(booking.id);
+          return {
+            id: booking.id,
+            leadBooker: guests.length > 0 ? guests[0].name : 'Unknown',
+            email: booking.userEmail,
+            phone: guests.length > 0 ? guests[0].phone : '',
+            package: booking.packageName,
+            guests: booking.numberOfGuests,
+            amount: parseInt(booking.totalAmount),
+            date: booking.dates,
+            status: booking.paymentStatus,
+            flightNumber: booking.flightNumber
+          };
+        })
+      );
+      
+      res.json({ leads, bookings: bookingsWithGuests });
+    } catch (error) {
+      console.error('Error fetching admin dashboard data:', error);
+      res.status(500).json({ error: 'Failed to fetch dashboard data' });
+    }
+  });
+
+  // Admin create lead endpoint - SECURE  
+  app.post('/api/admin/leads', adminAuth, async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      // Check if email already exists
+      const existingLead = await storage.getLeadByEmail(email.trim());
+      if (existingLead) {
+        return res.status(400).json({ error: 'Email already exists in leads' });
+      }
+
+      const leadId = await storage.createLead({ email: email.trim(), status: 'email_only' });
+      res.json({ success: true, leadId });
+    } catch (error) {
+      console.error('Error creating lead:', error);
+      res.status(500).json({ error: 'Failed to create lead' });
+    }
+  });
+
+  // Admin route - Get all bookings for admin dashboard (DEPRECATED - use /api/admin/dashboard)
+  app.get('/api/admin/bookings', adminAuth, async (req, res) => {
     try {
       const allBookings = await storage.getAllBookings();
       

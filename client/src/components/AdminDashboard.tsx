@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase";
 
 interface Lead {
   id: string;
@@ -35,61 +34,38 @@ interface DashboardData {
   bookings: Booking[];
 }
 
-// Fetch leads and bookings from Supabase
-const fetchDashboardData = async (): Promise<DashboardData> => {
+// Fetch leads and bookings from secure backend
+const fetchDashboardData = async (password: string): Promise<DashboardData> => {
   try {
-    // Fetch leads
-    const { data: leadsData, error: leadsError } = await supabase
-      .from('leads')
-      .select('id, email, status, created_at, booking_id')
-      .order('created_at', { ascending: false });
-
-    if (leadsError) throw leadsError;
-
-    // Fetch bookings with first guest (lead booker) information
-    const { data: bookingsWithGuests, error: bookingsError } = await supabase
-      .from('bookings')
-      .select(`
-        id,
-        user_email,
-        package_name,
-        number_of_guests,
-        total_amount,
-        payment_plan,
-        payment_status,
-        room_type,
-        flight_number,
-        created_at,
-        guests!inner (
-          name,
-          phone
-        )
-      `)
-      .order('created_at', { ascending: false });
-
-    if (bookingsError) throw bookingsError;
-
-    // Transform bookings data to match UI format
-    const transformedBookings: Booking[] = (bookingsWithGuests || []).map(booking => {
-      // Get the first guest as the lead booker
-      const leadGuest = booking.guests[0];
-      
-      return {
-        id: booking.id.substring(0, 8), // Show first 8 chars of UUID
-        leadBooker: leadGuest?.name || booking.user_email.split('@')[0] || 'N/A',
-        email: booking.user_email,
-        phone: leadGuest?.phone || 'N/A',
-        package: `${booking.package_name} (${booking.room_type})`,
-        guests: booking.number_of_guests,
-        amount: Math.round(parseFloat(booking.total_amount)), // Amount is already in euros
-        date: new Date(booking.created_at).toLocaleDateString(),
-        status: booking.payment_status === "paid" ? "confirmed" : booking.payment_status === "pending" ? "pending" : "completed",
-        flightNumber: booking.flight_number || null
-      };
+    const response = await fetch('/api/admin/dashboard', {
+      headers: {
+        'Authorization': `Bearer ${password}`,
+        'Content-Type': 'application/json'
+      }
     });
 
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dashboard data: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Transform bookings to match UI format
+    const transformedBookings: Booking[] = (data.bookings || []).map((booking: any) => ({
+      id: booking.id.substring(0, 8), // Show first 8 chars of UUID
+      leadBooker: booking.leadBooker || 'N/A',
+      email: booking.email,
+      phone: booking.phone || 'N/A',
+      package: booking.package,
+      guests: booking.guests,
+      amount: booking.amount,
+      date: new Date(booking.date).toLocaleDateString(),
+      status: booking.status === "paid" ? "confirmed" : booking.status === "pending" ? "pending" : "completed",
+      flightNumber: booking.flightNumber || null
+    }));
+
     return {
-      leads: leadsData || [],
+      leads: data.leads || [],
       bookings: transformedBookings
     };
   } catch (error) {
@@ -113,11 +89,11 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   const [newLeadEmail, setNewLeadEmail] = useState("");
   const [isAddingLead, setIsAddingLead] = useState(false);
 
-  // Use React Query to fetch data from Supabase
+  // Use React Query to fetch data from secure backend
   const { data: dashboardData, isLoading, refetch } = useQuery({
-    queryKey: ['dashboard-data'],
-    queryFn: fetchDashboardData,
-    enabled: isLoggedIn,
+    queryKey: ['dashboard-data', password],
+    queryFn: () => fetchDashboardData(password),
+    enabled: isLoggedIn && !!password,
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
@@ -166,30 +142,35 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   };
 
   const handleAddLead = async () => {
-    if (!newLeadEmail.trim()) return;
+    if (!newLeadEmail.trim() || !password) return;
     
     setIsAddingLead(true);
     try {
-      const { error } = await supabase
-        .from('leads')
-        .insert([
-          {
-            email: newLeadEmail.trim(),
-            status: 'email_only'
-          }
-        ]);
+      const response = await fetch('/api/admin/leads', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${password}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: newLeadEmail.trim() })
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to add lead');
+      }
 
       // Reset form and close dialog
       setNewLeadEmail("");
       setIsAddLeadDialogOpen(false);
+      setError("");
       
       // Refresh data
       refetch();
     } catch (error) {
       console.error('Error adding lead:', error);
-      setError("Failed to add lead. Please try again.");
+      setError(error instanceof Error ? error.message : "Failed to add lead. Please try again.");
     } finally {
       setIsAddingLead(false);
     }
