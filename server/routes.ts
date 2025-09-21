@@ -73,6 +73,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Coupon validation endpoint
+  app.post('/api/validate-coupon', async (req, res) => {
+    try {
+      const { code, totalAmount, paymentPlan, numberOfPeople, selectedAddOns } = req.body;
+
+      if (!code) {
+        return res.status(400).json({ valid: false, error: 'Coupon code is required' });
+      }
+
+      const upperCode = code.toUpperCase();
+
+      // Define available coupons
+      const coupons: Record<string, any> = {
+        'EARLY60': {
+          type: 'fixed',
+          description: 'Pool party free',
+          usageLimit: 60,
+          paymentPlans: ['full', 'installment']
+        },
+        'BEENHEREB4': {
+          type: 'percentage',
+          discount: 0.10,
+          description: '10% discount',
+          paymentPlans: ['full']
+        },
+        '4ORMORE': {
+          type: 'percentage', 
+          discount: 0.10,
+          description: '10% discount for groups of 4 or more',
+          minPeople: 4,
+          paymentPlans: ['full']
+        }
+      };
+
+      const coupon = coupons[upperCode];
+      if (!coupon) {
+        return res.status(400).json({ valid: false, error: 'Invalid coupon code' });
+      }
+
+      // Check payment plan restrictions
+      if (!coupon.paymentPlans.includes(paymentPlan)) {
+        return res.status(400).json({ 
+          valid: false, 
+          error: paymentPlan === 'installment' 
+            ? 'Only EARLY60 coupon can be used with installment payments'
+            : 'This coupon cannot be used with the selected payment plan'
+        });
+      }
+
+      // Check minimum people requirement for 4ORMORE
+      if (upperCode === '4ORMORE' && numberOfPeople < 4) {
+        return res.status(400).json({ 
+          valid: false, 
+          error: '4ORMORE coupon requires a group of 4 or more people'
+        });
+      }
+
+      // Check usage limit for EARLY60
+      if (upperCode === 'EARLY60') {
+        const usageCount = await storage.getCouponUsageCount('EARLY60');
+        if (usageCount >= 60) {
+          return res.status(400).json({ 
+            valid: false, 
+            error: 'EARLY60 coupon has reached its usage limit'
+          });
+        }
+      }
+
+      // Calculate discount
+      let discount = 0;
+      
+      if (coupon.type === 'fixed' && upperCode === 'EARLY60') {
+        // Pool party is €15 per person
+        const hasPoolParty = selectedAddOns.includes('poolParty');
+        if (hasPoolParty) {
+          discount = 15 * numberOfPeople;
+        } else {
+          return res.status(400).json({ 
+            valid: false, 
+            error: 'EARLY60 coupon requires Pool Party add-on to be selected'
+          });
+        }
+      } else if (coupon.type === 'percentage') {
+        discount = Math.round(totalAmount * coupon.discount * 100) / 100;
+      }
+
+      return res.json({
+        valid: true,
+        discount: discount,
+        description: coupon.description,
+        code: upperCode
+      });
+
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      return res.status(500).json({ valid: false, error: 'Failed to validate coupon' });
+    }
+  });
+
   // Create pending booking endpoint - saves booking data immediately when user clicks "Proceed to Pay"
   app.post('/api/create-pending-booking', async (req, res) => {
     try {

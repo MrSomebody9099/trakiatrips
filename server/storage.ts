@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead, users, bookings, guests, paymentTransactions, leads } from "../../shared/schema";
+import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead, users, bookings, guests, paymentTransactions, leads } from "../shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -46,6 +46,9 @@ export interface IStorage {
   // Enhanced booking operations for pending bookings
   getPendingBookingsByEmail(userEmail: string): Promise<Booking[]>;
   reactivatePendingBooking(bookingId: string): Promise<Booking | undefined>;
+  
+  // Coupon operations
+  getCouponUsageCount(couponCode: string): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -299,6 +302,12 @@ export class MemStorage implements IStorage {
     this.bookings.set(bookingId, booking);
     return booking;
   }
+
+  async getCouponUsageCount(couponCode: string): Promise<number> {
+    // For MemStorage, we don't track coupon usage, return 0
+    // In a real implementation, you'd track this in a separate Map
+    return 0;
+  }
 }
 
 // Database storage implementation using Drizzle ORM
@@ -478,6 +487,12 @@ class DatabaseStorage implements IStorage {
       .where(eq(bookings.id, bookingId))
       .returning();
     return result[0];
+  }
+
+  async getCouponUsageCount(couponCode: string): Promise<number> {
+    // For now, return 0. In a real implementation, you'd create a coupons table
+    // and track usage count there
+    return 0;
   }
 }
 

@@ -146,6 +146,10 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installment'>('full');
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponError, setCouponError] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
   // Auto-fill email from localStorage if available
   useEffect(() => {
@@ -171,7 +175,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
       return sum + (addOn.price * numberOfPeople);
     }
   }, 0);
-  const totalPrice = basePrice + addOnPrice;
+  const totalPrice = Math.max(0, basePrice + addOnPrice - couponDiscount);
 
   const handlePackageSelect = (pkg: Package) => {
     setSelectedPackage(pkg);
@@ -216,6 +220,65 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         item.id === addOnId ? { ...item, days } : item
       )
     );
+  };
+
+  const validateCoupon = async (code: string) => {
+    setCouponError("");
+    
+    if (!code.trim()) {
+      setCouponDiscount(0);
+      setAppliedCoupon(null);
+      return;
+    }
+
+    const upperCode = code.toUpperCase();
+    
+    // Check payment plan restrictions
+    if (paymentPlan === 'installment' && upperCode !== 'EARLY60') {
+      setCouponError("Only EARLY60 coupon can be used with installment payments");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          code: upperCode, 
+          totalAmount: basePrice + addOnPrice,
+          paymentPlan,
+          numberOfPeople,
+          selectedAddOns: selectedAddOns.map(a => a.id)
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.valid) {
+        setCouponDiscount(result.discount);
+        setAppliedCoupon(upperCode);
+        setCouponError("");
+      } else {
+        setCouponError(result.error || "Invalid coupon code");
+        setCouponDiscount(0);
+        setAppliedCoupon(null);
+      }
+    } catch (error) {
+      setCouponError("Failed to validate coupon");
+      setCouponDiscount(0);
+      setAppliedCoupon(null);
+    }
+  };
+
+  const applyCoupon = () => {
+    validateCoupon(couponCode);
+  };
+
+  const removeCoupon = () => {
+    setCouponCode("");
+    setCouponDiscount(0);
+    setCouponError("");
+    setAppliedCoupon(null);
   };
 
   const canProceedToPayment = termsAccepted && 
@@ -760,10 +823,63 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                       <span className="font-heading font-semibold">€{addOnPrice}</span>
                     </div>
                   )}
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span className="font-body">Coupon ({appliedCoupon}):</span>
+                      <span className="font-heading font-semibold">-€{couponDiscount}</span>
+                    </div>
+                  )}
                   <div className="border-t pt-3 flex justify-between font-heading font-bold">
                     <span>Total:</span>
                     <span data-testid="text-total-price">€{totalPrice}</span>
                   </div>
+                </div>
+
+                {/* Coupon Section */}
+                <div className="space-y-3 mb-6 p-4 bg-green-50 rounded-lg">
+                  <h4 className="font-semibold text-green-900">Promo Code</h4>
+                  
+                  {numberOfPeople >= 4 && !appliedCoupon && (
+                    <div className="bg-blue-100 p-3 rounded-lg text-sm text-blue-800">
+                      <strong>Suggestion:</strong> Try coupon code "4ORMORE" for a 10% discount on groups of 4 or more!
+                    </div>
+                  )}
+                  
+                  {!appliedCoupon ? (
+                    <div className="space-y-2">
+                      <div className="flex space-x-2">
+                        <Input
+                          placeholder="Enter promo code"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          className="flex-1"
+                        />
+                        <Button 
+                          onClick={applyCoupon}
+                          variant="outline"
+                          disabled={!couponCode.trim()}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                      {couponError && (
+                        <p className="text-red-600 text-sm">{couponError}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-green-100 p-3 rounded-lg">
+                      <span className="text-green-800 font-medium">
+                        Coupon "{appliedCoupon}" applied! You saved €{couponDiscount}
+                      </span>
+                      <Button 
+                        onClick={removeCoupon}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-4 mb-6 p-4 bg-blue-50 rounded-lg">
