@@ -259,112 +259,19 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                   </RadioGroup>
                 </div>
                 
-                {/* COUPON SECTION */}
-                <div className="border-b pb-4">
-                  <h3 className="font-medium mb-2">Promo Code</h3>
-                  
-                  {/* Auto-suggestion for 4ORMORE (small font) */}
-                  {groupSize >= 4 && !couponCode && !appliedDiscount && (
-                    <p className="text-xs text-green-600 mb-2" data-testid="text-group-discount-suggestion">
-                      💡 You qualify for group discount! Use code "4ORMORE" for 10% off
-                    </p>
-                  )}
-                  
-                  {/* Manual input field */}
-                  <div className="flex gap-2 mb-2">
-                    <Input 
-                      placeholder="Enter promo code (EARLY60, BEENHEREB4, 4ORMORE)"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      data-testid="input-coupon-code"
-                    />
-                    <Button 
-                      variant="outline" 
-                      onClick={validateCoupon}
-                      disabled={isValidatingCoupon || !couponCode}
-                      data-testid="button-apply-coupon"
-                    >
-                      {isValidatingCoupon ? 'Checking...' : 'Apply'}
-                    </Button>
-                  </div>
-                  
-                  {/* Group size input for 4ORMORE validation */}
-                  <div className="mb-2">
-                    <Label htmlFor="groupSize" className="text-sm">Number of people in your group:</Label>
-                    <Input 
-                      id="groupSize"
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={groupSize}
-                      onChange={(e) => setGroupSize(parseInt(e.target.value) || 1)}
-                      className="mt-1"
-                      data-testid="input-group-size"
-                    />
-                  </div>
-                  
-                  {/* Show discount if applied */}
-                  {appliedDiscount && (
-                    <div className="bg-green-50 border border-green-200 rounded p-2" data-testid="text-applied-discount">
-                      <p className="text-sm text-green-700">
-                        ✅ <strong>{appliedDiscount.name}</strong> applied
-                        {appliedDiscount.percent_off && ` (${appliedDiscount.percent_off}% off)`}
-                        {appliedDiscount.amount_off && ` (€${(appliedDiscount.amount_off / 100).toFixed(2)} off)`}
-                      </p>
-                      {appliedDiscount.remaining_redemptions && (
-                        <p className="text-xs text-green-600">
-                          {appliedDiscount.remaining_redemptions} uses remaining
-                        </p>
-                      )}
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={removeCoupon}
-                        className="mt-1 text-xs"
-                        data-testid="button-remove-coupon"
-                      >
-                        Remove coupon
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {/* Show error if validation failed */}
-                  {couponError && (
-                    <div className="bg-red-50 border border-red-200 rounded p-2" data-testid="text-coupon-error">
-                      <p className="text-sm text-red-600">❌ {couponError}</p>
-                    </div>
-                  )}
-                </div>
                 
                 <div className="border-b pb-4">
                   <h3 className="font-medium mb-2">Total</h3>
-                  
-                  {/* Show original amount if discount is applied */}
-                  {appliedDiscount && (
-                    <div className="flex justify-between text-sm text-gray-500 line-through mb-1">
-                      <span>Original {paymentMode === 'full' ? 'Amount' : 'Deposit'}</span>
-                      <span>
-                        {paymentMode === 'full' 
-                          ? formatPrice(totalAmount * 100) 
-                          : formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}
-                      </span>
-                    </div>
-                  )}
                   
                   {/* Show final amount */}
                   <div className="flex justify-between font-bold">
                     <span>
                       {paymentMode === 'full' ? 'Final Amount' : 'Deposit (30%)'}
-                      {appliedDiscount && (
-                        <span className="text-green-600 font-normal text-sm ml-2">
-                          (with {appliedDiscount.name})
-                        </span>
-                      )}
                     </span>
-                    <span className={appliedDiscount ? "text-green-600" : ""}>
+                    <span>
                       {paymentMode === 'full' 
-                        ? formatPrice(finalAmount * 100) 
-                        : formatPrice((packageData.name === 'Package A' ? 5600 : 7400) * (appliedDiscount && appliedDiscount.percent_off ? (1 - appliedDiscount.percent_off / 100) : 1))}
+                        ? formatPrice(totalAmount * 100) 
+                        : formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}
                     </span>
                   </div>
                   

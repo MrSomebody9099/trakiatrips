@@ -351,14 +351,14 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
             />
           </div>
           <div className="flex gap-2">
-            {activeTab === 'leads' && (
+            {activeTab === 'bookings' && (
               <Button 
-                onClick={() => setIsAddLeadDialogOpen(true)}
+                onClick={() => setIsAddBookingDialogOpen(true)}
                 className="hover-elevate"
-                data-testid="button-add-lead"
+                data-testid="button-add-booking"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Lead
+                Add
               </Button>
             )}
             <Button 
