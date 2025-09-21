@@ -840,21 +840,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const leads = await storage.getAllLeads();
       const allBookings = await storage.getAllBookings();
       
-      // Format bookings with lead booker information only (not guest details)
-      const bookingsWithLeadBookers = allBookings.map((booking) => {
-        return {
-          id: booking.id,
-          leadBooker: booking.leadBookerName || 'Unknown',
-          email: booking.userEmail,
-          phone: booking.leadBookerPhone || '',
-          package: booking.packageName,
-          guests: booking.numberOfGuests,
-          amount: parseInt(booking.totalAmount),
-          date: booking.dates,
-          status: booking.paymentStatus,
-          flightNumber: booking.flightNumber
-        };
-      });
+      // Format bookings with lead booker information AND guest details
+      const bookingsWithLeadBookers = await Promise.all(
+        allBookings.map(async (booking) => {
+          const guests = await storage.getGuestsByBookingId(booking.id);
+          return {
+            id: booking.id,
+            leadBooker: booking.leadBookerName || 'Unknown',
+            email: booking.userEmail,
+            phone: booking.leadBookerPhone || '',
+            package: booking.packageName,
+            guests: booking.numberOfGuests,
+            guestDetails: guests, // Add actual guest details
+            amount: parseInt(booking.totalAmount),
+            date: booking.dates,
+            status: booking.paymentStatus,
+            flightNumber: booking.flightNumber
+          };
+        })
+      );
       
       res.json({ leads, bookings: bookingsWithLeadBookers });
     } catch (error) {

@@ -29,6 +29,13 @@ interface Booking {
   phone: string;
   package: string;
   guests: number;
+  guestDetails?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+  }>;
   amount: number;
   date: string;
   status: "pending" | "confirmed" | "completed";
@@ -415,7 +422,21 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                           data-testid={`booking-row-${booking.id}`}
                         >
                           <td className="p-3 font-body font-medium">{booking.id}</td>
-                          <td className="p-3 font-body">{booking.leadBooker}</td>
+                          <td className="p-3 font-body">
+                            <div className="text-sm">
+                              <div className="font-medium">{booking.leadBooker}</div>
+                              {booking.guestDetails && booking.guestDetails.length > 0 && (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  <div className="text-xs text-gray-500 mb-1">Guests:</div>
+                                  {booking.guestDetails.map((guest, index) => (
+                                    <div key={guest.id} className="ml-2">
+                                      {guest.email}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </td>
                           <td className="p-3 font-body">
                             <div className="text-sm">
                               <div>{booking.email}</div>
