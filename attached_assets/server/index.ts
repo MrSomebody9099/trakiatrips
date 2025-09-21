@@ -39,7 +39,49 @@ app.use((req, res, next) => {
   next();
 });
 
+// Comprehensive startup health check
+const performHealthCheck = () => {
+  console.log('[Health Check] Starting system validation...');
+  
+  // Check environment variables
+  const requiredEnvVars = [
+    'DATABASE_URL',
+    'STRIPE_SECRET_KEY', 
+    'STRIPE_PUBLISHABLE_KEY',
+    'VITE_STRIPE_PUBLIC_KEY',
+    'SUPABASE_URL',
+    'SUPABASE_ANON_KEY',
+    'VITE_SUPABASE_URL',
+    'VITE_SUPABASE_ANON_KEY'
+  ];
+  
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error('[Health Check] ❌ Missing environment variables:', missingVars);
+    console.warn('[Health Check] ⚠️  Application may not function correctly in production');
+  } else {
+    console.log('[Health Check] ✅ All required environment variables present');
+  }
+  
+  // Validate Stripe key formats
+  const stripeSecret = process.env.STRIPE_SECRET_KEY;
+  if (stripeSecret && !stripeSecret.startsWith('sk_')) {
+    console.error('[Health Check] ❌ Invalid STRIPE_SECRET_KEY format');
+  }
+  
+  const stripePublishable = process.env.STRIPE_PUBLISHABLE_KEY;
+  if (stripePublishable && !stripePublishable.startsWith('pk_')) {
+    console.error('[Health Check] ❌ Invalid STRIPE_PUBLISHABLE_KEY format');
+  }
+  
+  console.log('[Health Check] System validation complete');
+};
+
 (async () => {
+  // Run health check before starting server
+  performHealthCheck();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
