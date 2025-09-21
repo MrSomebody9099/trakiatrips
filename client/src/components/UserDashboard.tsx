@@ -1,37 +1,11 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User, Edit3, Plus, Calendar, MapPin, Users, CreditCard } from "lucide-react";
+import { User, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Navigation from "./Navigation";
-
-interface Guest {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-}
-
-interface Booking {
-  id: string;
-  packageName: string;
-  packagePrice: number;
-  dates: string;
-  numberOfGuests: number;
-  roomType: string;
-  addOns: string[];
-  totalAmount: number;
-  paymentStatus: 'pending' | 'paid' | 'failed';
-  bookingDate: string;
-  flightNumber?: string;
-  guests: Guest[];
-}
 
 interface UserDashboardProps {
   onClose?: () => void;
@@ -39,10 +13,6 @@ interface UserDashboardProps {
 
 export default function UserDashboard({ onClose }: UserDashboardProps) {
   const [userEmail, setUserEmail] = useState("");
-  const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [tempBookings, setTempBookings] = useState<Booking[]>([]);
-  const [currentBookingId, setCurrentBookingId] = useState<string>("");
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",

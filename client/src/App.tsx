@@ -9,6 +9,7 @@ import TermsPage from "./pages/TermsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import BookingFlow from "./components/BookingFlow";
 import AdminDashboard from "./components/AdminDashboard";
+import UserProfile from "./components/UserProfile";
 import UserDashboard from "./components/UserDashboard";
 import SuccessPage from "./pages/SuccessPage";
 import TransactionSuccess from "./pages/TransactionSuccess";
@@ -32,7 +33,7 @@ function Router() {
       <Route path="/payment-failed" component={() => <PaymentFailed />} />
       <Route path="/transaction-successful" component={() => <TransactionSuccess />} />
       <Route path="/dashboard" component={() => <AdminDashboard />} />
-      <Route path="/profile" component={() => <UserDashboard />} />
+      <Route path="/profile" component={() => <UserProfile />} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
