@@ -21,9 +21,8 @@ const initializeStripe = () => {
     throw new Error('STRIPE_SECRET_KEY is required but not found in environment variables');
   }
   
-  if (!secretKey.startsWith('sk_')) {
-    console.error('STRIPE_SECRET_KEY validation failed. Key preview:', secretKey.substring(0, 10));
-    throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_test_ or sk_live_');
+  if (!secretKey.startsWith('sk_') && !secretKey.startsWith('rk_')) {
+    throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_ or rk_');
   }
   
   console.log(`[Stripe] Initializing with key: ${secretKey.substring(0, 12)}...`);
