@@ -42,10 +42,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Raw body parsing for Stripe webhook is configured in server/index.ts
 
-  // Email collection API endpoint
+  // Enhanced email/lead collection API endpoint - supports full lead information
   app.post('/api/collect-email', async (req, res) => {
     try {
-      const { email, status = 'email_only' } = req.body;
+      const { email, name, phone, packageName, status = 'email_only', role = 'lead_booker' } = req.body;
 
       if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -57,7 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid email format' });
       }
 
-      // Check if email already exists
+      // For backward compatibility, check if email already exists (first match)
       const existingLead = await storage.getLeadByEmail(email);
       if (existingLead) {
         return res.json({ 
@@ -67,18 +67,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create new lead
-      const newLead = await storage.createLead({ email, status });
+      // Create new lead with complete information
+      const leadData = {
+        email,
+        name: name || null,
+        phone: phone || null,
+        packageName: packageName || null,
+        role: role as 'lead_booker' | 'guest',
+        status
+      };
+
+      const newLead = await storage.createLead(leadData);
       
       return res.json({ 
         success: true, 
-        message: 'Email collected successfully',
+        message: name ? 'Lead information collected successfully' : 'Email collected successfully',
         lead: newLead
       });
 
     } catch (error) {
-      console.error('Error collecting email:', error);
-      return res.status(500).json({ error: 'Failed to save email. Please try again.' });
+      console.error('Error collecting lead information:', error);
+      return res.status(500).json({ error: 'Failed to save lead information. Please try again.' });
+    }
+  });
+
+  // New Lead Management API endpoint - Admin only
+  app.post('/api/leads', adminAuth, async (req, res) => {
+    try {
+      const leadData = insertLeadSchema.parse(req.body);
+
+      // Validate email format
+      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      if (!emailRegex.test(leadData.email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+
+      const newLead = await storage.createLead(leadData);
+      
+      return res.json({ 
+        success: true, 
+        message: 'Lead created successfully',
+        lead: newLead
+      });
+
+    } catch (error) {
+      console.error('Error creating lead:', error);
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ error: 'Invalid lead data', details: (error as any).errors });
+      }
+      return res.status(500).json({ error: 'Failed to create lead. Please try again.' });
+    }
+  });
+
+  // Get all leads - Admin only
+  app.get('/api/leads', adminAuth, async (req, res) => {
+    try {
+      const leads = await storage.getAllLeads();
+      
+      return res.json({ 
+        success: true,
+        leads
+      });
+
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      return res.status(500).json({ error: 'Failed to fetch leads.' });
     }
   });
 
@@ -184,7 +237,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create pending booking endpoint - saves booking data immediately when user clicks "Proceed to Pay"
   app.post('/api/create-pending-booking', async (req, res) => {
     try {
-      const { userEmail, packageName, packagePrice, dates, numberOfGuests, roomType, addOns, totalAmount, paymentPlan, flightNumber, guests } = req.body;
+      const { 
+        userEmail, 
+        leadBookerName, 
+        leadBookerPhone, 
+        packageName, 
+        packagePrice, 
+        dates, 
+        numberOfGuests, 
+        roomType, 
+        addOns, 
+        totalAmount, 
+        paymentPlan, 
+        flightNumber, 
+        guests 
+      } = req.body;
 
       if (!userEmail || !packageName || !totalAmount) {
         return res.status(400).json({ error: 'Required fields missing: userEmail, packageName, totalAmount' });
@@ -201,8 +268,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const reactivatedBooking = await storage.reactivatePendingBooking(latestBooking.id);
         
-        // Update lead status to link to this booking
-        await storage.updateLeadStatus(userEmail, 'booking_started', reactivatedBooking?.id);
+        // Find and update lead booker's lead status by ID
+        const leadBookerLeads = await storage.getLeadsByEmail(userEmail);
+        const leadBookerLead = leadBookerLeads.find(lead => lead.role === 'lead_booker');
+        if (leadBookerLead) {
+          await storage.updateLeadStatusById(leadBookerLead.id, 'booking_started', reactivatedBooking?.id);
+        }
         
         console.log(`Reactivated existing pending booking ${reactivatedBooking?.id} for ${userEmail}`);
         
@@ -214,9 +285,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create new pending booking
+      // Create new pending booking with lead booker information
       const bookingData = {
         userEmail,
+        leadBookerName: leadBookerName || null,
+        leadBookerPhone: leadBookerPhone || null,
         packageName,
         packagePrice,
         dates,
@@ -231,12 +304,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const newBooking = await storage.createBooking(bookingData);
       
-      // Update lead status to link to this booking
-      await storage.updateLeadStatus(userEmail, 'booking_started', newBooking.id);
+      // Create lead record for the lead booker
+      const leadBookerData = {
+        email: userEmail,
+        name: leadBookerName || null,
+        phone: leadBookerPhone || null,
+        packageName,
+        role: 'lead_booker' as const,
+        status: 'booking_started',
+        bookingId: newBooking.id
+      };
+      
+      const leadBookerLead = await storage.createLead(leadBookerData);
 
-      // Create guest records if provided
+      // Create guest records and corresponding lead records if provided
       if (guests && guests.length > 0) {
         for (const guest of guests) {
+          // Create guest record in guests table (existing functionality)
           await storage.createGuest({
             bookingId: newBooking.id,
             name: guest.name,
@@ -244,10 +328,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             phone: guest.phone,
             dateOfBirth: guest.date_of_birth
           });
+          
+          // Create lead record for this guest
+          const guestLeadData = {
+            email: guest.email,
+            name: guest.name,
+            phone: guest.phone,
+            packageName,
+            role: 'guest' as const,
+            leadBookerId: leadBookerLead.id, // Reference to lead booker
+            withLeadName: leadBookerName || userEmail, // Display name for "With" field
+            status: 'booking_started',
+            bookingId: newBooking.id
+          };
+          
+          await storage.createLead(guestLeadData);
         }
       }
 
-      console.log(`Created pending booking ${newBooking.id} for ${userEmail}`);
+      console.log(`Created pending booking ${newBooking.id} for ${userEmail} with complete lead tracking`);
       
       return res.json({ 
         success: true, 
@@ -782,7 +881,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Email already exists in leads' });
       }
 
-      const leadId = await storage.createLead({ email: email.trim(), status: 'email_only' });
+      const leadId = await storage.createLead({ 
+        email: email.trim(), 
+        status: 'email_only',
+        role: 'lead_booker'
+      });
       res.json({ success: true, leadId });
     } catch (error) {
       console.error('Error creating lead:', error);
