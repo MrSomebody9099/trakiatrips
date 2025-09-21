@@ -11,6 +11,12 @@ import { Label } from "@/components/ui/label";
 interface Lead {
   id: string;
   email: string;
+  name?: string;
+  phone?: string;
+  packageName?: string;
+  role: 'lead_booker' | 'guest';
+  leadBookerId?: string;
+  withLeadName?: string;
   status: string;
   created_at: string;
   booking_id?: string;
@@ -437,11 +443,13 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-border">
-                        <th className="text-left p-3 font-heading font-semibold">Lead ID</th>
+                        <th className="text-left p-3 font-heading font-semibold">Name</th>
                         <th className="text-left p-3 font-heading font-semibold">Email</th>
+                        <th className="text-left p-3 font-heading font-semibold">Contact</th>
+                        <th className="text-left p-3 font-heading font-semibold">Package</th>
+                        <th className="text-left p-3 font-heading font-semibold">Role</th>
+                        <th className="text-left p-3 font-heading font-semibold">With</th>
                         <th className="text-left p-3 font-heading font-semibold">Status</th>
-                        <th className="text-left p-3 font-heading font-semibold">Date Collected</th>
-                        <th className="text-left p-3 font-heading font-semibold">Booking ID</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -451,24 +459,38 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                           className="border-b border-border/50 hover:bg-muted/50 transition-colors"
                           data-testid={`lead-row-${lead.id}`}
                         >
-                          <td className="p-3 font-body font-medium">{lead.id.substring(0, 8)}</td>
-                          <td className="p-3 font-body">{lead.email}</td>
-                          <td className="p-3">
+                          <td className="p-3 font-body font-medium" data-testid={`text-lead-name-${lead.id}`}>
+                            {lead.name || '-'}
+                          </td>
+                          <td className="p-3 font-body" data-testid={`text-lead-email-${lead.id}`}>
+                            {lead.email}
+                          </td>
+                          <td className="p-3 font-body" data-testid={`text-lead-phone-${lead.id}`}>
+                            {lead.phone || '-'}
+                          </td>
+                          <td className="p-3 font-body" data-testid={`text-lead-package-${lead.id}`}>
+                            {lead.packageName || '-'}
+                          </td>
+                          <td className="p-3" data-testid={`text-lead-role-${lead.id}`}>
+                            <Badge className={
+                              lead.role === 'lead_booker' ? 'bg-purple-100 text-purple-800' :
+                              'bg-orange-100 text-orange-800'
+                            }>
+                              {lead.role === 'lead_booker' ? 'Lead Booker' : 'Guest'}
+                            </Badge>
+                          </td>
+                          <td className="p-3 font-body" data-testid={`text-lead-with-${lead.id}`}>
+                            {lead.role === 'guest' && lead.withLeadName ? lead.withLeadName : '-'}
+                          </td>
+                          <td className="p-3" data-testid={`text-lead-status-${lead.id}`}>
                             <Badge className={
                               lead.status === 'email_only' ? 'bg-blue-100 text-blue-800' :
+                              lead.status === 'lead_collected' ? 'bg-green-100 text-green-800' :
                               lead.status === 'booking_started' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-green-100 text-green-800'
+                              'bg-gray-100 text-gray-800'
                             }>
                               {lead.status.replace('_', ' ')}
                             </Badge>
-                          </td>
-                          <td className="p-3 font-body">{new Date(lead.created_at).toLocaleDateString()}</td>
-                          <td className="p-3 font-body">
-                            {lead.booking_id ? (
-                              <span className="text-sm text-muted-foreground">{lead.booking_id.substring(0, 8)}</span>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">-</span>
-                            )}
                           </td>
                         </tr>
                       ))}
