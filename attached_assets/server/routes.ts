@@ -224,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a Stripe checkout session with subscription support for installments
   app.post('/api/create-checkout-session', async (req, res) => {
     try {
-      const { packageName, paymentMode, bookingData } = req.body;
+      const { packageName, paymentMode, bookingData, addOns = [] } = req.body;
 
       // Validate package name and get canonical pricing
       const packagePricing = PACKAGE_PRICING[packageName as keyof typeof PACKAGE_PRICING];
@@ -234,21 +234,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (paymentMode === 'full') {
         // Full payment - single charge
+        // Build line items including add-ons
+        const lineItems = [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: packageName,
+                description: `${packageName} - Full Payment`,
+              },
+              unit_amount: packagePricing.total * 100, // Convert to cents
+            },
+            quantity: 1,
+          },
+        ];
+        
+        // Add pool party add-on if selected (€15)
+        if (addOns.includes('poolParty')) {
+          lineItems.push({
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: 'Pool Party Experience',
+                description: 'Exclusive pool party access with premium amenities',
+              },
+              unit_amount: 1500, // €15 in cents
+            },
+            quantity: 1,
+          });
+        }
+        
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
-          line_items: [
-            {
-              price_data: {
-                currency: 'eur',
-                product_data: {
-                  name: packageName,
-                  description: `${packageName} - Full Payment`,
-                },
-                unit_amount: packagePricing.total * 100, // Convert to cents
-              },
-              quantity: 1,
-            },
-          ],
+          allow_promotion_codes: true,
+          line_items: lineItems,
           mode: 'payment',
           success_url: `${req.protocol}://${req.get('host')}/payment-success?session_id={CHECKOUT_SESSION_ID}&type=full`,
           cancel_url: `${req.protocol}://${req.get('host')}/payment-process`,
@@ -258,9 +277,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             totalAmount: packagePricing.total.toString(),
             bookingId: bookingData.bookingId,
             userEmail: bookingData.userEmail,
+            addOns: addOns.join(','),
           },
         });
-
+        
         return res.json({ url: session.url });
       } 
       
@@ -291,6 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create checkout session for subscription with deposit payment
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
+          allow_promotion_codes: true,
           mode: 'subscription',
           customer: customer.id,
           line_items: [
@@ -303,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 },
                 unit_amount: packagePricing.deposit * 100, // Deposit amount in cents
                 recurring: {
-                  interval: 'month'
+                  interval: 'month' as const
                 }
               },
               quantity: 1,
