@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
 
 interface AuthPanelProps {
@@ -19,7 +20,16 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
     password: "",
     confirmPassword: "",
     name: "",
+    phone: "",
+    packageName: "",
   });
+
+  // Available package options
+  const packageOptions = [
+    "Package A",
+    "Package B", 
+    "Custom Package"
+  ];
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateEmail = (email: string) => {
@@ -39,6 +49,13 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Invalid email address";
+    }
+
+    // Enhanced validation for email-only mode (lead collection)
+    if (mode === "email-only") {
+      if (!formData.name) newErrors.name = "Name is required";
+      if (!formData.phone) newErrors.phone = "Phone number is required";
+      if (!formData.packageName) newErrors.packageName = "Please select a package";
     }
 
     if (mode === "signup") {
@@ -67,7 +84,11 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
         },
         body: JSON.stringify({
           email: formData.email,
-          status: 'email_only'
+          name: formData.name || null,
+          phone: formData.phone || null,
+          packageName: formData.packageName || null,
+          role: mode === 'email-only' ? 'lead_booker' : 'lead_booker',
+          status: mode === 'email-only' ? 'lead_collected' : 'email_only'
         }),
       });
 
@@ -105,7 +126,7 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
       <DialogContent className="bg-white/95 backdrop-blur-lg border-border shadow-2xl max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground text-center text-xl font-heading font-semibold">
-            {mode === "email-only" ? "Stay Connected" : mode === "signup" ? "Create Account" : "Welcome Back"}
+            {mode === "email-only" ? "Tell Us About Your Travel Plans" : mode === "signup" ? "Create Account" : "Welcome Back"}
           </DialogTitle>
         </DialogHeader>
 
@@ -116,7 +137,7 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
             </div>
           )}
 
-          {mode === "signup" && (
+          {(mode === "signup" || mode === "email-only") && (
             <div>
               <Label htmlFor="name">Name</Label>
               <Input
@@ -144,6 +165,39 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
             />
             {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
           </div>
+
+          {mode === "email-only" && (
+            <>
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => updateFormData("phone", e.target.value)}
+                  placeholder="+1 (555) 123-4567"
+                  className={errors.phone ? "border-destructive" : ""}
+                  data-testid="input-lead-phone"
+                />
+                {errors.phone && <p className="text-destructive text-sm mt-1">{errors.phone}</p>}
+              </div>
+              
+              <div>
+                <Label htmlFor="package">Travel Package</Label>
+                <Select value={formData.packageName} onValueChange={(value) => updateFormData("packageName", value)}>
+                  <SelectTrigger className={errors.packageName ? "border-destructive" : ""} data-testid="select-lead-package">
+                    <SelectValue placeholder="Select a package" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {packageOptions.map((pkg) => (
+                      <SelectItem key={pkg} value={pkg}>{pkg}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.packageName && <p className="text-destructive text-sm mt-1">{errors.packageName}</p>}
+              </div>
+            </>
+          )}
 
           {mode !== "email-only" && (
             <div>
