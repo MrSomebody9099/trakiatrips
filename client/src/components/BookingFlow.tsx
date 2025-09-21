@@ -542,7 +542,20 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   {guests.map((guest, index) => (
                     <div key={index} className="border-l-4 border-primary pl-4">
                       <h4 className="font-heading font-semibold mb-3">Guest {index + 1}</h4>
-                      <div className="max-w-md">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Full Name *</Label>
+                          <Input
+                            value={guest.name}
+                            onChange={(e) => {
+                              const newGuests = [...guests];
+                              newGuests[index] = { ...guest, name: e.target.value };
+                              setGuests(newGuests);
+                            }}
+                            placeholder="Enter guest full name"
+                            data-testid={`input-guest-${index}-name`}
+                          />
+                        </div>
                         <div>
                           <Label>Email Address *</Label>
                           <Input
@@ -555,6 +568,32 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                             }}
                             placeholder="guest@email.com"
                             data-testid={`input-guest-${index}-email`}
+                          />
+                        </div>
+                        <div>
+                          <Label>Phone Number *</Label>
+                          <Input
+                            value={guest.phone}
+                            onChange={(e) => {
+                              const newGuests = [...guests];
+                              newGuests[index] = { ...guest, phone: e.target.value };
+                              setGuests(newGuests);
+                            }}
+                            placeholder="+359 88 123 4567"
+                            data-testid={`input-guest-${index}-phone`}
+                          />
+                        </div>
+                        <div>
+                          <Label>Date of Birth *</Label>
+                          <Input
+                            type="date"
+                            value={guest.dateOfBirth}
+                            onChange={(e) => {
+                              const newGuests = [...guests];
+                              newGuests[index] = { ...guest, dateOfBirth: e.target.value };
+                              setGuests(newGuests);
+                            }}
+                            data-testid={`input-guest-${index}-dob`}
                           />
                         </div>
                       </div>

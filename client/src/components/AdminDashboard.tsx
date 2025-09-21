@@ -38,7 +38,7 @@ interface Booking {
   }>;
   amount: number;
   date: string;
-  status: "pending" | "confirmed" | "completed";
+  status: "paid" | "pending" | "cancelled";
   flightNumber?: string;
 }
 
@@ -63,7 +63,7 @@ const fetchDashboardData = async (password: string): Promise<DashboardData> => {
 
     const data = await response.json();
     
-    // Transform bookings to match UI format
+    // Transform bookings to match UI format - preserve payment status
     const transformedBookings: Booking[] = (data.bookings || []).map((booking: any) => ({
       id: booking.id.substring(0, 8), // Show first 8 chars of UUID
       leadBooker: booking.leadBooker || 'N/A',
@@ -73,8 +73,8 @@ const fetchDashboardData = async (password: string): Promise<DashboardData> => {
       guests: booking.guests,
       amount: booking.amount,
       date: new Date(booking.date).toLocaleDateString(),
-      status: booking.status === "paid" ? "confirmed" : booking.status === "pending" ? "pending" : "completed",
-      flightNumber: booking.flightNumber || null
+      status: booking.status, // Preserve actual payment status: paid, pending, cancelled
+      flightNumber: booking.flightNumber || undefined
     }));
 
     return {
@@ -141,14 +141,14 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
     emailOnlyLeads: leads.filter((l: Lead) => l.status === "email_only").length,
     bookingStarted: leads.filter((l: Lead) => l.status === "booking_started").length,
     totalBookings: bookings.length,
-    confirmed: bookings.filter((b: Booking) => b.status === "confirmed").length,
+    confirmed: bookings.filter((b: Booking) => b.status === "paid").length,
     pending: bookings.filter((b: Booking) => b.status === "pending").length,
-    totalRevenue: bookings.filter((b: Booking) => b.status === "confirmed").reduce((sum: number, b: Booking) => sum + b.amount, 0)
+    totalRevenue: bookings.filter((b: Booking) => b.status === "paid").reduce((sum: number, b: Booking) => sum + b.amount, 0)
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed": return "bg-green-100 text-green-800";
+      case "paid": return "bg-green-100 text-green-800";
       case "pending": return "bg-yellow-100 text-yellow-800";
       case "cancelled": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
@@ -293,10 +293,10 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
             <CardContent className="flex items-center p-6">
               <CheckCircle className="h-8 w-8 text-green-600 mr-4" />
               <div>
-                <p className="text-2xl font-heading font-bold text-green-600" data-testid="stat-confirmed">
+                <p className="text-2xl font-heading font-bold text-green-600" data-testid="stat-paid">
                   {stats.confirmed}
                 </p>
-                <p className="text-muted-foreground font-body">Confirmed</p>
+                <p className="text-muted-foreground font-body">Paid</p>
               </div>
             </CardContent>
           </Card>
@@ -506,19 +506,29 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                           </td>
                           <td className="p-3" data-testid={`text-lead-status-${lead.id}`}>
                             <Badge className={
-                              lead.status === 'email_only' ? 'bg-blue-100 text-blue-800' :
-                              lead.status === 'email_and_name' ? 'bg-green-100 text-green-800' :
-                              lead.status === 'lead_collected' ? 'bg-green-100 text-green-800' :
-                              lead.status === 'booking_started' ? 'bg-yellow-100 text-yellow-800' :
-                              lead.booking_id ? 'bg-purple-100 text-purple-800' :
-                              'bg-gray-100 text-gray-800'
+                              (() => {
+                                if (lead.booking_id) {
+                                  const linkedBooking = bookings.find(b => b.id === lead.booking_id?.substring(0, 8));
+                                  return linkedBooking ? getStatusColor(linkedBooking.status) : 'bg-gray-100 text-gray-800';
+                                }
+                                return lead.status === 'email_only' ? 'bg-blue-100 text-blue-800' :
+                                       lead.status === 'email_and_name' ? 'bg-green-100 text-green-800' :
+                                       lead.status === 'lead_collected' ? 'bg-green-100 text-green-800' :
+                                       lead.status === 'booking_started' ? 'bg-yellow-100 text-yellow-800' :
+                                       'bg-gray-100 text-gray-800';
+                              })()
                             }>
-                              {lead.booking_id ? 'Has Booking' :
-                               lead.status === 'email_and_name' ? 'Contact Collected' :
-                               lead.status === 'email_only' ? 'Email Only' :
-                               lead.status === 'lead_collected' ? 'Lead Collected' :
-                               lead.status === 'booking_started' ? 'Booking Started' :
-                               lead.status.replace('_', ' ')}
+                              {(() => {
+                                if (lead.booking_id) {
+                                  const linkedBooking = bookings.find(b => b.id === lead.booking_id?.substring(0, 8));
+                                  return linkedBooking ? linkedBooking.status.charAt(0).toUpperCase() + linkedBooking.status.slice(1) : 'Unknown';
+                                }
+                                return lead.status === 'email_and_name' ? 'Contact Collected' :
+                                       lead.status === 'email_only' ? 'Email Only' :
+                                       lead.status === 'lead_collected' ? 'Lead Collected' :
+                                       lead.status === 'booking_started' ? 'Booking Started' :
+                                       lead.status.replace('_', ' ');
+                              })()}
                             </Badge>
                           </td>
                         </tr>
