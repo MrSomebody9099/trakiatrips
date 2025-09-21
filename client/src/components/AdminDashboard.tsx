@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Users, CheckCircle, Clock, DollarSign, Search, Download, Mail } from "lucide-react";
+import { Users, CheckCircle, Clock, DollarSign, Search, Download, Mail, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -109,6 +109,9 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<'leads' | 'bookings'>('bookings');
+  const [isAddLeadDialogOpen, setIsAddLeadDialogOpen] = useState(false);
+  const [newLeadEmail, setNewLeadEmail] = useState("");
+  const [isAddingLead, setIsAddingLead] = useState(false);
 
   // Use React Query to fetch data from Supabase
   const { data: dashboardData, isLoading, refetch } = useQuery({
@@ -159,6 +162,36 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
       case "pending": return "bg-yellow-100 text-yellow-800";
       case "cancelled": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleAddLead = async () => {
+    if (!newLeadEmail.trim()) return;
+    
+    setIsAddingLead(true);
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .insert([
+          {
+            email: newLeadEmail.trim(),
+            status: 'email_only'
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Reset form and close dialog
+      setNewLeadEmail("");
+      setIsAddLeadDialogOpen(false);
+      
+      // Refresh data
+      refetch();
+    } catch (error) {
+      console.error('Error adding lead:', error);
+      setError("Failed to add lead. Please try again.");
+    } finally {
+      setIsAddingLead(false);
     }
   };
 
@@ -330,15 +363,27 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
               data-testid="input-search-bookings"
             />
           </div>
-          <Button 
-            onClick={exportToCSV}
-            variant="outline"
-            className="hover-elevate"
-            data-testid="button-export-csv"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export to CSV
-          </Button>
+          <div className="flex gap-2">
+            {activeTab === 'leads' && (
+              <Button 
+                onClick={() => setIsAddLeadDialogOpen(true)}
+                className="hover-elevate"
+                data-testid="button-add-lead"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Lead
+              </Button>
+            )}
+            <Button 
+              onClick={exportToCSV}
+              variant="outline"
+              className="hover-elevate"
+              data-testid="button-export-csv"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export to CSV
+            </Button>
+          </div>
         </div>
 
         {/* Data Table */}
@@ -454,6 +499,56 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Lead Dialog */}
+      <Dialog open={isAddLeadDialogOpen} onOpenChange={setIsAddLeadDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Lead</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="lead-email">Email Address</Label>
+              <Input
+                id="lead-email"
+                type="email"
+                value={newLeadEmail}
+                onChange={(e) => setNewLeadEmail(e.target.value)}
+                placeholder="Enter email address"
+                className="mt-1"
+              />
+            </div>
+            
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                {error}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <Button
+              onClick={handleAddLead}
+              disabled={isAddingLead || !newLeadEmail.trim()}
+              className="flex-1 hover-elevate"
+            >
+              {isAddingLead ? "Adding..." : "Add Lead"}
+            </Button>
+            <Button
+              onClick={() => {
+                setIsAddLeadDialogOpen(false);
+                setNewLeadEmail("");
+                setError("");
+              }}
+              variant="outline"
+              className="flex-1 hover-elevate"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
