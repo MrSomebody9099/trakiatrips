@@ -92,6 +92,7 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<'leads' | 'bookings'>('bookings');
   const [isAddLeadDialogOpen, setIsAddLeadDialogOpen] = useState(false);
+  const [isAddBookingDialogOpen, setIsAddBookingDialogOpen] = useState(false);
   const [newLeadEmail, setNewLeadEmail] = useState("");
   const [isAddingLead, setIsAddingLead] = useState(false);
 
