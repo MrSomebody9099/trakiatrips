@@ -97,7 +97,7 @@ router.post('/create-coupons', async (req, res) => {
 // Validate promotion code
 router.post('/validate-coupon', async (req, res) => {
   try {
-    const { couponCode, groupSize } = req.body;
+    const { couponCode, groupSize, paymentMode } = req.body;
 
     // Find promotion code
     const promotionCodes = await stripe.promotionCodes.list({ code: couponCode, active: true });
@@ -116,6 +116,14 @@ router.post('/validate-coupon', async (req, res) => {
       return res.status(400).json({ 
         error: 'This coupon is only valid for groups of 4 or more people',
         suggestion: `You have ${groupSize} people. Add ${4 - groupSize} more to use this discount!`
+      });
+    }
+
+    // Payment mode restrictions - installment payments can only use EARLY60
+    if (paymentMode === 'installment' && couponCode !== 'EARLY60') {
+      return res.status(400).json({ 
+        error: 'This coupon is not available for installment payments',
+        suggestion: 'Only the EARLY60 coupon can be used with installment payments. Switch to full payment to use this coupon.'
       });
     }
 
