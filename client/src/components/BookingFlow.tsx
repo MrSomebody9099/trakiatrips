@@ -41,6 +41,7 @@ const addOns = [
   { id: "quad", name: "Quad Bike Adventure", price: 50 },
   { id: "ski", name: "Ski Gear Rental (per day)", price: 30, isPerDay: true },
   { id: "snowboard", name: "Snowboard Rental (per day)", price: 35, isPerDay: true },
+  { id: "poolParty", name: "Pool Party Experience", price: 15 },
 ];
 
 interface Guest {
