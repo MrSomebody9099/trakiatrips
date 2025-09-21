@@ -41,7 +41,11 @@ export interface IStorage {
   createLead(lead: InsertLead): Promise<Lead>;
   getAllLeads(): Promise<Lead[]>;
   getLeadByEmail(email: string): Promise<Lead | undefined>;
-  updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined>;
+  getLeadsByEmail(email: string): Promise<Lead[]>;
+  getLeadById(id: string): Promise<Lead | undefined>;
+  updateLeadById(id: string, updates: Partial<Lead>): Promise<Lead | undefined>;
+  updateLeadStatusById(id: string, status: string, bookingId?: string): Promise<Lead | undefined>;
+  updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined>; // Deprecated - use ID-based methods
 
   // Enhanced booking operations for pending bookings
   getPendingBookingsByEmail(userEmail: string): Promise<Booking[]>;
@@ -108,7 +112,9 @@ export class MemStorage implements IStorage {
       stripeSessionId: insertBooking.stripeSessionId || null,
       scheduledPaymentIntentId: insertBooking.scheduledPaymentIntentId || null,
       remainingAmount: insertBooking.remainingAmount || null,
-      balanceDueDate: insertBooking.balanceDueDate || null
+      balanceDueDate: insertBooking.balanceDueDate || null,
+      leadBookerName: insertBooking.leadBookerName || null,
+      leadBookerPhone: insertBooking.leadBookerPhone || null
     };
     this.bookings.set(id, booking);
     return booking;
@@ -264,7 +270,13 @@ export class MemStorage implements IStorage {
       id,
       createdAt: now,
       status: insertLead.status || "email_only",
-      bookingId: insertLead.bookingId ?? null
+      bookingId: insertLead.bookingId ?? null,
+      name: insertLead.name ?? null,
+      phone: insertLead.phone ?? null,
+      packageName: insertLead.packageName ?? null,
+      role: insertLead.role ?? "lead_booker",
+      leadBookerId: insertLead.leadBookerId ?? null,
+      withLeadName: insertLead.withLeadName ?? null
     };
     this.leads.set(id, lead);
     return lead;
@@ -280,17 +292,41 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
-    const lead = await this.getLeadByEmail(email);
+  async getLeadsByEmail(email: string): Promise<Lead[]> {
+    return Array.from(this.leads.values()).filter(
+      (lead) => lead.email === email
+    );
+  }
+
+  async getLeadById(id: string): Promise<Lead | undefined> {
+    return this.leads.get(id);
+  }
+
+  async updateLeadById(id: string, updates: Partial<Lead>): Promise<Lead | undefined> {
+    const lead = this.leads.get(id);
     if (!lead) return undefined;
     
-    lead.status = status;
+    const updatedLead = { ...lead, ...updates };
+    this.leads.set(id, updatedLead);
+    return updatedLead;
+  }
+
+  async updateLeadStatusById(id: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    const updates: any = { status };
     if (bookingId !== undefined) {
-      lead.bookingId = bookingId;
+      updates.bookingId = bookingId;
     }
-    
-    this.leads.set(lead.id, lead);
-    return lead;
+    return this.updateLeadById(id, updates);
+  }
+
+  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    // Deprecated: This method can cause issues with non-unique emails
+    const leads = await this.getLeadsByEmail(email);
+    if (leads.length === 0) return undefined;
+    if (leads.length > 1) {
+      throw new Error(`Multiple leads found for email ${email}. Use updateLeadStatusById instead.`);
+    }
+    return this.updateLeadStatusById(leads[0].id, status, bookingId);
   }
 
   async getPendingBookingsByEmail(userEmail: string): Promise<Booking[]> {
@@ -465,17 +501,40 @@ class DatabaseStorage implements IStorage {
     return result[0];
   }
 
-  // Enhanced lead operations
-  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
-    const updates: any = { status };
-    if (bookingId) {
-      updates.bookingId = bookingId;
-    }
+  async getLeadsByEmail(email: string): Promise<Lead[]> {
+    return await this.db.select().from(leads).where(eq(leads.email, email));
+  }
+
+  async getLeadById(id: string): Promise<Lead | undefined> {
+    const result = await this.db.select().from(leads).where(eq(leads.id, id)).limit(1);
+    return result[0];
+  }
+
+  async updateLeadById(id: string, updates: Partial<Lead>): Promise<Lead | undefined> {
     const result = await this.db.update(leads)
       .set(updates)
-      .where(eq(leads.email, email))
+      .where(eq(leads.id, id))
       .returning();
     return result[0];
+  }
+
+  async updateLeadStatusById(id: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    const updates: any = { status };
+    if (bookingId !== undefined) {
+      updates.bookingId = bookingId;
+    }
+    return this.updateLeadById(id, updates);
+  }
+
+  // Enhanced lead operations
+  async updateLeadStatus(email: string, status: string, bookingId?: string): Promise<Lead | undefined> {
+    // Deprecated: This method can cause issues with non-unique emails
+    const existingLeads = await this.getLeadsByEmail(email);
+    if (existingLeads.length === 0) return undefined;
+    if (existingLeads.length > 1) {
+      throw new Error(`Multiple leads found for email ${email}. Use updateLeadStatusById instead.`);
+    }
+    return this.updateLeadStatusById(existingLeads[0].id, status, bookingId);
   }
 
   // Enhanced booking operations for pending bookings

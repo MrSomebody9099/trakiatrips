@@ -22,10 +22,16 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Leads table for email collection
+// Leads table for complete lead information
 export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: text("email").notNull().unique(),
+  email: text("email").notNull(),
+  name: text("name"),
+  phone: text("phone"),
+  packageName: text("package_name"),
+  role: text("role").notNull().default("lead_booker"), // 'lead_booker' | 'guest'
+  leadBookerId: varchar("lead_booker_id"), // For guests, references lead booker
+  withLeadName: text("with_lead_name"), // Denormalized for easy display
   status: text("status").notNull().default("email_only"),
   bookingId: varchar("booking_id").references(() => bookings.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
@@ -34,6 +40,8 @@ export const leads = pgTable("leads", {
 export const insertLeadSchema = createInsertSchema(leads).omit({
   id: true,
   createdAt: true,
+}).extend({
+  role: z.enum(["lead_booker", "guest"]).default("lead_booker"),
 });
 
 export type InsertLead = z.infer<typeof insertLeadSchema>;
@@ -43,6 +51,8 @@ export type Lead = typeof leads.$inferSelect;
 export const bookings = pgTable("bookings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userEmail: text("user_email").notNull(),
+  leadBookerName: text("lead_booker_name"),
+  leadBookerPhone: text("lead_booker_phone"),
   packageName: text("package_name").notNull(),
   packagePrice: decimal("package_price", { precision: 10, scale: 2 }).notNull(),
   dates: text("dates").notNull(),
