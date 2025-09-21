@@ -10,22 +10,6 @@ VITE_SUPABASE_ANON_KEY=your_anon_key_here
 DATABASE_URL
 postgresql://postgres.isrznqauyuuhskblsuxf:[YOUR-PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres 
 
-
-
-**here are my keys dont worry i will delete them after wards**
-STRIPE_PUBLISHABLE_KEY=pk_live_51S1VA0Lb8rPy9vMDy4jdzYaXKxvd5NawJ3GsGRUnMnKGLgSIj0GsqJ1bVidhzQXq7WbLo2JD88HsMivfOZ9ddXyU00uI1Zy6t3
-
-STRIPE_SECRET_KEY=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
-
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzcnpucWF1eXV1aHNrYmxzdXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDYzOTEsImV4cCI6MjA3MzY4MjM5MX0.I0qcodr-5i6OlphUyGS75emLtFQJAPCX5ZVwgxhG0Rk  
-
-SUPABASE_URL=https://isrznqauyuuhskblsuxf.supabase.co
-
-DATABASE_URL="postgresql://postgres.isrznqauyuuhskblsuxf:MXTrd4moV5zMqrCZ@aws-1-eu-west-1.pooler.supabase.com:6543/postgres
-
-
-
-
 # Trakia Trips Travel Agency Platform
 
 ## Overview
