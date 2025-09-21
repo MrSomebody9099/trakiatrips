@@ -39,9 +39,11 @@ const packages: Package[] = [
 
 const addOns = [
   { id: "quad", name: "Quad Bike Adventure", price: 50 },
-  { id: "ski", name: "Ski Gear Rental (per day)", price: 30, isPerDay: true },
-  { id: "snowboard", name: "Snowboard Rental (per day)", price: 35, isPerDay: true },
+  { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
+  { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
+  { id: "lessons", name: "Lessons (2hr session)", price: 50 },
   { id: "poolParty", name: "Pool Party Experience", price: 15 },
+  { id: "none", name: "None", price: 0 },
 ];
 
 interface Guest {
@@ -218,7 +220,8 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
   const canProceedToPayment = termsAccepted && 
     leadBooker.name && leadBooker.email && leadBooker.phone && leadBooker.dateOfBirth &&
-    guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
+    guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth) &&
+    selectedAddOns.length > 0; // Must select at least one add-on (including "none")
 
   
   const handlePayment = async () => {
@@ -714,6 +717,10 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                     </div>
                   );
                 })}
+
+                <div className="text-sm text-muted-foreground bg-yellow-50 p-3 rounded-lg mb-4">
+                  <strong>Note:</strong> Helmets not included with ski/snowboard gear rentals. Please bring your own or rent separately.
+                </div>
 
                 <div className="flex items-center space-x-3 pt-4">
                   <Checkbox
