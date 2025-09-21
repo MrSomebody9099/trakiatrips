@@ -1,13 +1,23 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
+import { Request, Response, NextFunction } from 'express';
 
 const router = Router();
+
+// Admin authentication middleware
+const adminAuth = (req: Request, res: Response, next: NextFunction) => {
+  const password = req.headers.authorization?.replace('Bearer ', '');
+  if (password !== 'MO1345') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+};
 
 // Initialize Stripe with the secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
-// Create Stripe coupons and promotion codes
-router.post('/create-coupons', async (req, res) => {
+// Create Stripe coupons and promotion codes - ADMIN PROTECTED
+router.post('/create-coupons', adminAuth, async (req, res) => {
   try {
     const results: any = { coupons: {}, promotionCodes: {} };
 

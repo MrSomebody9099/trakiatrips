@@ -111,7 +111,8 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
         },
         body: JSON.stringify({
           couponCode: couponCode.trim(),
-          groupSize: groupSize
+          groupSize: groupSize,
+          paymentMode: paymentMode
         }),
       });
 
