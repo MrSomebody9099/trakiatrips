@@ -78,7 +78,12 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      hashedPassword: insertUser.password,
+      email: insertUser.email ?? null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -258,7 +263,8 @@ export class MemStorage implements IStorage {
       ...insertLead,
       id,
       createdAt: now,
-      status: insertLead.status || "email_only"
+      status: insertLead.status || "email_only",
+      bookingId: insertLead.bookingId ?? null
     };
     this.leads.set(id, lead);
     return lead;

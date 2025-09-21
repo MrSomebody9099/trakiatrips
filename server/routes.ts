@@ -738,7 +738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin dashboard data endpoint - SECURE
   app.get('/api/admin/dashboard', adminAuth, async (req, res) => {
     try {
-      const leads = await storage.getLeads();
+      const leads = await storage.getAllLeads();
       const allBookings = await storage.getAllBookings();
       
       // Format bookings with guest information for dashboard
