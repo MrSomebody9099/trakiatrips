@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead, users, bookings, guests, paymentTransactions, leads } from "../shared/schema";
+import { type User, type InsertUser, type Booking, type InsertBooking, type Guest, type InsertGuest, type PaymentTransaction, type InsertPaymentTransaction, type Lead, type InsertLead, type CouponUsage, type InsertCouponUsage, users, bookings, guests, paymentTransactions, leads, couponUsage } from "../shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -53,6 +53,8 @@ export interface IStorage {
   
   // Coupon operations
   getCouponUsageCount(couponCode: string): Promise<number>;
+  createCouponUsage(usage: InsertCouponUsage): Promise<CouponUsage>;
+  getCouponUsageByEmail(couponCode: string, userEmail: string): Promise<CouponUsage | null>;
 }
 
 export class MemStorage implements IStorage {
@@ -61,6 +63,7 @@ export class MemStorage implements IStorage {
   private guests: Map<string, Guest>;
   private paymentTransactions: Map<string, PaymentTransaction>;
   private leads: Map<string, Lead>;
+  private couponUsages: Map<string, CouponUsage>;
 
   constructor() {
     this.users = new Map();
@@ -68,6 +71,7 @@ export class MemStorage implements IStorage {
     this.guests = new Map();
     this.paymentTransactions = new Map();
     this.leads = new Map();
+    this.couponUsages = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -346,9 +350,35 @@ export class MemStorage implements IStorage {
   }
 
   async getCouponUsageCount(couponCode: string): Promise<number> {
-    // For MemStorage, we don't track coupon usage, return 0
-    // In a real implementation, you'd track this in a separate Map
-    return 0;
+    // Count total people for this coupon code
+    let totalPeople = 0;
+    for (const usage of Array.from(this.couponUsages.values())) {
+      if (usage.couponCode === couponCode) {
+        totalPeople += usage.numberOfPeople;
+      }
+    }
+    return totalPeople;
+  }
+
+  async createCouponUsage(insertUsage: InsertCouponUsage): Promise<CouponUsage> {
+    const id = randomUUID();
+    const usage: CouponUsage = {
+      ...insertUsage,
+      id,
+      bookingId: insertUsage.bookingId || null,
+      createdAt: new Date()
+    };
+    this.couponUsages.set(id, usage);
+    return usage;
+  }
+
+  async getCouponUsageByEmail(couponCode: string, userEmail: string): Promise<CouponUsage | null> {
+    for (const usage of Array.from(this.couponUsages.values())) {
+      if (usage.couponCode === couponCode && usage.userEmail === userEmail) {
+        return usage;
+      }
+    }
+    return null;
   }
 }
 
@@ -555,9 +585,35 @@ class DatabaseStorage implements IStorage {
   }
 
   async getCouponUsageCount(couponCode: string): Promise<number> {
-    // For now, return 0. In a real implementation, you'd create a coupons table
-    // and track usage count there
-    return 0;
+    // Count total people for this coupon code from database
+    const usages = await this.db.select({
+      numberOfPeople: couponUsage.numberOfPeople
+    })
+    .from(couponUsage)
+    .where(eq(couponUsage.couponCode, couponCode));
+    
+    let totalPeople = 0;
+    for (const usage of usages) {
+      totalPeople += usage.numberOfPeople;
+    }
+    return totalPeople;
+  }
+
+  async createCouponUsage(insertUsage: InsertCouponUsage): Promise<CouponUsage> {
+    const result = await this.db.insert(couponUsage).values(insertUsage).returning();
+    return result[0];
+  }
+
+  async getCouponUsageByEmail(couponCode: string, userEmail: string): Promise<CouponUsage | null> {
+    const result = await this.db.select()
+      .from(couponUsage)
+      .where(and(
+        eq(couponUsage.couponCode, couponCode),
+        eq(couponUsage.userEmail, userEmail)
+      ))
+      .limit(1);
+    
+    return result.length > 0 ? result[0] : null;
   }
 }
 

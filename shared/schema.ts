@@ -106,6 +106,29 @@ export const insertGuestSchema = createInsertSchema(guests).omit({
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
 export type Guest = typeof guests.$inferSelect;
 
+// Coupon usage tracking table
+export const couponUsage = pgTable("coupon_usage", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  couponCode: text("coupon_code").notNull(),
+  userEmail: text("user_email").notNull(),
+  bookingId: varchar("booking_id").references(() => bookings.id, { onDelete: "cascade" }),
+  numberOfPeople: integer("number_of_people").notNull(), // Track how many people this usage counts for
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  // Unique constraint to prevent duplicate usage per booking
+  uniqueBookingCoupon: sql`UNIQUE(booking_id, coupon_code)`,
+  // Unique constraint to prevent multiple usage per email for same coupon
+  uniqueEmailCoupon: sql`UNIQUE(user_email, coupon_code)`,
+}));
+
+export const insertCouponUsageSchema = createInsertSchema(couponUsage).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCouponUsage = z.infer<typeof insertCouponUsageSchema>;
+export type CouponUsage = typeof couponUsage.$inferSelect;
+
 // Payment transactions table for tracking installment payments
 export const paymentTransactions = pgTable("payment_transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

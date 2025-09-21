@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
 import { Request, Response, NextFunction } from 'express';
+import { storage } from '../storage';
 
 const router = Router();
 
@@ -154,6 +155,24 @@ router.post('/validate-coupon', async (req, res) => {
 
     if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
       return res.status(400).json({ error: 'This coupon has reached its usage limit' });
+    }
+
+    // Special database tracking for EARLY60 coupon - check person limit
+    if (couponCode === 'EARLY60') {
+      const currentUsageCount = await storage.getCouponUsageCount('EARLY60');
+      const remainingSlots = 60 - currentUsageCount;
+      
+      if (currentUsageCount >= 60) {
+        return res.status(400).json({ error: 'EARLY60 coupon has reached its 60-person limit' });
+      }
+      
+      // If group size would exceed remaining slots, warn user
+      if (groupSize && currentUsageCount + groupSize > 60) {
+        return res.status(400).json({ 
+          error: `EARLY60 coupon only has ${remainingSlots} spots remaining, but you need ${groupSize} spots`,
+          suggestion: `Only ${remainingSlots} spots left for this discount. Consider reducing your group size or booking without the coupon.`
+        });
+      }
     }
 
     res.json({

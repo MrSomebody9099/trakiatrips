@@ -1006,6 +1006,25 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
       processedAt: new Date(),
     });
 
+    // Track EARLY60 coupon usage if applicable
+    if (session.metadata?.couponCode === 'EARLY60') {
+      try {
+        // Check if usage already tracked to avoid duplicates
+        const existingUsage = await storage.getCouponUsageByEmail('EARLY60', updatedBooking.userEmail);
+        if (!existingUsage) {
+          await storage.createCouponUsage({
+            couponCode: 'EARLY60',
+            userEmail: updatedBooking.userEmail,
+            bookingId: bookingId,
+            numberOfPeople: parseInt(session.metadata?.groupSize) || updatedBooking.numberOfGuests || 1
+          });
+          console.log(`EARLY60 coupon usage tracked for ${updatedBooking.userEmail} with ${session.metadata?.groupSize || updatedBooking.numberOfGuests} people`);
+        }
+      } catch (error) {
+        console.error('Error tracking EARLY60 coupon usage:', error);
+      }
+    }
+
     console.log(`Full payment completed for booking ${bookingId}, amount: €${actualAmount}`);
   } catch (error) {
     console.error('Error handling full payment success:', error);
@@ -1051,6 +1070,25 @@ async function handleInstallmentDepositSuccess(session: any): Promise<void> {
       paymentProvider: 'stripe',
       processedAt: new Date(),
     });
+
+    // Track EARLY60 coupon usage if applicable (for installment payments)
+    if (session.metadata?.couponCode === 'EARLY60') {
+      try {
+        // Check if usage already tracked to avoid duplicates
+        const existingUsage = await storage.getCouponUsageByEmail('EARLY60', updatedBooking.userEmail);
+        if (!existingUsage) {
+          await storage.createCouponUsage({
+            couponCode: 'EARLY60',
+            userEmail: updatedBooking.userEmail,
+            bookingId: bookingId,
+            numberOfPeople: parseInt(session.metadata?.groupSize) || updatedBooking.numberOfGuests || 1
+          });
+          console.log(`EARLY60 coupon usage tracked for ${updatedBooking.userEmail} with ${session.metadata?.groupSize || updatedBooking.numberOfGuests} people`);
+        }
+      } catch (error) {
+        console.error('Error tracking EARLY60 coupon usage:', error);
+      }
+    }
 
     console.log(`Installment deposit completed for booking ${bookingId}, amount: €${actualDepositAmount}`);
   } catch (error) {
