@@ -507,11 +507,18 @@ export default function AdminDashboard({ isAuthenticated = false, onLogin }: Adm
                           <td className="p-3" data-testid={`text-lead-status-${lead.id}`}>
                             <Badge className={
                               lead.status === 'email_only' ? 'bg-blue-100 text-blue-800' :
+                              lead.status === 'email_and_name' ? 'bg-green-100 text-green-800' :
                               lead.status === 'lead_collected' ? 'bg-green-100 text-green-800' :
                               lead.status === 'booking_started' ? 'bg-yellow-100 text-yellow-800' :
+                              lead.booking_id ? 'bg-purple-100 text-purple-800' :
                               'bg-gray-100 text-gray-800'
                             }>
-                              {lead.status.replace('_', ' ')}
+                              {lead.booking_id ? 'Has Booking' :
+                               lead.status === 'email_and_name' ? 'Contact Collected' :
+                               lead.status === 'email_only' ? 'Email Only' :
+                               lead.status === 'lead_collected' ? 'Lead Collected' :
+                               lead.status === 'booking_started' ? 'Booking Started' :
+                               lead.status.replace('_', ' ')}
                             </Badge>
                           </td>
                         </tr>
