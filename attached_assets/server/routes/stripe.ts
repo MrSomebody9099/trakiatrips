@@ -22,6 +22,7 @@ const initializeStripe = () => {
   }
   
   if (!secretKey.startsWith('sk_')) {
+    console.error('STRIPE_SECRET_KEY validation failed. Key preview:', secretKey.substring(0, 10));
     throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_test_ or sk_live_');
   }
   
