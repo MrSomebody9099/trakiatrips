@@ -112,7 +112,7 @@ export default function AuthPanel({ isOpen, onClose, onEmailCollected }: AuthPan
       <DialogContent className="bg-white/95 backdrop-blur-lg border-border shadow-2xl max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground text-center text-xl font-heading font-semibold">
-            {mode === "email-only" ? "Tell Us About Your Travel Plans" : mode === "signup" ? "Create Account" : "Welcome Back"}
+            {mode === "email-only" ? "Make account, manage your booking" : mode === "signup" ? "Create Account" : "Welcome Back"}
           </DialogTitle>
         </DialogHeader>
 
