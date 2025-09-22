@@ -148,12 +148,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Define available coupons
       const coupons: Record<string, any> = {
-        'EARLY60': {
-          type: 'fixed',
-          description: 'Pool party free',
-          usageLimit: 60,
-          paymentPlans: ['full', 'installment']
-        },
         'BEENHEREB4': {
           type: 'percentage',
           discount: 0.10,
@@ -178,9 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!coupon.paymentPlans.includes(paymentPlan)) {
         return res.status(400).json({ 
           valid: false, 
-          error: paymentPlan === 'installment' 
-            ? 'Only EARLY60 coupon can be used with installment payments'
-            : 'This coupon cannot be used with the selected payment plan'
+          error: 'This coupon cannot be used with the selected payment plan'
         });
       }
 
@@ -192,32 +184,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Check usage limit for EARLY60
-      if (upperCode === 'EARLY60') {
-        const usageCount = await storage.getCouponUsageCount('EARLY60');
-        if (usageCount >= 60) {
-          return res.status(400).json({ 
-            valid: false, 
-            error: 'EARLY60 coupon has reached its usage limit'
-          });
-        }
-      }
 
       // Calculate discount
       let discount = 0;
       
-      if (coupon.type === 'fixed' && upperCode === 'EARLY60') {
-        // Pool party is €15 per person
-        const hasPoolParty = selectedAddOns.includes('poolParty');
-        if (hasPoolParty) {
-          discount = 15 * numberOfPeople;
-        } else {
-          return res.status(400).json({ 
-            valid: false, 
-            error: 'EARLY60 coupon requires Pool Party add-on to be selected'
-          });
-        }
-      } else if (coupon.type === 'percentage') {
+      if (coupon.type === 'percentage') {
         discount = Math.round(totalAmount * coupon.discount * 100) / 100;
       }
 
@@ -1006,24 +977,6 @@ async function handleFullPaymentSuccess(session: any): Promise<void> {
       processedAt: new Date(),
     });
 
-    // Track EARLY60 coupon usage if applicable
-    if (session.metadata?.couponCode === 'EARLY60') {
-      try {
-        // Check if usage already tracked to avoid duplicates
-        const existingUsage = await storage.getCouponUsageByEmail('EARLY60', updatedBooking.userEmail);
-        if (!existingUsage) {
-          await storage.createCouponUsage({
-            couponCode: 'EARLY60',
-            userEmail: updatedBooking.userEmail,
-            bookingId: bookingId,
-            numberOfPeople: parseInt(session.metadata?.groupSize) || updatedBooking.numberOfGuests || 1
-          });
-          console.log(`EARLY60 coupon usage tracked for ${updatedBooking.userEmail} with ${session.metadata?.groupSize || updatedBooking.numberOfGuests} people`);
-        }
-      } catch (error) {
-        console.error('Error tracking EARLY60 coupon usage:', error);
-      }
-    }
 
     console.log(`Full payment completed for booking ${bookingId}, amount: €${actualAmount}`);
   } catch (error) {
