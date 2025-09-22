@@ -1,3 +1,5 @@
+import logoImage from "@assets/WhatsApp Image 2025-09-06 at 20.05.52_c85b509a_1758564389096.png";
+
 export default function Footer() {
   return (
     <footer className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white">
@@ -7,12 +9,20 @@ export default function Footer() {
         <div className="text-center space-y-8">
           {/* Logo */}
           <div className="space-y-4">
-            <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl">
-              <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                TRAKIA
-              </span>
-              <span className="text-blue-200 ml-2">TRIPS</span>
-            </h2>
+            <div className="flex justify-center items-center space-x-4">
+              <img 
+                src={logoImage} 
+                alt="Trakia Trips" 
+                className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain"
+                data-testid="logo-footer"
+              />
+              <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl">
+                <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  TRAKIA
+                </span>
+                <span className="text-blue-200 ml-2">TRIPS</span>
+              </h2>
+            </div>
             <p className="font-body text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
               Where epic adventures meet unforgettable celebrations
             </p>

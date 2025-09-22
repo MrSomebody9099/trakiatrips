@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoImage from "@assets/WhatsApp Image 2025-09-06 at 20.05.52_c85b509a_1758564389096.png";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,13 +24,21 @@ export default function Navigation() {
             <div className="flex items-center md:hidden"></div>
 
             <div className="flex-1 flex justify-center items-center">
-              <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white tracking-wider uppercase relative">
-                <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                  TRAKIA
-                </span>
-                <span className="text-blue-200 ml-2">TRIPS</span>
-                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
-              </h1>
+              <div className="flex items-center space-x-3">
+                <img 
+                  src={logoImage} 
+                  alt="Trakia Trips" 
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain"
+                  data-testid="logo-header"
+                />
+                <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white tracking-wider uppercase relative">
+                  <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                    TRAKIA
+                  </span>
+                  <span className="text-blue-200 ml-2">TRIPS</span>
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
+                </h1>
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">
