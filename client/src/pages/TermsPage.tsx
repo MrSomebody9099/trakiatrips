@@ -1,185 +1,186 @@
-import MarqueeTape from "../components/MarqueeTape";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen" style={{backgroundColor: '#DDF9F1'}}>
-      <MarqueeTape />
       <Navigation />
       
       <main className="pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto py-16 md:py-24">
-          <div className="text-center mb-16 md:mb-24 animate-fade-in-up">
+        <div className="max-w-4xl mx-auto py-16">
+          {/* Header */}
+          <div className="text-center mb-12 animate-fade-in-up">
             <div className="inline-block bg-blue-500/10 border border-blue-500/20 rounded-full px-6 py-2 text-blue-600 font-medium mb-8">
-              Legal Information
+              Legal Document
             </div>
-            <h1 className="font-heading font-black text-4xl md:text-6xl lg:text-8xl xl:text-9xl text-foreground mb-8 md:mb-12 leading-tight">
+            <h1 className="font-heading font-black text-4xl md:text-6xl text-foreground mb-6 leading-tight">
               TERMS &
               <br />
               <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
                 CONDITIONS
               </span>
             </h1>
-            <p className="font-body text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              Clear guidelines for your epic adventure experience
+            <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
+              Please read these terms carefully before booking your adventure
             </p>
           </div>
-          
-          <div className="space-y-12 md:space-y-16 animate-fade-in-up animate-delay-200">
-            <div className="relative bg-gradient-to-br from-white via-blue-50/30 to-blue-100/20 backdrop-blur-xl border border-blue-200/50 rounded-3xl md:rounded-[3rem] p-8 md:p-16 lg:p-20 shadow-2xl shadow-blue-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent rounded-3xl md:rounded-[3rem]"></div>
+
+          {/* Legal Content */}
+          <div className="relative bg-white backdrop-blur-xl border border-blue-200/50 rounded-3xl p-8 md:p-12 shadow-xl">
+            <div className="prose prose-slate max-w-none">
               
-              <div className="relative">
-                <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 text-center">
-                  <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">BOOKING</span> Terms
-                </h2>
-                
-                <div className="grid lg:grid-cols-3 gap-8">
-                  <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl p-6 border border-green-200/50">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4">
-                      <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      </div>
-                    </div>
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-3">Payment</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      Full payment required upon booking. Early bird discounts apply for bookings before December 31st, 2024. We offer flexible payment options for group bookings.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-2xl p-6 border border-orange-200/50">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4">
-                      <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      </div>
-                    </div>
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-3">Cancellation</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      Full refund for cancellations 30+ days before trip. 50% fee for cancellations within 30 days.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl p-6 border border-blue-200/50">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
-                      <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      </div>
-                    </div>
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-3">What's Included</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      4★ hotel, meals, transport, club events, and pool party access for first 60 bookings.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative bg-gradient-to-br from-blue-500/5 to-blue-600/15 backdrop-blur-xl border border-blue-300/30 rounded-3xl md:rounded-[3rem] p-8 md:p-16 lg:p-20 shadow-2xl shadow-blue-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent rounded-3xl md:rounded-[3rem]"></div>
-              
-              <div className="relative">
-                <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 text-center">
-                  <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">ADVENTURE</span> Guidelines
-                </h2>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Age Requirement</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          Participants must be 18+ years old. Valid ID required for all activities.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Safety First</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          All activities include safety briefings and proper equipment. Participation at your own risk.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Code of Conduct</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          Respectful and inclusive environment. Disruptive behavior may result in removal without refund.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Travel Insurance</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          Highly recommended but not included. You're responsible for your own coverage.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-blue-500/20 rounded-full blur-xl"></div>
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-gradient-to-br from-blue-300/15 to-blue-400/15 rounded-full blur-xl"></div>
-            </div>
-            
-            <div className="relative bg-gradient-to-br from-white via-blue-50/30 to-blue-100/20 backdrop-blur-xl border border-blue-200/50 rounded-3xl md:rounded-[3rem] p-8 md:p-16 lg:p-20 shadow-2xl shadow-blue-500/10 text-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-transparent rounded-3xl md:rounded-[3rem]"></div>
-              
-              <div className="relative">
-                <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl text-foreground mb-8">
-                  Questions? <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">LET'S TALK</span>
-                </h2>
-                <p className="font-body text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 max-w-2xl mx-auto">
-                  For questions about these terms or your booking, reach out through our official channels
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">1. INTRODUCTION</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  These Terms govern all Bookings and Tickets. Where You have purchased Travel Arrangements and/or Extras, the terms and conditions of the Supplier of those Travel Arrangements and/or Extras (as may be provided to You by Us or the Supplier from time to time) apply in addition to these Terms. These Terms are legally binding on You and any person who purchases, possesses, uses or attempts to use any Booking and You and any such person shall be deemed to have accepted and agreed to comply with these Terms.
                 </p>
-                
-                <div className="flex justify-center">
-                  <a
-                    href="https://www.instagram.com/trakiatrips/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-3 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 rounded-2xl px-8 py-4 text-white font-heading font-bold text-lg transition-all duration-300 hover-elevate"
-                  >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                    <span>@trakiatrips</span>
-                  </a>
-                </div>
+                <p className="text-muted-foreground leading-relaxed">
+                  We reserve the right to vary these Terms from time to time without notice and at Our sole discretion. Updates will be published on Our Website and the date at the top of these Terms will be updated to reflect the date of the latest amendments.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">2. TICKET PURCHASE AND DELIVERY</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets are sold on Our Website on the platform operated by Stripe. Where You make a purchase on Our Website, a contract is entered into between You and Us and there is no contractual relationship between You and Stripe. Your payment to Us may be processed on Our behalf by Stripe.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  <strong>Payment Options:</strong> Bookings can be paid for in full at the time of purchase or by paying a deposit to secure Your Booking and thereafter paying the balance by the due date specified by Us.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  <strong>Refund Policy:</strong> If You choose to cancel Your Booking, You are entitled to a refund of Your second payment in the case that You cancel Your Booking at least 45 days prior to the date of the Festival. If You cancel Your Booking within 45 days of the trip You will not receive any refunds or compensation.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  <strong>Age Requirement:</strong> Ticket Purchasers and all Ticket Holders must be aged 18 or over at the time of the Event start date.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  Bookings are not exchangeable, refundable or transferable. Re-sale or attempted re-sale is not allowed, unless expressly authorised by Us via an authorised Ticket reseller.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">3. USE OF YOUR BOOKING AND TICKETS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Bookings (including Tickets) are strictly non-transferable and must not be sold or offered for sale, or transferred or otherwise disposed of, save as in accordance with these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets will be exchanged for Wristbands at the Festival at the Wristband exchange. Wristbands are only issued directly to the Ticket Holder on production of photographic ID (driver's licence or passport).
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  You must retain Your Wristband at all times whilst at the Festival and Wristbands must be produced for inspection upon Our request. Failure to do so may result in You being ejected from the Festival without refund or compensation.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">4. ACCESS, ENTRY AND CONDUCT</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Admission to the Festival will only be authorised upon presentation of a valid Wristband and photographic proof of identity and proof of age (driver's licence or passport).
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You may be refused admission to or ejected from the Festival without refund or compensation if You:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>Behave in a way that is anti-social, offensive, violent, dangerous, disruptive, racist, sexist, homophobic, sexually provocative or a nuisance to other guests</li>
+                  <li>Are excessively under the influence of alcohol</li>
+                  <li>Are under the influence of drugs, narcotics, psychoactive substances, or 'legal' highs</li>
+                  <li>Bring any prohibited items to the Festival</li>
+                  <li>Attempt to gain access to restricted areas</li>
+                  <li>Damage, tamper with or interfere with Our property</li>
+                  <li>Smoke or vape in non-permitted areas</li>
+                  <li>Commit or are suspected of committing a criminal offence</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed">
+                  You are responsible for Your own personal property at all times. We cannot accept any liability for any loss, theft or damage to Your personal property.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">5. PHOTOGRAPHY, FILMING AND RECORDINGS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You may take photographs and recordings at the Festival for personal, private, non-commercial purposes only. You must not use professional audio or imaging equipment or drones to capture footage.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  You consent to being photographed, filmed and sound recorded as an audience at the Festival without payment, and to Your image being exploited in any media for any purpose by Us.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">6. TRAVEL AND TRAVEL ARRANGEMENTS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where You book Travel Arrangements through Us, We act as a booking agent for the Supplier/Principals. Your purchase of Travel Arrangements is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The price of Travel Arrangements includes all government taxes applicable at the time of booking. Any taxes that have to be paid locally by You are extra and are Your responsibility (including 'Resort tax' in Bulgaria).
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  It is Your responsibility to ensure You have adequate travel insurance. You must be satisfied that Your insurance fully covers all Your personal requirements including pre-existing medical conditions, cancellation charges, and medical expenses.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">7. EXTRAS</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Where You book Extras through Us (equipment hire, lessons, excursions, dining experiences), We act as a booking agent for the Supplier/Principals. Your purchase is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">8. LIABILITY AND INSURANCE</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Unless otherwise prohibited by law, Our liability to You is limited to the Face Value of Your Ticket(s) plus the value of any Extras that are booked through Us for which We are not an agent.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  We do not accept any liability for costs or expense You might incur as a result of events beyond Our control which affect Your arrangements, including but not limited to war, strikes, natural disasters, adverse weather conditions, epidemics, flight restrictions, or government restrictions on travel.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">9. FORCE MAJEURE</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  We shall not be liable for any failure to perform Our obligations under these Terms if such failure is due to circumstances beyond Our reasonable control, including but not limited to acts of God, war, terrorism, epidemic, government action, or industrial action.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">10. DATA PROTECTION</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  We will store and process Your details in accordance with the terms of Our Privacy Policy, which can be found on Our Website. All personal data will be processed in accordance with applicable data protection laws.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">11. GENERAL PROVISIONS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  These Terms constitute the entire agreement between You and Us regarding Your Booking. If any provision of these Terms is found to be unenforceable, the remainder shall continue in full force and effect.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  These Terms shall be governed by and construed in accordance with the laws of England and Wales, and You submit to the exclusive jurisdiction of the English courts.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">12. CONTACT INFORMATION</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  For questions about these terms or your booking, please contact us at:
+                  <br />
+                  <strong>Email:</strong> trakia.trips@gmail.com
+                  <br />
+                  <strong>Instagram:</strong> @trakiatrips
+                </p>
+              </section>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  <strong>Last Updated:</strong> September 2025
+                  <br />
+                  By booking with Trakia Trips, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </main>
+      
       <Footer />
     </div>
   );
