@@ -16,8 +16,7 @@ export default function UserProfile({ onClose }: UserProfileProps) {
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
-    phone: "",
-    address: ""
+    phone: ""
   });
   const [isUserEditDialogOpen, setIsUserEditDialogOpen] = useState(false);
   const [editingUserInfo, setEditingUserInfo] = useState(userInfo);
@@ -32,8 +31,7 @@ export default function UserProfile({ onClose }: UserProfileProps) {
       setUserInfo({
         name: localStorage.getItem("userName") || "",
         email: email,
-        phone: localStorage.getItem("userPhone") || "",
-        address: localStorage.getItem("userAddress") || ""
+        phone: localStorage.getItem("userPhone") || ""
       });
     }
   }, []);
@@ -67,14 +65,12 @@ export default function UserProfile({ onClose }: UserProfileProps) {
   const handleSaveUserInfo = () => {
     const updatedUserInfo = {
       name: editingUserInfo.name.trim() || "",
-      phone: editingUserInfo.phone.trim() || "",
-      address: editingUserInfo.address.trim() || ""
+      phone: editingUserInfo.phone.trim() || ""
     };
     
     setUserInfo({...userInfo, ...updatedUserInfo});
     localStorage.setItem("userName", updatedUserInfo.name);
     localStorage.setItem("userPhone", updatedUserInfo.phone);
-    localStorage.setItem("userAddress", updatedUserInfo.address);
     setIsUserEditDialogOpen(false);
   };
 
@@ -121,12 +117,6 @@ export default function UserProfile({ onClose }: UserProfileProps) {
                     <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
                     <p className="text-lg font-medium mt-1">
                       {userInfo.phone || "Not provided"}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Address</Label>
-                    <p className="text-lg font-medium mt-1">
-                      {userInfo.address || "Not provided"}
                     </p>
                   </div>
                 </div>
@@ -180,18 +170,6 @@ export default function UserProfile({ onClose }: UserProfileProps) {
               />
             </div>
             
-            <div>
-              <Label htmlFor="edit-address">Address</Label>
-              <Input
-                id="edit-address"
-                value={editingUserInfo.address}
-                onChange={(e) => setEditingUserInfo({
-                  ...editingUserInfo,
-                  address: e.target.value
-                })}
-                placeholder="Your address"
-              />
-            </div>
           </div>
           
           <div className="flex gap-3 pt-4">
