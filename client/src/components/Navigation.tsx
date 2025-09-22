@@ -28,7 +28,7 @@ export default function Navigation() {
                 <img 
                   src={logoImage} 
                   alt="Trakia Trips" 
-                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain"
+                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain"
                   data-testid="logo-header"
                 />
                 <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white tracking-wider uppercase relative">
