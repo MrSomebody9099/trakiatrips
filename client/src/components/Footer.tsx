@@ -2,7 +2,7 @@ import logoImage from "@assets/one_1758569530864.jpg";
 
 export default function Footer() {
   return (
-    <footer className="relative text-white" style={{background: '#2D5FCF'}}>
+    <footer className="relative text-white" style={{background: '#004AAD'}}>
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
