@@ -1,133 +1,154 @@
-import MarqueeTape from "../components/MarqueeTape";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen" style={{backgroundColor: '#DDF9F1'}}>
-      <MarqueeTape />
       <Navigation />
       
       <main className="pt-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto py-16 md:py-24">
-          <div className="text-center mb-16 md:mb-24 animate-fade-in-up">
+        <div className="max-w-4xl mx-auto py-16">
+          {/* Header */}
+          <div className="text-center mb-12 animate-fade-in-up">
             <div className="inline-block bg-purple-500/10 border border-purple-500/20 rounded-full px-6 py-2 text-purple-600 font-medium mb-8">
-              Legal Information
+              Legal Document
             </div>
-            <h1 className="font-heading font-black text-4xl md:text-6xl lg:text-8xl xl:text-9xl text-foreground mb-8 md:mb-12 leading-tight">
+            <h1 className="font-heading font-black text-4xl md:text-6xl text-foreground mb-6 leading-tight">
               PRIVACY
               <br />
               <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
                 POLICY
               </span>
             </h1>
-            <p className="font-body text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              How we protect and use your information
+            <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
+              How we protect and use your personal information
             </p>
           </div>
-          
-          <div className="space-y-12 md:space-y-16 animate-fade-in-up animate-delay-200">
-            <div className="relative bg-gradient-to-br from-white via-purple-50/30 to-purple-100/20 backdrop-blur-xl border border-purple-200/50 rounded-3xl md:rounded-[3rem] p-8 md:p-16 lg:p-20 shadow-2xl shadow-purple-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 to-transparent rounded-3xl md:rounded-[3rem]"></div>
+
+          {/* Legal Content */}
+          <div className="relative bg-white backdrop-blur-xl border border-purple-200/50 rounded-3xl p-8 md:p-12 shadow-xl">
+            <div className="prose prose-slate max-w-none">
               
-              <div className="relative">
-                <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 text-center">
-                  <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">DATA</span> Collection
-                </h2>
-                
-                <div className="space-y-8">
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-6 border border-purple-200/50">
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-3">Information We Collect</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      We collect personal information that you voluntarily provide to us when you register on our website, express interest in obtaining information about us or our products and services, participate in activities on the website, or otherwise contact us. The personal information we collect may include names, email addresses, phone numbers, and payment information.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-6 border border-purple-200/50">
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-3">How We Use Your Information</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      We use the information we collect to provide, maintain, and improve our services, to process your bookings and transactions, to send you marketing and promotional communications if you have opted in to receive them, and to comply with legal obligations.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative bg-gradient-to-br from-purple-500/5 to-purple-600/15 backdrop-blur-xl border border-purple-300/30 rounded-3xl md:rounded-[3rem] p-8 md:p-16 lg:p-20 shadow-2xl shadow-purple-500/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 to-transparent rounded-3xl md:rounded-[3rem]"></div>
-              
-              <div className="relative">
-                <h2 className="font-heading font-black text-3xl md:text-4xl lg:text-5xl text-foreground mb-8 text-center">
-                  <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">YOUR</span> Rights
-                </h2>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Access and Update</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          You have the right to access and update the personal information we hold about you. You can do this by logging into your account or contacting us directly.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Data Deletion</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          You have the right to request that we delete your personal information. We will comply with such requests unless we have a legal obligation to retain certain information.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Marketing Preferences</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          You can opt out of receiving marketing communications from us at any time by clicking the "unsubscribe" link in our emails or contacting us directly.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mt-1">
-                        <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-heading font-bold text-xl text-foreground mb-2">Cookies</h3>
-                        <p className="font-body text-muted-foreground leading-relaxed">
-                          We use cookies to enhance your experience on our website. You can manage your cookie preferences through your browser settings.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <section className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  This privacy policy ("policy") will help you understand how Trakia Trips Limited ("us", "we", "our") uses and protects the data you provide to us when you visit and use our website ("website", "service").
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  We reserve the right to change this policy at any given time, of which you will be promptly updated. If you want to make sure that you are up to date with the latest changes, we advise you to frequently visit this page.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">What User Data We Collect</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  When you visit the website, we may collect the following data:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed space-y-2">
+                  <li>Your IP address</li>
+                  <li>Your contact information and email address</li>
+                  <li>Other information such as interests and preferences</li>
+                  <li>Data profile regarding your online behaviour on our website</li>
+                  <li>Operational data pertaining to your purchase</li>
+                </ul>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Why We Collect Your Data</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We are collecting your data for several reasons:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed space-y-2">
+                  <li>To better understand your needs</li>
+                  <li>To improve our services and products</li>
+                  <li>To operate safely and effectively at the event</li>
+                  <li>To send you promotional emails containing the information we think you will find interesting</li>
+                  <li>To contact you to fill out surveys and participate in other types of market research</li>
+                  <li>To customize our website according to your online behavior and personal preferences</li>
+                </ul>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Safeguarding and Securing the Data</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Trakia Trips Limited is committed to securing your data and keeping it confidential. Trakia Trips Limited has done all in its power to prevent data theft, unauthorized access, and disclosure by implementing the latest technologies and software, which help us safeguard all the information we collect online.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Our Cookie Policy</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Once you agree to allow our website to use cookies, you also agree to use the data it collects regarding your online behavior (analyze web traffic, web pages you spend the most time on, and websites you visit).
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The data we collect by using cookies is used to customize our website to your needs. After we use the data for statistical analysis, the data is completely removed from our systems.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Please note that cookies don't allow us to gain control of your computer in any way. They are strictly used to monitor which pages you find useful and which you do not so that we can provide a better experience for you.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  If you want to disable cookies, you can do it by accessing the settings of your internet browser. You can visit www.internetcookies.com, which contains comprehensive information on how to do this on a wide variety of browsers and devices.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Links to Other Websites</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Our website contains links that lead to other websites. If you click on these links Trakia Trips is not held responsible for your data and privacy protection. Visiting those websites is not governed by this privacy policy agreement. Make sure to read the privacy policy documentation of the website you go to from our website.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Restricting the Collection of Your Personal Data</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  At some point, you might wish to restrict the use and collection of your personal data. You can achieve this by doing the following:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>When you are filling the forms on the website, make sure to check if there is a box which you can leave unchecked, if you don't want to disclose your personal information</li>
+                  <li>If you have already agreed to share your information with us, feel free to contact us via email and we will be more than happy to change this for you</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed">
+                  Trakia Trips Limited will not lease, sell or distribute your personal information to any third parties, unless we have your permission. We might do so if the law forces us. Your personal information will be used when we need to send you promotional materials if you agree to this privacy policy.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Your Data Protection Rights</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Under data protection law, you have the following rights:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed space-y-2">
+                  <li><strong>The right to access:</strong> You have the right to request copies of your personal data</li>
+                  <li><strong>The right to rectification:</strong> You have the right to request that we correct any information you believe is inaccurate or complete information you believe is incomplete</li>
+                  <li><strong>The right to erasure:</strong> You have the right to request that we erase your personal data, under certain conditions</li>
+                  <li><strong>The right to restrict processing:</strong> You have the right to request that we restrict the processing of your personal data, under certain conditions</li>
+                  <li><strong>The right to object to processing:</strong> You have the right to object to our processing of your personal data, under certain conditions</li>
+                  <li><strong>The right to data portability:</strong> You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions</li>
+                </ul>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">Contact Trakia Trips</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Should you wish to contact us to speak about your data, please contact:
+                  <br />
+                  <strong>Email:</strong> trakia.trips@gmail.com
+                  <br />
+                  <strong>Instagram:</strong> @trakiatrips
+                </p>
+              </section>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mt-8">
+                <p className="text-sm text-purple-800 leading-relaxed">
+                  <strong>Last Updated:</strong> September 2025
+                  <br />
+                  By using our website and services, you acknowledge that you have read and understood this Privacy Policy and agree to the collection and use of your information as described herein.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );
