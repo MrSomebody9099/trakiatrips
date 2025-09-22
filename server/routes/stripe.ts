@@ -1,9 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import Stripe from 'stripe';
-import { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
 
-const router = Router();
+// Load environment variables
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 // Admin authentication middleware
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -16,6 +18,8 @@ const adminAuth = (req: Request, res: Response, next: NextFunction) => {
 
 // Initialize Stripe with the secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+
+const router = Router();
 
 // Create Stripe coupons and promotion codes - ADMIN PROTECTED
 router.post('/create-coupons', adminAuth, async (req, res) => {

@@ -618,4 +618,18 @@ class DatabaseStorage implements IStorage {
 }
 
 // Switch to database storage
-export const storage = new DatabaseStorage();
+let storageInstance: DatabaseStorage | null = null;
+export function getStorage(): DatabaseStorage {
+  if (!storageInstance) {
+    storageInstance = new DatabaseStorage();
+  }
+  return storageInstance;
+}
+
+// For backward compatibility, define storage as a proxy that lazily initializes
+export const storage: IStorage = new Proxy({} as IStorage, {
+  get(_target, prop) {
+    const instance = getStorage();
+    return (instance as any)[prop];
+  }
+});

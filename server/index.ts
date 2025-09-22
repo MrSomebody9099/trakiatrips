@@ -1,12 +1,17 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Load environment variables only in development
+// Load environment variables FIRST before importing any modules that depend on them
 import dotenv from "dotenv";
-if (process.env.NODE_ENV === "development") {
-  dotenv.config({ path: ".env.local" });
-}
+import path from "path";
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+
+// Debug: Log the DATABASE_URL to see if it's loaded
+console.log("DATABASE_URL:", process.env.DATABASE_URL ? "Loaded" : "Not found");
+console.log("Current working directory:", process.cwd());
+
+// Now import routes after environment variables are loaded
+import { registerRoutes } from "./routes";
 
 const app = express();
 
