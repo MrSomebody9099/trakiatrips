@@ -42,7 +42,7 @@ const addOns = [
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
   { id: "lessons", name: "Lessons (2hr session)", price: 50 },
-  { id: "poolParty", name: "Pool Party Experience", price: 15 },
+  { id: "poolParty", name: "Pool Party (free for first 60 bookings)", price: 15 },
   { id: "none", name: "None", price: 0 },
 ];
 
@@ -687,7 +687,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                           data-testid={`checkbox-addon-${addOn.id}`}
                         />
                         <Label htmlFor={addOn.id} className="flex-1 cursor-pointer">
-                          {addOn.name} {addOn.price > 0 ? `(€${addOn.price}${isPerDay ? '/day' : '/person'})` : '(Free)'}
+                          {addOn.name} {addOn.price > 0 && addOn.id !== 'none' ? `(€${addOn.price}${isPerDay ? '/day' : '/person'})` : addOn.id === 'none' ? '' : '(Free)'}
                         </Label>
                       </div>
                       {isSelected && isPerDay && (

@@ -1,8 +1,8 @@
-import logoImage from "@assets/WhatsApp Image 2025-09-06 at 20.05.52_c85b509a_1758564389096.png";
+import logoImage from "@assets/one_1758569530864.jpg";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white">
+    <footer className="relative text-white" style={{background: '#004AAD'}}>
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">

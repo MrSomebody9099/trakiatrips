@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logoImage from "@assets/WhatsApp Image 2025-09-06 at 20.05.52_c85b509a_1758564389096.png";
+import logoImage from "@assets/one_1758569530864.jpg";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,7 +9,7 @@ export default function Navigation() {
   return (
     <>
       {/* Premium ticker banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary via-blue-600 to-primary h-8 overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 h-8 overflow-hidden" style={{background: '#004AAD'}}>
         <div className="flex items-center h-full animate-marquee whitespace-nowrap">
           <div className="text-white font-body font-medium text-xs sm:text-sm px-4 sm:px-8">
             early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money
@@ -18,7 +18,7 @@ export default function Navigation() {
       </div>
 
       {/* Premium navigation */}
-      <nav className="fixed top-8 left-0 right-0 z-40 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 backdrop-blur-lg border-b border-blue-700/50 shadow-2xl">
+      <nav className="fixed top-8 left-0 right-0 z-40 backdrop-blur-lg border-b border-blue-700/50 shadow-2xl" style={{background: '#004AAD'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center md:hidden"></div>
