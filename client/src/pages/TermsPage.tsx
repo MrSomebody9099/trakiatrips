@@ -410,6 +410,64 @@ export default function TermsPage() {
                 </p>
               </section>
 
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">15. GENERAL</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where any provision of these Terms is declared by any judicial or other competent authority to be void, voidable, illegal or otherwise unenforceable or indications to that effect are received by Us from any such authority, that provision shall be severed from these Terms and the remaining provisions of these Terms shall remain in full force and effect.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  These Terms shall be governed by and construed in accordance with English law. You hereby submit to the exclusive jurisdiction of the English courts as regards any claim or matter arising under these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We may assign or transfer any of Our rights and obligations under these Terms to another entity but will always notify You by publishing details on Our Website if We do so. You may not transfer any of Your rights or obligations under these Terms to another person.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Our failure or delay in exercising any right, power or privilege under these Terms shall not operate as a waiver of such right, power or privilege.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  If there is a conflict between these Terms and information contained on Our Website (other than these Terms), these Terms shall prevail.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Save where specifically stated otherwise in these Terms, all provisions of these Terms are intended to be severable and no provision of these Terms is intended to be binding on any person who is not a party to the contract between You and Us.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We may provide You with notices by email to Your email address provided by You for Your Account. It is Your responsibility to update Your contact details in Your Account where they change. Any notices shall be deemed to be received by You within 24 hours of the email containing the notice being sent to You by Us to Your registered email address.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  These Terms set out the entire agreement and understanding between You and Us and supersede all prior agreements, understandings and representations relating to the subject matter of these Terms.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">16. DEFINITIONS</h2>
+                <div className="text-muted-foreground leading-relaxed space-y-4">
+                  <p><strong>"Account"</strong> means Your user account on Our Website</p>
+                  <p><strong>"Additional Parties"</strong> means any parties other than those forming part of the Festival programme but available for purchase through Us on Our Website</p>
+                  <p><strong>"Authorised Person"</strong> means any person authorised by Us to act on Our behalf in relation to the Festival including (but not limited to) Our employees, contractors, agents and stewards</p>
+                  <p><strong>"Booking"</strong> means Your purchase of Tickets, Travel Arrangements and/or Extras through Our Website</p>
+                  <p><strong>"Booking Fees"</strong> means any fees charged by Us for processing Your Booking</p>
+                  <p><strong>"Deposit"</strong> means a partial payment for Your Booking paid at the time of purchase</p>
+                  <p><strong>"Extras"</strong> means any additional services, activities or products available for purchase through Our Website, including but not limited to equipment hire, lessons, excursions, dining experiences and Additional Parties</p>
+                  <p><strong>"Face Value"</strong> means the original price paid for a Ticket excluding any Booking Fees</p>
+                  <p><strong>"Festival"</strong> means the Trakia Trips ski festival event taking place from 6th-9th March 2025 in Bansko, Bulgaria</p>
+                  <p><strong>"Material Alteration"</strong> means a significant change to the Festival that fundamentally alters the nature or experience of the event</p>
+                  <p><strong>"Privacy Policy"</strong> means Our privacy policy available on Our Website</p>
+                  <p><strong>"Prohibited Item"</strong> means any item that We deem unsuitable, dangerous or illegal to bring to the Festival or Venue(s)</p>
+                  <p><strong>"Resort"</strong> means the Bansko ski resort and surrounding areas where the Festival takes place</p>
+                  <p><strong>"Supplier/Principal"</strong> means any third-party provider of Travel Arrangements and/or Extras</p>
+                  <p><strong>"Terms"</strong> means these terms and conditions</p>
+                  <p><strong>"Ticket"</strong> means any ticket or pass granting entry to the Festival</p>
+                  <p><strong>"Ticket Holder"</strong> means any person who holds a valid Ticket</p>
+                  <p><strong>"Ticket Purchaser"</strong> means the person who purchases Tickets through Our Website</p>
+                  <p><strong>"Travel Arrangements"</strong> means any travel-related services available for purchase through Our Website, including but not limited to accommodation and transfers</p>
+                  <p><strong>"Venue(s)"</strong> means any location where Festival events take place</p>
+                  <p><strong>"We", "Us", "Our"</strong> means Trakia Trips</p>
+                  <p><strong>"Website"</strong> means Our official website at the current domain</p>
+                  <p><strong>"Wristband"</strong> means the physical wristband exchanged for Your Ticket at the Festival</p>
+                  <p><strong>"You", "Your"</strong> means the person purchasing or using Tickets, Travel Arrangements and/or Extras</p>
+                </div>
+              </section>
+
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
                 <p className="text-sm text-blue-800 leading-relaxed">
                   <strong>Last Updated:</strong> September 2025

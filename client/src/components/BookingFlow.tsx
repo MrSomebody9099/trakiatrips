@@ -42,7 +42,7 @@ const baseAddOns = [
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
   { id: "lessons", name: "Lessons (2hr session)", price: 50 },
-  { id: "poolParty", name: "Pool Party (free for first 60 bookings)", price: 15 }, // This will be dynamically updated
+  { id: "poolParty", name: "Pool Party (free for first 60 bookings)", price: 0 }, // Always free
   { id: "none", name: "None", price: 0 },
 ];
 
@@ -163,16 +163,16 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         const data = await response.json();
         if (data.success) {
           setPoolPartyCount(data);
-          // Update the pool party add-on price based on count
+          // Update the pool party add-on name based on count, but keep price at 0
           setAddOns(prev => prev.map(addon => 
             addon.id === 'poolParty' 
-              ? { ...addon, price: data.isFree ? 0 : 15, name: data.isFree ? `Pool Party (free - ${data.remaining} spots left!)` : `Pool Party (€15/person - ${data.remaining} free spots taken)` }
+              ? { ...addon, price: 0, name: data.isFree ? `Pool Party (FREE - ${data.remaining} spots left!)` : `Pool Party (FREE - ${data.remaining} free spots taken)` }
               : addon
           ));
         }
       } catch (error) {
         console.error('Error fetching pool party count:', error);
-        // Keep default pricing if API fails
+        // Keep default pricing (free) if API fails
       }
     };
     
