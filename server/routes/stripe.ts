@@ -79,24 +79,10 @@ router.post('/create-coupons', adminAuth, async (req, res) => {
     });
     results.coupons.fourOrMore = groupCoupon;
 
-    // Create fixed amount coupon for pool party extra (€30 off)
-    const poolPartyCoupon = await createCouponIfNotExists('early60-coupon', {
-      name: 'Early Bird Pool Party',
-      amount_off: 3000, // €30 in cents
-      currency: 'eur',
-      duration: 'once',
-      max_redemptions: 60,
-      metadata: {
-        description: 'Free pool party extra for early bookings (€30 value)',
-        type: 'pool_party_free'
-      }
-    });
-    results.coupons.early60 = poolPartyCoupon;
 
     // Create promotion codes
     results.promotionCodes.beenHereB4 = await createPromotionCodeIfNotExists('BEENHEREB4', beenHereCoupon.id);
     results.promotionCodes.fourOrMore = await createPromotionCodeIfNotExists('4ORMORE', groupCoupon.id);
-    results.promotionCodes.early60 = await createPromotionCodeIfNotExists('EARLY60', poolPartyCoupon.id);
 
     res.json({
       success: true,
@@ -134,13 +120,6 @@ router.post('/validate-coupon', async (req, res) => {
       });
     }
 
-    // Payment mode restrictions - installment payments can only use EARLY60
-    if (paymentMode === 'installment' && couponCode !== 'EARLY60') {
-      return res.status(400).json({ 
-        error: 'This coupon is not available for installment payments',
-        suggestion: 'Only the EARLY60 coupon can be used with installment payments. Switch to full payment to use this coupon.'
-      });
-    }
 
     // Check if promotion code is active
     if (!promotionCode.active) {
@@ -161,23 +140,6 @@ router.post('/validate-coupon', async (req, res) => {
       return res.status(400).json({ error: 'This coupon has reached its usage limit' });
     }
 
-    // Special database tracking for EARLY60 coupon - check person limit
-    if (couponCode === 'EARLY60') {
-      const currentUsageCount = await storage.getCouponUsageCount('EARLY60');
-      const remainingSlots = 60 - currentUsageCount;
-      
-      if (currentUsageCount >= 60) {
-        return res.status(400).json({ error: 'EARLY60 coupon has reached its 60-person limit' });
-      }
-      
-      // If group size would exceed remaining slots, warn user
-      if (groupSize && currentUsageCount + groupSize > 60) {
-        return res.status(400).json({ 
-          error: `EARLY60 coupon only has ${remainingSlots} spots remaining, but you need ${groupSize} spots`,
-          suggestion: `Only ${remainingSlots} spots left for this discount. Consider reducing your group size or booking without the coupon.`
-        });
-      }
-    }
 
     res.json({
       valid: true,
