@@ -160,6 +160,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: '10% discount for groups of 4 or more',
           minPeople: 4,
           paymentPlans: ['full']
+        },
+        'EARLY60': {
+          type: 'fixed',
+          description: 'Pool party free',
+          paymentPlans: ['full', 'installment'],
+          usageLimit: 60
         }
       };
 
@@ -184,11 +190,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Check payment plan restrictions
+      if (upperCode === 'EARLY60' && paymentPlan !== 'full' && paymentPlan !== 'installment') {
+        return res.status(400).json({ 
+          valid: false, 
+          error: paymentPlan === 'installment' 
+            ? 'Only EARLY60 coupon can be used with installment payments'
+            : 'This coupon cannot be used with the selected payment plan'
+        });
+      }
+
+      // Check usage limit for EARLY60
+      if (upperCode === 'EARLY60') {
+        const usageCount = await storage.getCouponUsageCount('EARLY60');
+        if (usageCount >= 60) {
+          return res.status(400).json({ 
+            valid: false, 
+            error: 'EARLY60 coupon has reached its usage limit'
+          });
+        }
+      }
 
       // Calculate discount
       let discount = 0;
       
-      if (coupon.type === 'percentage') {
+      if (coupon.type === 'fixed' && upperCode === 'EARLY60') {
+        // Pool party is €15 per person
+        const hasPoolParty = selectedAddOns.includes('poolParty');
+        if (hasPoolParty) {
+          discount = 15 * numberOfPeople;
+        } else {
+          return res.status(400).json({ 
+            valid: false, 
+            error: 'EARLY60 coupon requires Pool Party add-on to be selected'
+          });
+        }
+      } else if (coupon.type === 'percentage') {
         discount = Math.round(totalAmount * coupon.discount * 100) / 100;
       }
 

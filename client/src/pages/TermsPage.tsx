@@ -32,140 +32,205 @@ export default function TermsPage() {
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">1. INTRODUCTION</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  These Terms govern all Bookings and Tickets. Where You have purchased Travel Arrangements and/or Extras, the terms and conditions of the Supplier of those Travel Arrangements and/or Extras (as may be provided to You by Us or the Supplier from time to time) apply in addition to these Terms. These Terms are legally binding on You and any person who purchases, possesses, uses or attempts to use any Booking and You and any such person shall be deemed to have accepted and agreed to comply with these Terms.
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  We reserve the right to vary these Terms from time to time without notice and at Our sole discretion. Updates will be published on Our Website and the date at the top of these Terms will be updated to reflect the date of the latest amendments.
+                  These Terms govern all Bookings and Tickets. Where You have purchased Travel Arrangements and/or Extras, the terms and conditions of the Supplier of those Travel Arrangements and/or Extras (as may be provided to You by Us or the Supplier from time to time) apply in addition to these Terms. These Terms are legally binding on You and any person who purchases, possesses, uses or attempts to use any Booking and You and any such person shall be deemed to have accepted and agreed to comply with these Terms. All capitalised words used in these Terms shall have the meaning as set out in clause 16. We reserve the right to vary these Terms from time to time without notice and at Our sole discretion. Updates will be published on Our Website and the date at the top of these Terms will be updated to reflect the date of the latest amendments. Any directives or statements featured on the Tickets (including electronic Tickets) or posted or announced at or in relation to the Festival, shall also form part of these Terms.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">2. TICKET PURCHASE AND DELIVERY</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Tickets are sold on Our Website on the platform operated by Stripe. Where You make a purchase on Our Website, a contract is entered into between You and Us and there is no contractual relationship between You and Stripe. Your payment to Us may be processed on Our behalf by Stripe.
+                  Tickets are sold on Our Website on the platform operated by Stripe. Stripe has no control over the Tickets, Travel Arrangements or Extras We sell on Our Website. Where You make a purchase on Our Website, a contract is entered into between You and Us (subject to Our agency status as set out below for Travel Arrangements and Extras) and there is no contractual relationship between You and Stripe. Your payment to Us may be processed on Our behalf by the Stripe (or its appointed third party payment processing provider). Stripe receives the monies You pay to it as Our payment agent only. Stripe is not a ticketing agent and has no responsibility to You. Any payment You make to Stripe shall be in satisfaction of payments You are liable to make to Us in accordance with these Terms. If You have any questions, concerns, complaints, or requests, You should direct them to Us and not Stripe.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  <strong>Payment Options:</strong> Bookings can be paid for in full at the time of purchase or by paying a deposit to secure Your Booking and thereafter paying the balance by the due date specified by Us.
+                  Nothing in these Terms shall affect Your applicable statutory rights as a consumer.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  <strong>Refund Policy:</strong> If You choose to cancel Your Booking, You are entitled to a refund of Your second payment in the case that You cancel Your Booking at least 45 days prior to the date of the Festival. If You cancel Your Booking within 45 days of the trip You will not receive any refunds or compensation.
+                  Tickets may only be purchased from Us or through any other sale or transfer mechanism authorised by Us in writing. Tickets purchased or obtained from any other source shall be void and may be seized or cancelled without refund or compensation.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  <strong>Age Requirement:</strong> Ticket Purchasers and all Ticket Holders must be aged 18 or over at the time of the Event start date.
+                  Bookings are not exchangeable, refundable or transferable. Re-sale or attempted re-sale is not allowed, unless expressly authorised by Us (at Our sole discretion) via an authorised Ticket reseller and may only be sold and purchased in accordance with the Ticket resellers terms and conditions. If You are buying or selling Tickets, Travel Arrangements and/or Extras from an official Ticket reseller, please read their terms and conditions carefully, additional fees may apply. Only Bookings that have been fully paid for shall be available for re-sale. Not all Bookings shall be available for re-sale and We reserve the right to disable the re-sale function at any time. Do not attempt to buy or sell Tickets from touts or unauthorised re-sellers. We reserve the right to cancel any Ticket that We reasonably believe to have been bought or sold in this way. We will not be able to respond to any questions or queries You might have unless You are a valid Ticket Holder.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Any attempt to exchange or transfer Your Booking in breach of these Terms shall result in the Booking being void and it may be seized or cancelled without refund or compensation.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Bookings can be paid for in the following ways (in case of options I and ii, subject to availability (which shall be entirely at Our discretion) and eligibility:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>in full at the time of purchase using the acceptable payment methods as shown on Our Website (please note that these may vary from time to time);</li>
+                  <li>by paying a deposit to secure Your Booking and thereafter paying the balance by the due date specified by Us at the time of purchase (the deposit terms and conditions set out at clause 2.7 shall apply if You choose this payment method);</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The Terms set out in this clause 2.7 shall apply when You choose to pay for Your Booking using a Deposit. You acknowledge and agree that:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>You shall pay to Us the balance of Your Booking on the due date provided to You by Us at the time of Your Booking;</li>
+                  <li>it is Your responsibility to make the balance paying through Your Account by the due date;</li>
+                  <li>if You fail to make the balance payment by the due date agreed between You and Us and do not contact Us to remedy such failure to Our satisfaction, Your Booking shall be cancelled and Your Tickets, Travel Arrangements and/or any Extras shall be null and void and Your Deposit shall not be refunded; and</li>
+                  <li>You may cancel Your Booking at any time by contacting Us without making any further payments to Us. If You choose to cancel Your Booking, You are entitled to a refund of Your second payment in the case that You cancel Your Booking at least 45 days prior to the date of the Festival. If You cancel Your Booking within 45 days of the trip You will not receive any refunds or compensation) and Your Booking shall be null and void.</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We will store Your details in accordance with the terms of Our Privacy Policy, which can be found on Our Website.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The debit or credit card used to purchase Tickets must be registered in the name and address of the Ticket Purchaser. To prevent fraud We may carry out checks and/or You may be asked to provide additional information (such as proof of address or proof that the nominated card is registered to You) after Your booking. If We suspect fraud, We may cancel Your Booking at any time.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Your Booking is not complete until You have paid for Your Booking in full. Until such time, Your Tickets, Travel Arrangements and/or Extras shall not be issued and to the extent they have already been issued, they shall not be valid.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where the Ticket Purchaser is purchasing Tickets, Travel Arrangements and/or Extras on behalf of other people as part of a group Booking, it is the Ticket Purchasers responsibility to circulate these Terms to the entire Booking party and Ticket Holders, all of whom are bound by these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets, Wristbands and/or other forms of rights to attend the Festival and/or any Venue are personal, revocable licences granted by Us to each Ticket Holder and shall remain Our property at all times. For safety and security purposes, We reserve the right, at Our sole discretion, to recall any accreditation or other rights to attend the Festival and/or any Venue at any time.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Ticket price and availability may be subject to change without notice prior to purchase.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We reserve the right to limit the number of Tickets that any person may purchase for the Festival. Tickets may be limited to a maximum number per person, per payment card and/or per household. We reserve the right to cancel Tickets purchased in excess of this number.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets are not issued on a sale or return basis and refunds will not be made on returned Tickets unless provided for under these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Ticket Purchasers and all Ticket Holders must be aged 18 or over at the time of the Event start date.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  It is Your responsibility to check Your Booking information carefully and inform Us immediately of any inaccuracies or any changes You wish to make. Mistakes cannot always be rectified, and changes or rectification may incur a charge. Typically, an administration charge of €5 is applied when a change or rectification is made, however, this is subject to change and increase at Our discretion. We cannot accept any liability for errors made by You. In some instances, You will be able to make changes directly in Your Account. Should You make any changes that relate to any Travel Arrangements or Extras within the 60 days leading up to the Festival, You must also notify Us directly so that We can make a change request to the relevant Supplier. We cannot accept any liability for errors in orders placed with Suppliers on Your behalf where this error arises as a result of inaccuracies in information provided by You. Should any change result in any overpayment being made by You, these are strictly non-refundable.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  Bookings are not exchangeable, refundable or transferable. Re-sale or attempted re-sale is not allowed, unless expressly authorised by Us via an authorised Ticket reseller.
+                  Unless otherwise prohibited by law, Our liability to You is limited to the Face Value of Your Ticket(s) plus the value of any Extras that are booked through Us for which We are not an agent.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">3. USE OF YOUR BOOKING AND TICKETS</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Bookings (including Tickets) are strictly non-transferable and must not be sold or offered for sale, or transferred or otherwise disposed of, save as in accordance with these Terms.
+                  Bookings (including Tickets) are strictly non-transferable and must not be sold or offered, exposed or made available for sale, or transferred or otherwise disposed of, save as in accordance with these Terms. We reserve the right to cancel without refund or compensation any Bookings issued to a Ticket Holder whom We believe plans to offer such Booking for resale otherwise than in accordance with these Terms.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Tickets will be exchanged for Wristbands at the Festival at the Wristband exchange. Wristbands are only issued directly to the Ticket Holder on production of photographic ID (driver's licence or passport).
+                  If a Ticket Purchaser makes a Booking for more than one person, the Ticket Purchaser must retain one Ticket for his/her personal use. Any remaining Tickets may only be used by a natural person who is known to the Ticket Purchaser personally (and who did not become known to the Ticket Purchaser through the sale, transfer or disposal of the Ticket) and who is intended to accompany the Ticket Purchaser to the Festival and subject to the following conditions: i) the sale, transfer or disposal of any such Booking must not be for a value greater than the original sale price of the Booking; ii) the Booking must not be offered publicly (including on any website) whether for sale, as a gift or donation or any other means of transfer; and iii) the sale, transfer or disposal must be made strictly subject to these Terms (and the transferee's acceptance thereof) which shall be binding upon the transferee in full as if the transferee was the Ticket Purchaser, save only that such transferee shall have no right to a refund under these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Notwithstanding clause 3.2 above, the Booking must not be: i) transferred, used or otherwise disposed of in the course of any business or for the purpose of facilitating a third party's business; ii) transferred, used or otherwise disposed of in relation to any promotional or commercial purpose (including any competition, advertising, promotion, auction or as a prize in any competition or sweepstake, whether for a business or a charity or otherwise; iii) transferred or otherwise disposed of to any person who agrees to buy any good(s) or service(s) in return for the Booking; and/or d) combined with any other good(s) or service(s) (including as part of any hospitality, accommodation or travel package or service), in each case without Our prior written approval.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Any Booking offered for sale, sold, transferred, used or disposed of in breach of clause 3 of these Conditions may be cancelled and any person seeking to use the Booking may be refused admission to or be evicted from the Festival and/or Venue(s) without refund or compensation.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets will be exchanged for Wristbands at the Festival at the Wristband exchange. If You are using an electronic Ticket, it is Your responsibility to ensure You have a sufficiently powered mobile device enabling You to show Your Ticket. Wristbands are only issued directly to the Ticket Holder on production of photographic ID (driver's licence or passport). In the event that We suspect (acting reasonably) that the ID presented is not valid or authentic, We reserve the right to request a secondary form of ID. If We are not satisfied that the ID presented is valid or valid or authentic (acting reasonably), We reserve the right to refuse to issue a Wristband without refund or compensation. It is not possible to collect Wristbands on behalf of other people and all Wristbands must be placed and secured on the Ticket Holder's wrist directly by Us. Your Wristband will be invalidated if any part of it is removed, detached, altered or defaced. Wristbands will not be reissued or replaced regardless of whether You still have Your Ticket.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You must retain Your Wristband at all times whilst at the Festival and/or any Venue and Wristbands must be produced for inspection upon Our request and/or the request of any Authorised Person. Failure to do so may result in the You being ejected from the Festival or any Venue without refund or compensation.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We are not liable for lost, stolen or defaced Tickets or Wristbands. If You lose or damage Your Ticket or Wristband, You will not be able to re-enter the Festival or Venue(s). All Wristbands will be checked when entering and leaving the Festival and Venue(s).
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Tickets for Travel Arrangements and/or Extras are separate to Festival Tickets. You will be notified by Us as to how You redeem Your tickets for Travel Arrangements and/or Extras in advance. Your Wristband cannot be used as proof of purchase of or to gain access or entry to any Travel Arrangements or Extras.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  You must retain Your Wristband at all times whilst at the Festival and Wristbands must be produced for inspection upon Our request. Failure to do so may result in You being ejected from the Festival without refund or compensation.
+                  Festival Tickets and Tickets for Travel Arrangements and/or Extras are not valid for persons under the age of 18. Persons under the age of 18 will not be permitted entry to the Festival or any Venues and we will not be able to exchange their Ticket for a Wristband. Persons under the age of 18 will not be able to use any Tickets for Travel Arrangements and/or Extras. No refunds or compensation will be given in these circumstances.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">4. ACCESS, ENTRY AND CONDUCT</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Admission to the Festival will only be authorised upon presentation of a valid Wristband and photographic proof of identity and proof of age (driver's licence or passport).
+                  Admission to the Festival and Venue(s) will only be authorised upon presentation of a valid Wristband and, We and/or any Authorised Representative may require, photographic proof of identity and proof of age (driver's licence or passport). You are not guaranteed an uninterrupted and/or uninhibited view of any performance, nor is any representation or warranty given as to the quality, content or duration of the Festival or any performances. Access to Venue(s) is subject to capacity and We accept no liability and will not offer any refunds if You are unable to attend a specific performance due to the Venue being at maximum capacity.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  You may be refused admission to or ejected from the Festival without refund or compensation if You:
+                  You may be requested to submit to a body check and/or a search of Your possessions for the purposes of locating and removing any Prohibited Item. Should You refuse, You may be refused admission to or ejected from the Festival or Venue(s) without refund or compensation.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You may be refused admission to or ejected from the Festival and/or any Venue with Your Wristband removed, or denied access or entry to any Travel Arrangements or Extras, without refund or compensation, if You (in Our opinion or in the opinion of any Authorised Person):
                 </p>
                 <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
-                  <li>Behave in a way that is anti-social, offensive, violent, dangerous, disruptive, racist, sexist, homophobic, sexually provocative or a nuisance to other guests</li>
-                  <li>Are excessively under the influence of alcohol</li>
-                  <li>Are under the influence of drugs, narcotics, psychoactive substances, or 'legal' highs</li>
-                  <li>Bring any prohibited items to the Festival</li>
-                  <li>Attempt to gain access to restricted areas</li>
-                  <li>Damage, tamper with or interfere with Our property</li>
-                  <li>Smoke or vape in non-permitted areas</li>
-                  <li>Commit or are suspected of committing a criminal offence</li>
+                  <li>behave (or are likely to behave) in a way that is anti-social, offensive, violent, dangerous disruptive, racist, sexist, homophobic, sexually provocative or a nuisance to other Festival guests, neighbouring residents of the Festival, Our staff, Suppliers or Venue staff;</li>
+                  <li>behave (or are likely to behave) in a manner contrary to public order and/or safety;</li>
+                  <li>are excessively under the influence of alcohol;</li>
+                  <li>are under the influence of drugs, narcotics, psychoactive substances, nitrous oxide, 'legal' highs or any similar or associated paraphernalia;</li>
+                  <li>bring, attempt to bring, possess or use within the Festival, Resort or any Venue any Prohibited Item (and any Prohibited Items may be confiscated and/or destroyed without compensation at the discretion of Us and any Authorised Person);</li>
+                  <li>attempt to gain access to any restricted areas, climb on any infrastructure, mosh, crowd surf or throw items;</li>
+                  <li>damage, tamper with or interfere with any of Our property or that of any Venue or Supplier;</li>
+                  <li>smoke or vape in a non-permitted area;</li>
+                  <li>commit (or are suspected of committing or are likely to commit) a criminal offence; or</li>
+                  <li>behave in a way that is contrary to Our (or an Authorised Persons) reasonable instruction.</li>
                 </ul>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Suppliers of Travel Arrangements and Extras reserve their rights to refuse service to You as a result of Your non-compliance with these Terms and any terms and conditions provided by them. We accept no responsibility for any action taken by Suppliers.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Unless otherwise agreed by Us in writing, You must not engage in any trading, marketing or commercial activity at the Festival or any Venue or bring into the Festival or Venues or display or distribute at any sponsorship, promotional or marketing materials.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
                   You are responsible for Your own personal property at all times. We cannot accept any liability for any loss, theft or damage to Your personal property.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You acknowledge that Police are present at the Resort who enforce strict laws including but not limited to with regards drug possession and use and drunken or other disorderly behaviour in public. It is Your responsibility to be aware of and abide by local laws. We accept no responsibility for any action taken by the police and no refunds or compensation will be paid should Your Booking be affected by police action taken.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  In the interest of Your safety, We may provide welfare assistance and services to You during the Festival. For example, We may provide translation or logistical services should You be detained by the police, or We may provide You with a welfare room if Your accommodation is not appropriate or accessible or we consider your safety is at risk. In certain instances, We will charge You for these services, particularly where the requirement for these services arises as a result of Your breach of these Terms. We reserve the right to refuse welfare assistance and services to You in the event that You breach these Terms.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Whilst We provide welfare assistance at the Festival and Resort, We shall not provide any such assistance in the event that You breach these Terms or those of any Supplier.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Suppliers of medical assistance may charge You for their services in the event that You require medical assistance. In some instances, We shall recover such charges from You on their behalf.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where necessary, Our staff (including members of Our security team) will report Your behaviour to the police. Should You commit (or be suspected of committing) a crime, Our security team may detain You until the police arrive and may confiscate from You any such evidence that the police may require.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  In some instances, We may require You to provide emergency contact information. By providing us with such information, You agree that We may contact such persons in the event of an emergency. We will handle such information in accordance with the terms of Our Privacy Policy which can be found on Our Website.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">5. PHOTOGRAPHY, FILMING AND RECORDINGS</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  You may take photographs and recordings at the Festival for personal, private, non-commercial purposes only. You must not use professional audio or imaging equipment or drones to capture footage.
+                  You may take photographs and recordings at the Festival for personal, private, non-commercial and non-promotional purposes only providing that You do not use any professional audio or imaging equipment or drones to capture such footage. You must not, under any circumstances, disseminate or transmit (on social media, the internet, radio, TV or any other form of media) any footage of the Festival for commercial gain. Unauthorised photography and recordings or transmission of the Festival or any performers is strictly forbidden. Any recording or transmitting equipment (including professional cameras), unauthorised photos, recordings, tapes, films or similar items may be confiscated and/or destroyed by Us without compensation.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  You consent to being photographed, filmed and sound recorded as an audience at the Festival without payment, and to Your image being exploited in any media for any purpose by Us.
+                  You consent to being photographed, filmed and sound recorded as an audience at the Festival without payment, and to Your image being exploited in any and all media for any purpose at any time throughout the world by Us who shall own the copyright in all such recordings. All personal data will be processed in accordance with Our Privacy Policy which can be found on Our Website.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="font-heading font-bold text-2xl text-foreground mb-4">6. TRAVEL AND TRAVEL ARRANGEMENTS</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Where You book Travel Arrangements through Us, We act as a booking agent for the Supplier/Principals. Your purchase of Travel Arrangements is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal.
+                  Where You book Travel Arrangements through Us on Our Website, We act in the sole capacity of a booking agent for the Supplier/Principals. We will arrange for You to enter into a contract with the applicable Supplier/Principal of the Travel Arrangements. Your purchase of Travel Arrangements is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal You contract with (such terms may be issued to you in French language without translation). The Supplier/Principal's terms and conditions may limit and/or exclude the Supplier/Principal's liability to You. As an agent, We accept no liability in relation to the Travel Arrangements You purchase or for the acts or omissions of the Supplier/Principal or other person(s) or party(ies) connected with any Travel Arrangements. Your contract is with the Supplier/Principal and its terms and conditions apply. As agent, We accept no responsibility for the actual provision of the Travel Arrangements. Our responsibilities are limited to making the booking in accordance with Your instructions. We accept no responsibility for any information about the Travel Arrangements that We pass on to You in good faith. However, in the event that We are found liable to You on any basis whatsoever, Our maximum liability to You is limited to the cost of the commission We earn on Your Travel Arrangements. Except where otherwise advised or stated in the terms and conditions of the Supplier/Principal concerned, all monies You pay to Us for Your Travel Arrangements will be held by Us on behalf of the Supplier/Principal and forwarded on to the Supplier/Principal in accordance with Our agreement with them.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  The price of Travel Arrangements includes all government taxes applicable at the time of booking. Any taxes that have to be paid locally by You are extra and are Your responsibility (including 'Resort tax' in Bulgaria).
+                  The price of the Travel Arrangements includes all government taxes as applicable at the time of booking that do not have to be paid locally. Any taxes that have to be paid locally by You are extra and are Your responsibility (including, but not limited to, 'Resort tax', which is a tourist tax collected by people such as accommodation providers in Bulgaria).
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  It is Your responsibility to ensure You have adequate travel insurance. You must be satisfied that Your insurance fully covers all Your personal requirements including pre-existing medical conditions, cancellation charges, and medical expenses.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">7. EXTRAS</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Where You book Extras through Us (equipment hire, lessons, excursions, dining experiences), We act as a booking agent for the Supplier/Principals. Your purchase is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">8. LIABILITY AND INSURANCE</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Unless otherwise prohibited by law, Our liability to You is limited to the Face Value of Your Ticket(s) plus the value of any Extras that are booked through Us for which We are not an agent.
+                  We will do Our utmost to cater for any special requirements You may have. If You (or any member of Your group has) any medical problem or disability which may affect Your Festival, please provide Us with full details before We confirm Your Booking so that We can try to advise You as to the suitability of Your chosen Booking. Acting reasonably, if We or the Supplier/Principal is unable to properly accommodate the needs of the person(s) concerned, We will not confirm Your booking or, if You did not give Us full details at the time of booking, We may cancel it and impose applicable cancellation charges, when We become aware of these details.
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  We do not accept any liability for costs or expense You might incur as a result of events beyond Our control which affect Your arrangements, including but not limited to war, strikes, natural disasters, adverse weather conditions, epidemics, flight restrictions, or government restrictions on travel.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">9. FORCE MAJEURE</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We shall not be liable for any failure to perform Our obligations under these Terms if such failure is due to circumstances beyond Our reasonable control, including but not limited to acts of God, war, terrorism, epidemic, government action, or industrial action.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">10. DATA PROTECTION</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We will store and process Your details in accordance with the terms of Our Privacy Policy, which can be found on Our Website. All personal data will be processed in accordance with applicable data protection laws.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">11. GENERAL PROVISIONS</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  These Terms constitute the entire agreement between You and Us regarding Your Booking. If any provision of these Terms is found to be unenforceable, the remainder shall continue in full force and effect.
+                  We will inform You as soon as reasonably possible if the Supplier/Principal needs to make a significant change to Your confirmed Travel Arrangements or to cancel them. We will also liaise between You and the Supplier/Principal in relation to any alternative arrangements offered by the Supplier/Principal but We will have no further liability to You.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  All ratings for the Travel Arrangements are as provided by the relevant Supplier/Principal. These are intended to give a guide to the services and facilities You should expect from Your Travel Arrangements. Standards and ratings may vary between countries, as well as between Supplier/Principals. We cannot guarantee the accuracy of any ratings given.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We do not accept any liability, including for compensation, for any costs or expense You might incur as a result of events beyond Our or the Supplier/Principals control which affect Your Travel Arrangements. This includes, but is not limited to, whether actual or threatened, war, riot, civil strife, strikes, terrorist activity, industrial dispute, natural or nuclear disaster, adverse weather conditions, flood, epidemics and pandemics, fire, airport, port or airspace closures, restrictions or congestion, flight or entry restrictions imposed by any regulatory authority or other third party, an FCO advisory against travel to a particular destination and any other government restrictions on travel from any destination.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We cannot guarantee the accuracy of any information We provide relating to visas, passports and health requirements. Requirements may change and it is Your responsibility to check the up to date position with regards visas, passports and health requirements before You travel. For up-to-date travel advice from the UK government, visit www.gov.uk/foreign-travel-advice.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We do not accept any liability in the event that You are unable to cross any international border including by coach, air and car. No refunds or compensation will be given in such instances.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  It is Your responsibility to ensure You have adequate travel insurance. You must be satisfied that Your insurance fully covers all Your personal requirements including pre-existing medical conditions, cancellation charges, medical expenses and repatriation in the event of accident or illness as well any adventure activities insurance appropriate to the activities You will be undertaking. We will not be liable for any such losses howsoever arising.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Any purchases You make for travel arrangements that are not purchased through Us on Our Website, including, but not limited to, any flights, accommodation, travel or transfers or coach travel to the Festival (e.g. a coach to the Festival booked through National Express) are not governed by these Terms. Under no circumstances do We accept responsibility or liability for any such bookings made directly with third parties.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  These Terms shall be governed by and construed in accordance with the laws of England and Wales, and You submit to the exclusive jurisdiction of the English courts.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">12. CONTACT INFORMATION</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  For questions about these terms or your booking, please contact us at:
-                  <br />
-                  <strong>Email:</strong> trakia.trips@gmail.com
-                  <br />
-                  <strong>Instagram:</strong> @trakiatrips
+                  The price of Travel Arrangements and availability may be subject to change without prior notice prior to purchase.
                 </p>
               </section>
 
