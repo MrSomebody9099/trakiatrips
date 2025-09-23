@@ -109,6 +109,7 @@ export class MemStorage implements IStorage {
       installmentStatus: insertBooking.installmentStatus || null,
       paymentStatus: insertBooking.paymentStatus || "pending",
       paymentPlan: insertBooking.paymentPlan || "full",
+      depositPaid: insertBooking.depositPaid ?? false,
       fondyOrderId: insertBooking.fondyOrderId || null,
       flightNumber: insertBooking.flightNumber || null,
       stripeCustomerId: insertBooking.stripeCustomerId || null,

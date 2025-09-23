@@ -338,11 +338,11 @@ router.post('/webhook', async (req, res) => {
       
       try {
         // Create the booking in the database
-        await storage.createBooking(bookingRecord);
+        const createdBooking = await storage.createBooking(bookingRecord);
         
-        // Create payment transaction record
+        // Create payment transaction record with the booking ID
         const transactionRecord = {
-          bookingId: '', // Will be set by storage after booking creation
+          bookingId: createdBooking.id,
           stripePaymentIntentId: paymentIntent.id,
           amount: depositAmount.toString(),
           paymentType: paymentMode === 'full' ? 'full' : 'deposit',
@@ -357,7 +357,9 @@ router.post('/webhook', async (req, res) => {
           processedAt: new Date()
         };
         
-        console.log('Booking and payment transaction created successfully');
+        await storage.createPaymentTransaction(transactionRecord);
+        
+        console.log(`Booking ${createdBooking.id} and payment transaction created successfully`);
         
       } catch (dbError: any) {
         console.error('Database error:', dbError);
@@ -480,10 +482,7 @@ async function createPaymentLinkForFailedCharge(booking: any) {
 router.post('/process-balance-payments', adminAuth, async (req, res) => {
   try {
     // Find all bookings with outstanding balances due today or overdue
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    
-    // This would need to be implemented in storage to query bookings
-    // For now, let's create the endpoint structure
+    const targetDate = req.body.dueDate || '2026-01-06'; // Allow override for testing
     
     const results = {
       processed: 0,
@@ -492,26 +491,33 @@ router.post('/process-balance-payments', adminAuth, async (req, res) => {
       errors: [] as any[]
     };
 
-    console.log(`Processing balance payments for date: ${today}`);
+    console.log(`Processing balance payments for date: ${targetDate}`);
     
-    // TODO: Implement storage method to get bookings with outstanding balances
-    // const outstandingBookings = await storage.getBookingsWithOutstandingBalance(today);
+    // Get bookings due for payment
+    const outstandingBookings = await storage.getBookingsDueForPayment(targetDate);
     
-    // for (const booking of outstandingBookings) {
-    //   results.processed++;
-    //   const result = await chargeRemainingBalance(booking);
-    //   
-    //   if (result.success) {
-    //     results.succeeded++;
-    //   } else {
-    //     results.failed++;
-    //     results.errors.push({
-    //       bookingId: booking.id,
-    //       error: result.error?.message,
-    //       paymentLink: result.paymentLink?.url
-    //     });
-    //   }
-    // }
+    console.log(`Found ${outstandingBookings.length} bookings due for payment`);
+    
+    for (const booking of outstandingBookings) {
+      results.processed++;
+      console.log(`Processing booking ${booking.id} for user ${booking.userEmail}`);
+      
+      const result = await chargeRemainingBalance(booking);
+      
+      if (result.success) {
+        results.succeeded++;
+        console.log(`Successfully charged ${booking.userEmail} for booking ${booking.id}`);
+      } else {
+        results.failed++;
+        results.errors.push({
+          bookingId: booking.id,
+          userEmail: booking.userEmail,
+          error: result.error?.message,
+          paymentLink: result.paymentLink?.url
+        });
+        console.error(`Failed to charge ${booking.userEmail} for booking ${booking.id}: ${result.error?.message}`);
+      }
+    }
 
     res.json({
       success: true,
@@ -534,27 +540,30 @@ router.post('/create-balance-payment-link', adminAuth, async (req, res) => {
       return res.status(400).json({ error: 'Booking ID is required' });
     }
 
-    // TODO: Implement storage method to get booking by ID
-    // const booking = await storage.getBookingById(bookingId);
+    const booking = await storage.getBooking(bookingId);
     
-    // if (!booking) {
-    //   return res.status(404).json({ error: 'Booking not found' });
-    // }
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
     
-    // if (booking.paymentStatus === 'paid') {
-    //   return res.status(400).json({ error: 'Booking is already fully paid' });
-    // }
+    if (booking.paymentStatus === 'paid') {
+      return res.status(400).json({ error: 'Booking is already fully paid' });
+    }
     
-    // const paymentLink = await createPaymentLinkForFailedCharge(booking);
+    if (booking.paymentPlan !== 'installment') {
+      return res.status(400).json({ error: 'This booking is not an installment payment' });
+    }
     
-    // if (!paymentLink) {
-    //   return res.status(500).json({ error: 'Failed to create payment link' });
-    // }
+    const paymentLink = await createPaymentLinkForFailedCharge(booking);
+    
+    if (!paymentLink) {
+      return res.status(500).json({ error: 'Failed to create payment link' });
+    }
 
     res.json({
       success: true,
-      // paymentLink: paymentLink.url
-      message: 'Payment link creation endpoint ready - storage methods need implementation'
+      paymentLink: paymentLink.url,
+      message: 'Payment link created successfully'
     });
 
   } catch (error: any) {
