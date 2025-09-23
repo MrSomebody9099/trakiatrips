@@ -1,0 +1,95 @@
+You are updating the Trakia Trips ski trip booking website.
+⚠️ The current Stripe setup for installments is wrong. The deposit product was accidentally created as a subscription, which is why Stripe is showing “next invoice in 30 days.” That is NOT what we want.
+
+🔹 Correct Installment Logic
+
+Deposit Payment (First Payment)
+
+Must be a one-time payment using Stripe Checkout in payment mode.
+
+Amount = deposit (e.g. 75€).
+
+When creating the Checkout Session, add:
+
+setup_future_usage: 'off_session'
+
+
+This saves the card securely for later.
+
+Store the customer.id and payment_method.id from this session in the database (Supabase).
+
+DO NOT use mode: subscription.
+
+Save Customer + PaymentMethod
+
+Stripe will automatically generate a Customer object.
+
+Attach the PaymentMethod to that customer.
+
+Save both IDs in Supabase with the booking record.
+
+Final Payment (Second Installment on Jan 6th)
+
+On the fixed due date (6th January), the backend must charge the saved card.
+
+Use the stored customer.id + payment_method.id to create a new PaymentIntent for the balance.
+
+Mark it as off_session: true so Stripe charges automatically without customer input.
+
+Example:
+
+const paymentIntent = await stripe.paymentIntents.create({
+  amount: 16000, // balance in cents
+  currency: 'eur',
+  customer: customerId,  // stored in Supabase
+  payment_method: paymentMethodId, // stored in Supabase
+  off_session: true,
+  confirm: true,
+});
+
+
+What Not to Do
+
+Do not use Stripe Subscriptions.
+
+Do not use recurring pricing.
+
+This is NOT a monthly plan, it’s a deposit now, remainder later flow.
+
+🔹 Required Changes in Code
+
+Replace the current installment logic.
+
+First Checkout Session = mode: payment, deposit amount, setup_future_usage: 'off_session'.
+
+After success, save customer.id and payment_method.id in Supabase with booking.
+
+Implement a backend function (Node.js/Express) that can:
+
+Find all bookings with outstanding balances.
+
+On 6th Jan, automatically charge the balance with PaymentIntent.
+
+If auto-charge fails (card declined), send customer a Stripe Payment Link to manually complete payment.
+
+🔹 Technical Notes
+
+Keep using environment variables for API keys:
+
+STRIPE_SECRET_KEY
+
+VITE_STRIPE_PUBLIC
+
+Ensure success/failure redirect URLs remain working.
+
+Ensure DB schema in Supabase has fields for:
+
+deposit_paid (boolean)
+
+balance_due (amount)
+
+due_date (fixed: 6 Jan 2026)
+
+customer_id (Stripe customer.id)
+
+payment_method_id (Stripe paymentMethod.id)
