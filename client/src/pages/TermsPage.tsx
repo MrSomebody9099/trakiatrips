@@ -439,32 +439,34 @@ export default function TermsPage() {
               </section>
 
               <section className="mb-8">
-                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">16. DEFINITIONS</h2>
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">16. INTERPRETATION</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  When used in these Terms, the following capitalised terms shall have the following meanings:
+                </p>
                 <div className="text-muted-foreground leading-relaxed space-y-4">
-                  <p><strong>"Account"</strong> means Your user account on Our Website</p>
-                  <p><strong>"Additional Parties"</strong> means any parties other than those forming part of the Festival programme but available for purchase through Us on Our Website</p>
-                  <p><strong>"Authorised Person"</strong> means any person authorised by Us to act on Our behalf in relation to the Festival including (but not limited to) Our employees, contractors, agents and stewards</p>
-                  <p><strong>"Booking"</strong> means Your purchase of Tickets, Travel Arrangements and/or Extras through Our Website</p>
-                  <p><strong>"Booking Fees"</strong> means any fees charged by Us for processing Your Booking</p>
-                  <p><strong>"Deposit"</strong> means a partial payment for Your Booking paid at the time of purchase</p>
-                  <p><strong>"Extras"</strong> means any additional services, activities or products available for purchase through Our Website, including but not limited to equipment hire, lessons, excursions, dining experiences and Additional Parties</p>
-                  <p><strong>"Face Value"</strong> means the original price paid for a Ticket excluding any Booking Fees</p>
-                  <p><strong>"Festival"</strong> means the Trakia Trips ski festival event taking place from 6th-9th March 2025 in Bansko, Bulgaria</p>
-                  <p><strong>"Material Alteration"</strong> means a significant change to the Festival that fundamentally alters the nature or experience of the event</p>
-                  <p><strong>"Privacy Policy"</strong> means Our privacy policy available on Our Website</p>
-                  <p><strong>"Prohibited Item"</strong> means any item that We deem unsuitable, dangerous or illegal to bring to the Festival or Venue(s)</p>
-                  <p><strong>"Resort"</strong> means the Bansko ski resort and surrounding areas where the Festival takes place</p>
-                  <p><strong>"Supplier/Principal"</strong> means any third-party provider of Travel Arrangements and/or Extras</p>
-                  <p><strong>"Terms"</strong> means these terms and conditions</p>
-                  <p><strong>"Ticket"</strong> means any ticket or pass granting entry to the Festival</p>
-                  <p><strong>"Ticket Holder"</strong> means any person who holds a valid Ticket</p>
-                  <p><strong>"Ticket Purchaser"</strong> means the person who purchases Tickets through Our Website</p>
-                  <p><strong>"Travel Arrangements"</strong> means any travel-related services available for purchase through Our Website, including but not limited to accommodation and transfers</p>
-                  <p><strong>"Venue(s)"</strong> means any location where Festival events take place</p>
-                  <p><strong>"We", "Us", "Our"</strong> means Trakia Trips</p>
-                  <p><strong>"Website"</strong> means Our official website at the current domain</p>
-                  <p><strong>"Wristband"</strong> means the physical wristband exchanged for Your Ticket at the Festival</p>
-                  <p><strong>"You", "Your"</strong> means the person purchasing or using Tickets, Travel Arrangements and/or Extras</p>
+                  <p><strong>Additional Parties</strong> means an after party or Pool party that You book directly through Us on Our Website, tickets for which are sold separately to Tickets;</p>
+                  <p><strong>Account</strong> means Your account with the Stripe;</p>
+                  <p><strong>Authorised Person(s)</strong> means collectively all Festival management, Festival suppliers (including security) Venue(s) management, police, public bodies and agencies responsible for safety and security in connection with the Festival or the Venue(s), and their respective staff, officials, representatives, officers and volunteers;</p>
+                  <p><strong>Booking</strong> means a combination of any Tickets, Travel Services and/or Extras;</p>
+                  <p><strong>Booking Fee</strong> means the fee payable per Ticket, transaction or order, charged in addition to the Face Value of the Ticket, for the processing and delivery of Tickets in that transaction or order;</p>
+                  <p><strong>Extras</strong> means After Parties, dining experiences, lift passes, equipment hire, lessons, excursions and any other extras that You book directly through Us on our Website that are not Travel Arrangements;</p>
+                  <p><strong>Face Value</strong> means the specified price of the Ticket only as stated on the relevant Ticket, and excludes any Booking Fee (or part thereof) or other fees or charges paid by the Ticket Purchaser in respect of that Ticket;</p>
+                  <p><strong>Festival</strong> means Trakia Trips ski trip;</p>
+                  <p><strong>Material Alteration</strong> means a change which, in Our reasonable opinion, makes the Festival materially different to the Festival which all Ticket purchasers, taken generally, could reasonably expect as judged by reference to the nature and billing of the Festival. The following are not "Material Alterations": changes to the artists or performers performing at the Festival; changes to any advertised attractions or facilities; changes to performance times; changes to individual band members; adverse weather conditions unless they result in cancellation of the entire Festival; shortening of the Festival when the majority of it is performed in full; delays or changes to start times of the Festival or any performances; or a change of Venue(s) used for the Festival;</p>
+                  <p><strong>Stripe</strong> means Stripe;</p>
+                  <p><strong>Prohibited Item(s)</strong> means any items which We or any Authorised Person deem to be dangerous or inappropriate including (without limitation) Chinese lanterns; chemical toilets; sound systems; generators; BBQs; glass bottles; drones; laser pens; unofficial high vis jackets; potential weapons of any kind; legal highs; illegal substances; fireworks; compressed gas containers; flares; air horns; smoke bombs; flag sticks; banners, signs or materials displaying political, religious, offensive or race-related messages, slogans or images; any item that an Authorised Person considers may be used as a weapon or a missile or that may compromise or otherwise interfere with the enjoyment, comfort or safety of (or pose a hazard to) any person at the Festival, any tripods or video camera equipment whatsoever (whether or not for personal use); any camera or other type of photographic or recording device (of any nature whatsoever and whether capturing audio, or still or moving pictures) other than for personal use; any objects bearing trademarks or other kinds of signs that are derogatory or offensive;</p>
+                  <p><strong>Supplier and Principal(s)</strong> means the third party supplier(s) of the Travel Arrangements or Extras, including but not limited to accommodation providers, transport companies, equipment hire providers, ski lessons providers, lift pass providers; attraction/excursion providers and dining experience providers;</p>
+                  <p><strong>Terms</strong> means these terms and conditions together with any amendments or updates to the same issued by or on Our behalf from time to time;</p>
+                  <p><strong>Ticket</strong> means any ticket (whether a hard copy ticket or an e-ticket) evidencing a personal revocable licence from Us for an individual to attend the Festival in accordance with these Terms;</p>
+                  <p><strong>Ticket Holder</strong> means any individual possessing, holding or using a Ticket, including (without limitation) the Ticket Purchaser or any person to whom the Ticket was issued or transferred in accordance with these Terms;</p>
+                  <p><strong>Ticket Purchaser</strong> means the individual who has validly made a Booking;</p>
+                  <p><strong>Travel Arrangements</strong> means the accommodation and/or transport (such as transfers) booked directly through Us on Our Website for the purposes of the Festival;</p>
+                  <p><strong>Resort</strong> means Bansko Ski Resort,Bulgaria where the Festival is held;</p>
+                  <p><strong>Venue(s)</strong> means all stages, venues, arenas and clubs used in connection with the staging of the Festival (including Additional Parties) at the Resort;</p>
+                  <p><strong>We, Us and Our</strong> means Trakia Trips Limited;</p>
+                  <p><strong>Website</strong> means the Trakia Trips website;</p>
+                  <p><strong>Wristband</strong> means any valid wristband given to a Ticket Holder in exchange for their Ticket at the Event; and</p>
+                  <p><strong>You and Your</strong> means the first named person on the booking and all persons on whose behalf a booking is made or any other person to whom a booking is added or transferred and any person to whom these Terms apply.</p>
                 </div>
               </section>
 
