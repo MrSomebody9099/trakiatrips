@@ -10,7 +10,11 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 // Admin authentication middleware
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
   const password = req.headers.authorization?.replace('Bearer ', '');
-  if (password !== 'MO1345') {
+  const adminToken = process.env.ADMIN_TOKEN || process.env.ADMIN_PASSWORD; // Support both env var names
+  if (!adminToken) {
+    return res.status(500).json({ error: 'Admin authentication not configured' });
+  }
+  if (password !== adminToken) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   next();
@@ -277,10 +281,13 @@ router.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// Webhook to handle successful payments
+// Webhook to handle successful payments - needs raw body for signature verification
 router.post('/webhook', async (req, res) => {
   const payload = req.body;
   const sig = req.headers['stripe-signature'];
+  
+  // Log webhook attempt for debugging
+  console.log('Stripe webhook received:', { type: 'unknown', signature_present: !!sig });
 
   let event;
 
@@ -292,7 +299,7 @@ router.post('/webhook', async (req, res) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       
-      console.log('Payment successful:', session.id);
+      console.log('Stripe webhook - Payment successful:', session.id);
       
       // Get payment intent to access metadata and payment method
       const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent as string);
@@ -330,10 +337,10 @@ router.post('/webhook', async (req, res) => {
         stripePaymentMethodId: paymentIntent.payment_method as string,
         stripeSessionId: session.id,
         remainingAmount: remainingAmount > 0 ? remainingAmount.toString() : null,
-        balanceDueDate: paymentMode === 'installment' ? '2026-01-06' : null,
+        balanceDueDate: paymentMode === 'installment' ? (bookingData.balanceDueDate || '2026-01-06') : null,
         flightNumber: bookingData.flightNumber,
         installmentStatus: paymentMode === 'installment' ? 
-          JSON.stringify({ deposit: 'paid', balance: 'pending', dueDate: '2026-01-06' }) : null
+          JSON.stringify({ deposit: 'paid', balance: 'pending', dueDate: bookingData.balanceDueDate || '2026-01-06' }) : null
       };
       
       try {
