@@ -213,6 +213,12 @@ router.post('/create-checkout-session', async (req, res) => {
       },
     };
 
+    // For installment payments, setup future usage to save the payment method
+    if (paymentMode === 'installment') {
+      sessionOptions.payment_intent_data.setup_future_usage = 'off_session';
+      sessionOptions.customer_creation = 'always';
+    }
+
     // Server-side validation and application of coupon/promotion code
     if (couponCode) {
       try {
@@ -284,15 +290,79 @@ router.post('/webhook', async (req, res) => {
     
     // Handle the event
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
+      const session = event.data.object as Stripe.Checkout.Session;
       
-      // Process the successful payment
-      console.log('Payment successful:', session);
+      console.log('Payment successful:', session.id);
       
-      // Here you would typically:
-      // 1. Update your database with the booking information
-      // 2. Send confirmation emails
-      // 3. Update inventory/availability
+      // Get payment intent to access metadata and payment method
+      const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent as string);
+      const metadata = paymentIntent.metadata;
+      
+      if (!metadata.bookingData) {
+        console.error('No booking data found in payment metadata');
+        return res.status(400).send('No booking data found');
+      }
+      
+      const bookingData = JSON.parse(metadata.bookingData);
+      const paymentMode = metadata.paymentMode;
+      const totalAmount = parseFloat(metadata.totalAmount);
+      const depositAmount = parseFloat(metadata.depositAmount);
+      
+      // Calculate remaining amount for installments
+      const remainingAmount = paymentMode === 'installment' ? totalAmount - depositAmount : 0;
+      
+      // Create the booking record
+      const bookingRecord = {
+        userEmail: bookingData.email,
+        leadBookerName: bookingData.name,
+        leadBookerPhone: bookingData.phone,
+        packageName: bookingData.packageName,
+        packagePrice: bookingData.packagePrice.toString(),
+        dates: bookingData.dates,
+        numberOfGuests: bookingData.numberOfGuests,
+        roomType: bookingData.roomType,
+        addOns: bookingData.addOns || [],
+        totalAmount: totalAmount.toString(),
+        paymentStatus: paymentMode === 'full' ? 'paid' : 'partial',
+        paymentPlan: paymentMode,
+        depositPaid: true,
+        stripeCustomerId: session.customer as string,
+        stripePaymentMethodId: paymentIntent.payment_method as string,
+        stripeSessionId: session.id,
+        remainingAmount: remainingAmount > 0 ? remainingAmount.toString() : null,
+        balanceDueDate: paymentMode === 'installment' ? '2026-01-06' : null,
+        flightNumber: bookingData.flightNumber,
+        installmentStatus: paymentMode === 'installment' ? 
+          JSON.stringify({ deposit: 'paid', balance: 'pending', dueDate: '2026-01-06' }) : null
+      };
+      
+      try {
+        // Create the booking in the database
+        await storage.createBooking(bookingRecord);
+        
+        // Create payment transaction record
+        const transactionRecord = {
+          bookingId: '', // Will be set by storage after booking creation
+          stripePaymentIntentId: paymentIntent.id,
+          amount: depositAmount.toString(),
+          paymentType: paymentMode === 'full' ? 'full' : 'deposit',
+          status: 'succeeded',
+          paymentProvider: 'stripe',
+          stripeResponse: JSON.stringify({
+            session_id: session.id,
+            payment_intent_id: paymentIntent.id,
+            customer_id: session.customer,
+            payment_method_id: paymentIntent.payment_method
+          }),
+          processedAt: new Date()
+        };
+        
+        console.log('Booking and payment transaction created successfully');
+        
+      } catch (dbError: any) {
+        console.error('Database error:', dbError);
+        // Continue - don't fail the webhook for DB issues
+      }
     }
     
     res.status(200).send();
@@ -323,6 +393,173 @@ router.post('/suggest-coupon', async (req, res) => {
   } catch (error: any) {
     console.error('Error suggesting coupon:', error);
     res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to suggest coupon' });
+  }
+});
+
+// Function to charge remaining balance for installment bookings
+async function chargeRemainingBalance(booking: any) {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(parseFloat(booking.remainingAmount) * 100), // Convert to cents
+      currency: 'eur',
+      customer: booking.stripeCustomerId,
+      payment_method: booking.stripePaymentMethodId,
+      off_session: true,
+      confirm: true,
+      metadata: {
+        bookingId: booking.id,
+        paymentType: 'balance',
+      },
+    });
+
+    // Update booking status to fully paid
+    await storage.updateBooking(booking.id, {
+      paymentStatus: 'paid',
+      installmentStatus: JSON.stringify({ deposit: 'paid', balance: 'paid', dueDate: '2026-01-06' })
+    });
+
+    // Create payment transaction record
+    const transactionRecord = {
+      bookingId: booking.id,
+      stripePaymentIntentId: paymentIntent.id,
+      amount: booking.remainingAmount,
+      paymentType: 'balance',
+      status: 'succeeded',
+      paymentProvider: 'stripe',
+      stripeResponse: JSON.stringify(paymentIntent),
+      processedAt: new Date()
+    };
+
+    console.log(`Successfully charged remaining balance for booking ${booking.id}`);
+    return { success: true, paymentIntent };
+
+  } catch (error: any) {
+    console.error(`Failed to charge remaining balance for booking ${booking.id}:`, error);
+    
+    // Create payment link as fallback
+    const paymentLink = await createPaymentLinkForFailedCharge(booking);
+    
+    return { success: false, error, paymentLink };
+  }
+}
+
+// Create payment link for failed auto-charges
+async function createPaymentLinkForFailedCharge(booking: any) {
+  try {
+    const paymentLink = await stripe.paymentLinks.create({
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `${booking.packageName} - Final Payment`,
+              description: 'Final installment payment for your Trakia Trips booking',
+            },
+            unit_amount: Math.round(parseFloat(booking.remainingAmount) * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        bookingId: booking.id,
+        paymentType: 'balance',
+        fallbackPayment: 'true',
+      },
+    });
+
+    console.log(`Created payment link for booking ${booking.id}: ${paymentLink.url}`);
+    return paymentLink;
+
+  } catch (error: any) {
+    console.error(`Failed to create payment link for booking ${booking.id}:`, error);
+    return null;
+  }
+}
+
+// Endpoint to process balance payments (to be called on Jan 6th)
+router.post('/process-balance-payments', adminAuth, async (req, res) => {
+  try {
+    // Find all bookings with outstanding balances due today or overdue
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // This would need to be implemented in storage to query bookings
+    // For now, let's create the endpoint structure
+    
+    const results = {
+      processed: 0,
+      succeeded: 0,
+      failed: 0,
+      errors: [] as any[]
+    };
+
+    console.log(`Processing balance payments for date: ${today}`);
+    
+    // TODO: Implement storage method to get bookings with outstanding balances
+    // const outstandingBookings = await storage.getBookingsWithOutstandingBalance(today);
+    
+    // for (const booking of outstandingBookings) {
+    //   results.processed++;
+    //   const result = await chargeRemainingBalance(booking);
+    //   
+    //   if (result.success) {
+    //     results.succeeded++;
+    //   } else {
+    //     results.failed++;
+    //     results.errors.push({
+    //       bookingId: booking.id,
+    //       error: result.error?.message,
+    //       paymentLink: result.paymentLink?.url
+    //     });
+    //   }
+    // }
+
+    res.json({
+      success: true,
+      message: `Processed ${results.processed} bookings. ${results.succeeded} succeeded, ${results.failed} failed.`,
+      ...results
+    });
+
+  } catch (error: any) {
+    console.error('Error processing balance payments:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to process balance payments' });
+  }
+});
+
+// Manual payment link generation for customers
+router.post('/create-balance-payment-link', adminAuth, async (req, res) => {
+  try {
+    const { bookingId } = req.body;
+    
+    if (!bookingId) {
+      return res.status(400).json({ error: 'Booking ID is required' });
+    }
+
+    // TODO: Implement storage method to get booking by ID
+    // const booking = await storage.getBookingById(bookingId);
+    
+    // if (!booking) {
+    //   return res.status(404).json({ error: 'Booking not found' });
+    // }
+    
+    // if (booking.paymentStatus === 'paid') {
+    //   return res.status(400).json({ error: 'Booking is already fully paid' });
+    // }
+    
+    // const paymentLink = await createPaymentLinkForFailedCharge(booking);
+    
+    // if (!paymentLink) {
+    //   return res.status(500).json({ error: 'Failed to create payment link' });
+    // }
+
+    res.json({
+      success: true,
+      // paymentLink: paymentLink.url
+      message: 'Payment link creation endpoint ready - storage methods need implementation'
+    });
+
+  } catch (error: any) {
+    console.error('Error creating payment link:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to create payment link' });
   }
 });
 

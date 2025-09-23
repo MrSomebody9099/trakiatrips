@@ -63,6 +63,7 @@ export const bookings = pgTable("bookings", {
   paymentStatus: text("payment_status").notNull().default("pending"), // pending, paid, failed
   paymentPlan: text("payment_plan").default("full"), // full, installment
   installmentStatus: jsonb("installment_status").default(null), // { deposit: paid/pending, balance: paid/pending, dueDate: string }
+  depositPaid: boolean("deposit_paid").default(false), // Track if deposit payment is completed
   fondyOrderId: text("fondy_order_id"),
   // Stripe fields for installment payments
   stripeCustomerId: text("stripe_customer_id"),
