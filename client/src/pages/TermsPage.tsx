@@ -234,6 +234,182 @@ export default function TermsPage() {
                 </p>
               </section>
 
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">7. EXTRAS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where You book the following Extras through Us on Our Website, We act in the sole capacity of a booking agent for the Supplier/Principals, including in relation to: (i) equipment hire; (ii) lessons; (iii) excursions; and/or (iv) dining experiences. In such circumstances:
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We will arrange for You to enter into a contract with the applicable Supplier/Principal of these Extras. Your purchase of these Extras is subject to these Terms and the specific terms and conditions of the relevant Supplier/Principal You contract with (such terms may be issued to you in Bulgarian language without translation). The Supplier/Principal's terms and conditions may limit and/or exclude the Supplier/Principal's liability to You. As an agent, We accept no liability in relation to these Extras You purchase or for the acts or omissions of the Supplier/Principal or other person(s) or party(ies) connected with any such Extras. Your contract is with the Supplier/Principal and its terms and conditions apply. As agent, We accept no responsibility for the actual provision of these Extras. Our responsibilities are limited to making the booking in accordance with Your instructions. We accept no responsibility for any information about these Extras that We pass on to You in good faith. However, in the event that We are found liable to You on any basis whatsoever, Our maximum liability to You is limited to the cost of the commission We earn on Your Extras. Except where otherwise advised or stated in the terms and conditions of the Supplier/Principal concerned, all monies You pay to Us for such Extras will be held by Us on behalf of the Supplier/Principal and forwarded on to the Supplier/Principal in accordance with Our agreement with them;
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We will do Our utmost to cater for any special requirements You may have. If You (or any member of Your group has) any medical problem or disability which may affect Your Extras, please provide Us with full details before We confirm Your Booking so that We can try to advise You as to the suitability of Your chosen Booking. Acting reasonably, if We or the Supplier/Principal is unable to properly accommodate the needs of the person(s) concerned, We will not confirm Your booking or, if You did not give Us full details at the time of booking, We may cancel it and impose applicable cancellation charges, when We become aware of these details; and
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We will inform You as soon as reasonably possible if the Supplier/Principal needs to make a significant change to Your confirmed Travel Arrangements or to cancel them. We will also liaise between You and the Supplier/Principal in relation to any alternative arrangements offered by the Supplier/Principal but We will have no further liability to You.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Where You book tickets to Additional Parties directly from Us on Our Website, the contract is between You and Us.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Additional Parties are subject to the terms and conditions provided to You at the time of booking. Tickets to Additional Parties are non-refundable and non-transferrable. If You miss the last entry time, You will be denied entry to the event. Tickets for Additional Parties will be electronic tickets and it is Your responsibility to ensure that You have sufficient power on Your mobile device to present the electronic ticket to gain entry to the event. The Terms set out in clauses 4.1 to 4.3 apply to Additional Parties.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  The price of Extras and availability may be subject to change without prior notice prior to purchase.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">8. ACCOMMODATION</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Supplier/Principals terms and conditions relating to any accommodation booked by You as part of a Travel Arrangement shall apply. We do not have any control over or liability for any such terms set by the Supplier/Principal. These may include (but are not limited to) the following (exact terms will be set by the Supplier/Principal in relation to this Travel Arrangement):
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>Check-in requires the lead booker present;</li>
+                  <li>A damage deposit may be charged by the Supplier (the amount, method and conditions of the damage deposit such as how the Supplier shall return Your damage deposit are determined by the Supplier and it is Your responsibility to obtain these terms from the Supplier and familiarise yourself with them (We would point out that some Suppliers include within their terms a liability for communal damage where specific offenders cannot be identified));</li>
+                  <li>Check in times and procedures; and/or</li>
+                  <li>The way in which (and if) You can check in after hours</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  all of which, for the avoidance of doubt, We are not responsible for, have no control over and accept no liability for.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  For safety and security reasons, We employ security to patrol some accommodation. Security shall report to Us any anti-social behaviour that takes place in or around the accommodation. Examples of antisocial behaviour include but are not limited to:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>Excessive noise after 22:00;</li>
+                  <li>Non-residents found inside accommodation buildings;</li>
+                  <li>Waste left in communal areas;</li>
+                  <li>Damage caused in communal areas and in areas surrounding the accommodation; and/or</li>
+                  <li>Excessive noise (which causes a concern of nuisance or welfare).</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  In the event Our security team reports to Us that You have engaged in the behaviours set out in clause 8.2, We reserve the right to take the following actions against You (in no particular order, for example, where a behaviour is sufficiently serious to warrant such action, in Our sole opinion, We may skip any step):
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>Deliver to You a first warning by text message, notification, email or in person;</li>
+                  <li>Deliver to You a second warning by text message, notification, email or in person where there is evidence that You have continued to engage in the behaviours set out in clause 8.2, despite having already received a warning;</li>
+                  <li>Deliver to You a final warning in person (either directly or via an Authorised Person, a member of the Supplier/Principals team and/or Our security team; then</li>
+                  <li>Eject You from the accommodation with no refund or compensation or support for alternative accommodation.</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed">
+                  You must direct any queries or questions You have regarding Your accommodation or any deposit to the Supplier/Principal. We may, at Our discretion and with no liability, assist You with such queries if appropriate.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">9. TRANSFERS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Supplier/Principal terms and conditions relating to any transfers booked by You as part of Travel Arrangement shall apply. We do not have any control over or liability for any such terms set by the Supplier/Principal. These may include (but are not limited to) the following (exact terms will be set by the Supplier/Principal in relation to this Travel Arrangement):
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>pick up location and times and the consequence of You not being at Your pick up location at Your pick up time;</li>
+                  <li>expected wait times for Your transfer following Your arrival at the pick-up location;</li>
+                  <li>conditions of You travelling (such as travel may be denied due to intoxication or anti-social behaviour);</li>
+                  <li>importance of accurate booking information being provided and the consequence of any inaccuracies; and</li>
+                  <li>exclusion of any liability for You not reaching Your destination at the estimated time (whether this results in missed onward travel or not).</li>
+                </ul>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">10. EQUIPMENT HIRE</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Supplier/Principal terms and conditions relating to any equipment hire booked by You as an Extra shall apply. We do not have any control over or liability for any such terms set by the Supplier/Principal. These may include (but are not limited to) exclusion of any liability arising as a result of:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>You not providing details of Your accommodation at the time of booking;</li>
+                  <li>You not providing any preferences or specification of the equipment You wish to hire;</li>
+                  <li>You providing inaccurate information resulting in any delays or unavailability of equipment;</li>
+                  <li>Your arrival being outside of the usual dates for the Festival; or</li>
+                  <li>any time lost due to collection not being available in certain hours.</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed">
+                  We accept no responsibility or liability for any loss, theft or damage to any equipment hired by You.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">11. LESSONS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Supplier/Principal terms and conditions relating to any lessons booked by You as an Extra shall apply. We do not have any control over or liability for any such terms set by the Supplier/Principal. These may include (but are not limited to) exclusion of any liability arising from:
+                </p>
+                <ul className="list-disc pl-6 text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <li>You not collecting Your hired equipment in time for the start of Your lesson or not having the appropriate clothing or equipment for Your lesson;</li>
+                  <li>Your non attendance of the activity; or</li>
+                  <li>You booking the wrong level of lesson appropriate to Your abilities; or</li>
+                  <li>You missing Your lesson as a result of You arriving at the wrong time or location.</li>
+                </ul>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">12. ACCESSIBILITY</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We are committed to providing equal access to the Festival where possible. Due to the nature of the Resort being a ski resort, this is not always possible. Any access requirements must be provided to Us in writing at trakia.trips@gmail.com prior to Your Booking, upon receipt of which We can inform You how We can accommodate Your requirements. Not all parts of the Resort are under Our control during the Festival (for example bars, restaurants, accommodation, ski lifts and slopes) and We can only advise on the areas of the Resort We have under Our control during the Festival.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We provide a complimentary Ticket to a personal assistant accompanying a paid for accessibility Ticket. In order for Us to provide a complimentary Ticket, We require the evidence of Your accessibility requirements (such as a copy of the front page of Your DLA, proof of PIP or AccessCard, or the equivalent of such in your country of residence). The complimentary Ticket does not include a lift pass.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  If You are purchasing Travel Arrangements through Us, You must inform of Us of any accessibility requirements so that We can discuss Your requirements with Suppliers/Principals. Access to accommodation widely varies between Suppliers.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">13. RISK AND LIABILITY</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We do not accept any responsibility or liability for any loss, damage or injury arising as a result of activities You participate in at the Resort (save for where this is caused by Our negligence). It is Your responsibility to assess whether You are fit and able to participate in any skiing, snowboarding or similar or associated activities at the Resort. You should consult a medical professional and (where Your activity is booked as an Extra through Us, the Supplier) if You are unsure. You assume all risks associated with such activities. Should You book an Extra through Us and later decide You are not able to participate in the activity booked, no refunds or compensation will be given by Us.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You acknowledge that You may be asked to sign a waiver by a Supplier for any Extras that You have booked through Us. You should read this waiver carefully and ensure You understand it before signing.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You acknowledge and accept that it is solely Your responsibility to communicate any allergies or dietary requirements You may have to Your Supplier with regards any dining experiences You book as an Extra through Us. We accept no responsibility or liability for any loss, damage or injury arising as a result of You not communicating, or the Supplier not meeting or not being able to meet, any dietary requirements You may have. No refunds or compensation will be given by Us in such circumstances.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We make no representations or warranties that any guidance provided by Us to You on Our Website relating to appropriate clothing and equipment is accurate and You acknowledge and accept that it is solely Your responsibility to ensure that You have the appropriate clothing and equipment to participate in any activity at the Resort (whether booked through Us or otherwise). We do not accept any responsibility or liability for any damage, loss or injury arising as a result of You not having or wearing the appropriate clothing or equipment during any activity You participate in at the Resort and no refunds or compensation will be given by Us in such circumstances.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You acknowledge and agree that it is solely Your responsibility to ensure that any equipment You use at the Resort does not cause harm to other people and/or third party property. You may be liable to a third party for damages if Your equipment causes harm or damage. We accept no responsibility or liability for any loss, damage or injury caused by You.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Subject to clause 14, We accept no responsibility or liability for any part of the Resort being closed or hindered (for example, where lifts are closed due to adverse weather conditions).
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Strobe lighting, lasers, pyrotechnics, smoke / haze effects and other special effects may be used in some performances at the Festival.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You acknowledge that exposure to loud music over periods of time can cause damage hearing. It is the Your responsibility to protect Yourself from such exposure if so required.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We accept no responsibility or liability to You for any loss, theft or damage to any equipment or property howsoever caused in any circumstances unless due to Our negligence.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We accept no responsibility or liability to You for any purchases or bookings You make directly with third parties.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  These Terms do not seek to exclude liability for death or personal injury: (i) which cannot legally be excluded or limited; and (ii) is caused by Our gross negligence, or that of anyone for whom We are legally liable.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="font-heading font-bold text-2xl text-foreground mb-4">14. REFUNDS</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  We may alter or vary a published Festival programme which may result in changes to some elements of the line-up, playing times, start and finish times, facilities, Venue(s) or locations of facilities and/or Venue(s) at the Festival. We will not be liable to You for any refunds or other costs, expenses or other losses resulting from such alteration, unless it is a Material Alteration which gives a right to a refund under clause 14.2 in which case Our only liability to You will be a refund of the Face Value of the Ticket and the cost of any Additional Parties bookings. In no circumstances will We be liable to You for any part of Your Booking for which We act as agent (including Travel Arrangements and those Extras for which We act in the capacity of agent).
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  You will only be entitled to a refund of any Tickets You have purchased directly from Us through Our Website in the following circumstances: i) if the entire Festival is cancelled; ii) if the entire Festival is postponed and/or rescheduled to another date (unless You elect to transfer Your Ticket to the rescheduled date, in which case You will not be entitled to a refund); iii) in the event of a Material Alteration which gives You the right to a refund under applicable law; or iv) as otherwise required under applicable law.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Any refunds will be for the Face Value of the Tickets (or Additional Party tickets) purchased (or for a proportionate amount where We agree to refund You in part if the Festival is cancelled less than half-way through) only and You will not be entitled to a refund of any Booking Fees or administration fees.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Save as set out in clause 14.2, a Ticket will not be exchanged or refunded after it has been exchanged for a Wristband.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  If We agree to refund the Face Value of a Ticket (or portion thereof), We will provide details of the refund process and deadlines for making a claim either through Our Website, social media, the media or directly. You are responsible for following any such process and complying with any deadlines We set out. Any refund request made after such deadline(s) will not be considered. You must submit any complaint to Us within 28 days of receipt. We request that you read these Terms fully prior to submitting any complaint.
+                </p>
+              </section>
+
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
                 <p className="text-sm text-blue-800 leading-relaxed">
                   <strong>Last Updated:</strong> September 2025
