@@ -309,21 +309,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const newBooking = await storage.createBooking(bookingData);
       
-      // Create lead record for the lead booker
-      const leadBookerData = {
-        email: userEmail,
-        name: leadBookerName || null,
-        phone: leadBookerPhone || null,
-        packageName,
-        role: 'lead_booker' as const,
-        status: 'booking_started',
-        bookingId: newBooking.id
-      };
+      // Check if lead booker already exists, if so update it, otherwise create new
+      let leadBookerLead;
+      const existingLeads = await storage.getLeadsByEmail(userEmail);
+      const existingLeadBooker = existingLeads.find(lead => lead.role === 'lead_booker');
       
-      const leadBookerLead = await storage.createLead(leadBookerData);
+      if (existingLeadBooker) {
+        // Update existing lead booker
+        leadBookerLead = await storage.updateLeadById(existingLeadBooker.id, {
+          name: leadBookerName || existingLeadBooker.name || null,
+          phone: leadBookerPhone || existingLeadBooker.phone || null,
+          packageName,
+          status: 'booking_started',
+          bookingId: newBooking.id
+        });
+      } else {
+        // Create new lead record for the lead booker
+        const leadBookerData = {
+          email: userEmail,
+          name: leadBookerName || null,
+          phone: leadBookerPhone || null,
+          packageName,
+          role: 'lead_booker' as const,
+          status: 'booking_started',
+          bookingId: newBooking.id
+        };
+        
+        leadBookerLead = await storage.createLead(leadBookerData);
+      }
 
       // Create guest records and corresponding lead records if provided
-      if (guests && guests.length > 0) {
+      if (guests && guests.length > 0 && leadBookerLead) {
         for (const guest of guests) {
           // Create guest record in guests table (existing functionality)
           await storage.createGuest({
@@ -334,20 +350,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
             dateOfBirth: guest.date_of_birth
           });
           
-          // Create lead record for this guest
-          const guestLeadData = {
-            email: guest.email,
-            name: guest.name,
-            phone: guest.phone,
-            packageName,
-            role: 'guest' as const,
-            leadBookerId: leadBookerLead.id, // Reference to lead booker
-            withLeadName: leadBookerName || userEmail, // Display name for "With" field
-            status: 'booking_started',
-            bookingId: newBooking.id
-          };
-          
-          await storage.createLead(guestLeadData);
+          // Check if guest lead already exists, if so update it, otherwise create new
+          if (guest.email) {
+            const existingGuestLeads = await storage.getLeadsByEmail(guest.email);
+            const existingGuestLead = existingGuestLeads.find(lead => lead.role === 'guest');
+            
+            if (existingGuestLead && leadBookerLead) {
+              // Update existing guest lead
+              await storage.updateLeadById(existingGuestLead.id, {
+                name: guest.name || existingGuestLead.name || null,
+                phone: guest.phone || existingGuestLead.phone || null,
+                packageName,
+                leadBookerId: leadBookerLead.id, // Reference to lead booker
+                withLeadName: leadBookerName || userEmail, // Display name for "With" field
+                status: 'booking_started',
+                bookingId: newBooking.id
+              });
+            } else if (leadBookerLead) {
+              // Create lead record for this guest
+              const guestLeadData = {
+                email: guest.email,
+                name: guest.name,
+                phone: guest.phone,
+                packageName,
+                role: 'guest' as const,
+                leadBookerId: leadBookerLead.id, // Reference to lead booker
+                withLeadName: leadBookerName || userEmail, // Display name for "With" field
+                status: 'booking_started',
+                bookingId: newBooking.id
+              };
+              
+              await storage.createLead(guestLeadData);
+            }
+          }
         }
       }
 
