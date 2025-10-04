@@ -28,8 +28,8 @@ export const PACKAGES = {
   PACKAGE_A: {
     name: 'Package A',
     fullAmount: 18500, // €185 in cents
-    deposit: 5600,     // €56 in cents
-    remaining: 12900,  // €129 in cents
+    deposit: 5000,     // €50 in cents
+    remaining: 13500,  // €135 in cents
     dueDate: '2026-01-06'
   },
   PACKAGE_B: {

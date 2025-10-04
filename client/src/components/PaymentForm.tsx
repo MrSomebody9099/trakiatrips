@@ -176,7 +176,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
           packageType: packageData.name,
           paymentMode,
           totalAmount: totalAmount,
-          depositAmount: packageData.name === 'Package A' ? 56 : 74,
+          depositAmount: packageData.name === 'Package A' ? 50 : 74,
           couponCode: appliedDiscount ? couponCode : null,
           groupSize: groupSize,
           bookingData: {
@@ -272,7 +272,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                     <span>
                       {paymentMode === 'full' 
                         ? formatPrice(totalAmount * 100) 
-                        : formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}
+                        : formatPrice(packageData.name === 'Package A' ? 5000 : 7400)}
                     </span>
                   </div>
                   
@@ -283,14 +283,14 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                       <span>
                         {paymentMode === 'full' 
                           ? formatPrice((totalAmount - finalAmount) * 100)
-                          : formatPrice(((packageData.name === 'Package A' ? 56 : 74) * (appliedDiscount.percent_off || 0) / 100) * 100)}
+                          : formatPrice(((packageData.name === 'Package A' ? 50 : 74) * (appliedDiscount.percent_off || 0) / 100) * 100)}
                       </span>
                     </div>
                   )}
                   
                   {paymentMode === 'installment' && (
                     <div className="text-sm text-gray-500 mt-1">
-                      Remaining balance of {formatPrice(packageData.name === 'Package A' ? 12900 : 17100)} due January 6, 2026
+                      Remaining balance of {formatPrice(packageData.name === 'Package A' ? 13500 : 17100)} due January 6, 2026
                     </div>
                   )}
                 </div>
