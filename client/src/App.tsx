@@ -32,7 +32,7 @@ function Router() {
       <Route path="/success" component={() => <SuccessPage />} />
       <Route path="/payment-failed" component={() => <PaymentFailed />} />
       <Route path="/transaction-successful" component={() => <TransactionSuccess />} />
-      <Route path="/dashboard" component={() => <AdminDashboard />} />
+      {/* <Route path="/dashboard" component={() => <AdminDashboard />} /> */ /* Removed temporarily as requested */}
       <Route path="/profile" component={() => <UserProfile />} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
