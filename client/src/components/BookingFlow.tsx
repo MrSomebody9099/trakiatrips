@@ -250,11 +250,15 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
   
   const handlePayment = async () => {
+    // If user selected installment payment, redirect to external installment checkout
+    if (paymentPlan === 'installment') {
+      handleInstallmentRedirect();
+      return;
+    }
+
     try {
-      // Calculate payment amount based on plan
-      const paymentAmount = paymentPlan === 'installment' 
-        ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
-        : totalPrice;
+      // Calculate payment amount based on plan (only for full payment now)
+      const paymentAmount = totalPrice;
 
       const allGuests = [leadBooker, ...guests].map(guest => ({
         name: guest.name,
@@ -345,7 +349,35 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
       alert('Failed to process booking. Please check your connection and try again.');
     }
   };
-  
+
+  const handleInstallmentRedirect = () => {
+    // Detect which package is selected (185 or 245)
+    const packageBase = selectedPackage?.price === 185 ? "185" : "245";
+    
+    // Collect selected add-ons in the required order: Quad, Ski, Snowboard, Lessons
+    const addons = [];
+    
+    // Check for each add-on in the specified order
+    if (selectedAddOns.some(item => item.id === 'quad')) {
+      addons.push("Quad");
+    }
+    if (selectedAddOns.some(item => item.id === 'ski')) {
+      addons.push("Ski");
+    }
+    if (selectedAddOns.some(item => item.id === 'snowboard')) {
+      addons.push("Snowboard");
+    }
+    if (selectedAddOns.some(item => item.id === 'lessons')) {
+      addons.push("Lessons");
+    }
+    
+    // Construct the redirect slug
+    const slug = addons.length ? `${packageBase}+${addons.join("+")}` : packageBase;
+    
+    // Redirect to the external installment checkout
+    window.location.href = `https://preview--stripe-future-pay.lovable.app/${slug}`;
+  };
+
   const handlePaymentSuccess = () => {
     try {
       // Retrieve stored booking data
