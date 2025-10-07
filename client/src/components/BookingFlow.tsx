@@ -250,15 +250,11 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
   
   const handlePayment = async () => {
-    // If user selected installment payment, redirect to external installment checkout
-    if (paymentPlan === 'installment') {
-      handleInstallmentRedirect();
-      return;
-    }
-
     try {
-      // Calculate payment amount based on plan (only for full payment now)
-      const paymentAmount = totalPrice;
+      // Calculate payment amount based on plan
+      const paymentAmount = paymentPlan === 'installment' 
+        ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
+        : totalPrice;
 
       const allGuests = [leadBooker, ...guests].map(guest => ({
         name: guest.name,
@@ -341,7 +337,13 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         bookingId
       }));
       
-      // Redirect to the payment process page
+      // If user selected installment payment, redirect to external installment checkout
+      if (paymentPlan === 'installment') {
+        handleInstallmentRedirect();
+        return;
+      }
+      
+      // Redirect to the payment process page for full payment
       window.location.href = '/payment-process';
 
     } catch (error) {
