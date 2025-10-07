@@ -38,7 +38,6 @@ const packages: Package[] = [
 ];
 
 const baseAddOns = [
-  { id: "quad", name: "Quad Bike Adventure", price: 50 },
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
   { id: "lessons", name: "Lessons (2hr session)", price: 50 },
@@ -245,8 +244,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
   const canProceedToPayment = termsAccepted && 
     leadBooker.name && leadBooker.email && leadBooker.phone && leadBooker.dateOfBirth &&
-    guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth) &&
-    selectedAddOns.length > 0; // Must select at least one add-on (including "none")
+    guests.every(guest => guest.name && guest.email && guest.phone && guest.dateOfBirth);
 
   
   const handlePayment = async () => {
@@ -356,13 +354,14 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     // Detect which package is selected (185 or 245)
     const packageBase = selectedPackage?.price === 185 ? "185" : "245";
     
-    // Collect selected add-ons in the required order: Quad, Ski, Snowboard, Lessons
+    // Collect selected add-ons in the required order: Ski, Snowboard, Lessons
+    // (Quad Bike Adventure removed temporarily - prices TBD)
     const addons = [];
     
     // Check for each add-on in the specified order
-    if (selectedAddOns.some(item => item.id === 'quad')) {
-      addons.push("Quad");
-    }
+    // if (selectedAddOns.some(item => item.id === 'quad')) {
+    //   addons.push("Quad");
+    // }
     if (selectedAddOns.some(item => item.id === 'ski')) {
       addons.push("Ski");
     }
