@@ -144,7 +144,7 @@ export default function UserProfile({ onClose }: UserProfileProps) {
             <CardContent className="p-6">
               <div className="space-y-4 text-center">
                 <p className="text-muted-foreground">
-                  If you want to add more guests, modify your booking, or cancel your deposit plan, please contact us:
+                  If you want to add more guests, modify your booking, or cancel your booking, please contact us:
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <a 
