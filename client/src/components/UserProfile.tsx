@@ -133,6 +133,44 @@ export default function UserProfile({ onClose }: UserProfileProps) {
               </div>
             </CardContent>
           </Card>
+          
+          {/* Contact Information Section */}
+          <Card className="max-w-2xl mx-auto mt-8">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-heading">
+                Need Help?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4 text-center">
+                <p className="text-muted-foreground">
+                  If you want to add more guests, modify your booking, or cancel your deposit plan, please contact us:
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <a 
+                    href="mailto:Trakia.trips@gmail.com" 
+                    className="text-primary hover:underline"
+                  >
+                    Trakia.trips@gmail.com
+                  </a>
+                  <span className="hidden sm:inline">|</span>
+                  <a 
+                    href="https://www.instagram.com/trakiatrips/?__pwa=1" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                    DM on Instagram
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
