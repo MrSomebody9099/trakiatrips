@@ -40,8 +40,8 @@ const packages: Package[] = [
 const baseAddOns = [
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
-  { id: "lessons", name: "Lessons (2hr session)", price: 50 },
-  { id: "poolParty", name: "Pool Party (free for first 60 bookings)", price: 0 }, // Always free
+  { id: "lessons", name: "Lessons (2hr session)", price: 50, isFlatRate: true },
+  { id: "poolParty", name: "Pool Party (20 FREE places left)", price: 0 }, // Always free
   { id: "none", name: "None", price: 0 },
 ];
 
@@ -184,13 +184,17 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     if (!addOn) return sum;
     
     const isPerDay = (addOn as any).isPerDay;
+    const isFlatRate = (addOn as any).isFlatRate;
     const days = isPerDay ? (addOnSelection.days || 1) : 1;
     
     if (isPerDay) {
       // Per-day items: price * days * numberOfPeople
       return sum + (addOn.price * days * numberOfPeople);
+    } else if (isFlatRate) {
+      // Flat rate items: price (same regardless of number of people)
+      return sum + addOn.price;
     } else {
-      // Flat rate items: price * numberOfPeople (only once)
+      // Per-person items: price * numberOfPeople
       return sum + (addOn.price * numberOfPeople);
     }
   }, 0);
@@ -220,15 +224,17 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     }
   };
 
-  const handleAddOnToggle = (addOnId: string, days = 1) => {
+  const handleAddOnToggle = (addOnId: string) => {
     setSelectedAddOns(prev => {
       const existingIndex = prev.findIndex(item => item.id === addOnId);
       if (existingIndex >= 0) {
         // Remove if already selected
         return prev.filter((_, index) => index !== existingIndex);
       } else {
-        // Add new selection
-        return [...prev, { id: addOnId, days }];
+        // Add new selection with days information for per-day items
+        const addOn = addOns.find(a => a.id === addOnId);
+        const isPerDay = (addOn as any)?.isPerDay;
+        return [...prev, { id: addOnId, days: isPerDay ? 1 : undefined }];
       }
     });
   };
@@ -295,7 +301,20 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
 
       if (!response.ok) {
         console.error('Error creating pending booking:', result);
-        alert('Failed to save booking data. Please try again.');
+        let errorMessage = 'Failed to save booking data. Please try again.';
+        
+        // Provide more specific error messages based on the response
+        if (result.error) {
+          if (result.error.includes('DATABASE_URL')) {
+            errorMessage = 'Database connection error. Please contact support.';
+          } else if (result.error.includes('Supabase')) {
+            errorMessage = 'Supabase connection error. Please check your configuration.';
+          } else {
+            errorMessage = `Booking error: ${result.error}`;
+          }
+        }
+        
+        alert(errorMessage);
         return;
       }
 
@@ -362,12 +381,24 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     // if (selectedAddOns.some(item => item.id === 'quad')) {
     //   addons.push("Quad");
     // }
-    if (selectedAddOns.some(item => item.id === 'ski')) {
-      addons.push("Ski");
+    
+    // Check for ski rental with days
+    const skiSelection = selectedAddOns.find(item => item.id === 'ski');
+    if (skiSelection) {
+      const days = skiSelection.days || 1;
+      // For 1 day, just use "Ski"; for 2 days, use "Ski2Day"
+      addons.push(days === 1 ? "Ski" : "Ski2Day");
     }
-    if (selectedAddOns.some(item => item.id === 'snowboard')) {
-      addons.push("Snowboard");
+    
+    // Check for snowboard rental with days
+    const snowboardSelection = selectedAddOns.find(item => item.id === 'snowboard');
+    if (snowboardSelection) {
+      const days = snowboardSelection.days || 1;
+      // For 1 day, just use "Snowboard"; for 2 days, use "Snowboard2Day"
+      addons.push(days === 1 ? "Snowboard" : "Snowboard2Day");
     }
+    
+    // Check for lessons (flat rate)
     if (selectedAddOns.some(item => item.id === 'lessons')) {
       addons.push("Lessons");
     }
@@ -744,7 +775,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                           data-testid={`checkbox-addon-${addOn.id}`}
                         />
                         <Label htmlFor={addOn.id} className="flex-1 cursor-pointer">
-                          {addOn.name} {addOn.price > 0 && addOn.id !== 'none' ? `(€${addOn.price}${isPerDay ? '/day' : '/person'})` : addOn.id === 'none' ? '' : '(Free)'}
+                          {addOn.name} {addOn.price > 0 && addOn.id !== 'none' ? `(€${addOn.price}${isPerDay ? '/day' : (addOn as any).isFlatRate ? '' : '/person'})` : addOn.id === 'none' ? '' : '(Free)'}
                         </Label>
                       </div>
                       {isSelected && isPerDay && (
@@ -762,10 +793,11 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                             </Button>
                             <span className="w-8 text-center">{isSelected.days || 1}</span>
                             <Button
-                              onClick={() => handleAddOnDaysChange(addOn.id, (isSelected.days || 1) + 1)}
+                              onClick={() => handleAddOnDaysChange(addOn.id, Math.min(2, (isSelected.days || 1) + 1))}
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
+                              disabled={(isSelected.days || 1) >= 2}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -857,7 +889,11 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                       />
                       <div>
                         <div className="font-medium text-blue-900">Installment Plan</div>
-                        <div className="text-sm text-blue-700">Pay €{Math.ceil(totalPrice * 0.3)} deposit now, €{totalPrice - Math.ceil(totalPrice * 0.3)} due by January 6th</div>
+                        <div className="text-sm text-blue-700">
+                          Pay €
+                          {selectedPackage?.price === 185 ? '50' : selectedPackage?.price === 245 ? '74' : Math.ceil(totalPrice * 0.3)} 
+                          deposit now, rest amount due by January 6th
+                        </div>
                       </div>
                     </label>
                   </div>
@@ -870,7 +906,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   data-testid="button-proceed-payment"
                 >
                   {paymentPlan === 'installment' 
-                    ? `Pay Deposit - €${Math.ceil(totalPrice * 0.3)}`
+                    ? `Pay Deposit - €${selectedPackage?.price === 185 ? '50' : selectedPackage?.price === 245 ? '74' : Math.ceil(totalPrice * 0.3)}`
                     : `Proceed to Payment - €${totalPrice}`
                   }
                 </Button>

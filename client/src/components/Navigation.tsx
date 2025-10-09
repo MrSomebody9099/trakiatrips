@@ -12,7 +12,7 @@ export default function Navigation() {
       <div className="fixed top-0 left-0 right-0 z-50 h-8 overflow-hidden" style={{background: '#004AAD'}}>
         <div className="flex items-center h-full animate-marquee whitespace-nowrap">
           <div className="text-white font-body font-medium text-xs sm:text-sm px-4 sm:px-8">
-            early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money • early bird spaces, book now, save money
+            Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out
           </div>
         </div>
       </div>

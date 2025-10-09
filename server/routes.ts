@@ -258,6 +258,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         guests 
       } = req.body;
 
+      // Log received data for debugging
+      console.log('Received booking data:', {
+        userEmail, 
+        leadBookerName, 
+        leadBookerPhone, 
+        packageName, 
+        packagePrice, 
+        dates, 
+        numberOfGuests, 
+        roomType, 
+        addOns, 
+        totalAmount, 
+        paymentPlan, 
+        flightNumber, 
+        guestsCount: guests ? guests.length : 0
+      });
+
       if (!userEmail || !packageName || !totalAmount) {
         return res.status(400).json({ error: 'Required fields missing: userEmail, packageName, totalAmount' });
       }
@@ -397,7 +414,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error('Error creating pending booking:', error);
-      return res.status(500).json({ error: 'Failed to create pending booking' });
+      
+      // Provide more detailed error information
+      let errorMessage = 'Failed to create pending booking';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // Check for specific error types
+        if (errorMessage.includes('DATABASE_URL')) {
+          errorMessage = 'Database connection failed. Please check DATABASE_URL configuration.';
+        } else if (errorMessage.includes('Supabase') || errorMessage.includes('supabase')) {
+          errorMessage = 'Supabase connection failed. Please check Supabase configuration.';
+        } else if (errorMessage.includes('connection') || errorMessage.includes('connect')) {
+          errorMessage = 'Database connection error. Please check your database configuration.';
+        }
+      }
+      
+      return res.status(500).json({ error: errorMessage });
     }
   });
 
