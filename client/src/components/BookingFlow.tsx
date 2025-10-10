@@ -165,7 +165,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
           // Update the pool party add-on name based on count, but keep price at 0
           setAddOns(prev => prev.map(addon => 
             addon.id === 'poolParty' 
-              ? { ...addon, price: 0, name: data.isFree ? `Pool Party (FREE - ${data.remaining} spots left!)` : `Pool Party (FREE - ${data.remaining} free spots taken)` }
+              ? { ...addon, price: 0, name: `Pool Party (20 FREE places left)` }
               : addon
           ));
         }
@@ -377,25 +377,20 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     // (Quad Bike Adventure removed temporarily - prices TBD)
     const addons = [];
     
-    // Check for each add-on in the specified order
-    // if (selectedAddOns.some(item => item.id === 'quad')) {
-    //   addons.push("Quad");
-    // }
-    
     // Check for ski rental with days
     const skiSelection = selectedAddOns.find(item => item.id === 'ski');
     if (skiSelection) {
       const days = skiSelection.days || 1;
-      // For 1 day, just use "Ski"; for 2 days, use "Ski2Day"
-      addons.push(days === 1 ? "Ski" : "Ski2Day");
+      // For 1 day, use "Ski1day"; for 2 days, use "Ski2day"
+      addons.push(days === 1 ? "Ski1day" : "Ski2day");
     }
     
     // Check for snowboard rental with days
     const snowboardSelection = selectedAddOns.find(item => item.id === 'snowboard');
     if (snowboardSelection) {
       const days = snowboardSelection.days || 1;
-      // For 1 day, just use "Snowboard"; for 2 days, use "Snowboard2Day"
-      addons.push(days === 1 ? "Snowboard" : "Snowboard2Day");
+      // For 1 day, use "Snowboard1day"; for 2 days, use "Snowboard2day"
+      addons.push(days === 1 ? "Snowboard1day" : "Snowboard2day");
     }
     
     // Check for lessons (flat rate)
@@ -403,8 +398,11 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
       addons.push("Lessons");
     }
     
-    // Construct the redirect slug
-    const slug = addons.length ? `${packageBase}+${addons.join("+")}` : packageBase;
+    // Construct the base slug
+    const baseSlug = addons.length ? `${packageBase}+${addons.join("+")}` : packageBase;
+    
+    // Add multiplier for number of people if more than 1
+    const slug = numberOfPeople > 1 ? `${baseSlug}*${numberOfPeople}` : baseSlug;
     
     // Redirect to the external installment checkout
     window.location.href = `https://preview--stripe-future-pay.lovable.app/${slug}`;
