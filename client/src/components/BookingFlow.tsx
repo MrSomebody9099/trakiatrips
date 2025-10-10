@@ -40,7 +40,7 @@ const packages: Package[] = [
 const baseAddOns = [
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
-  { id: "lessons", name: "Lessons (2hr session)", price: 50, isFlatRate: true },
+  { id: "lessons", name: "Lessons (2hr session)", price: 50 }, // Per person pricing
   { id: "poolParty", name: "Pool Party (20 FREE places left)", price: 0 }, // Always free
   { id: "none", name: "None", price: 0 },
 ];
@@ -184,17 +184,13 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     if (!addOn) return sum;
     
     const isPerDay = (addOn as any).isPerDay;
-    const isFlatRate = (addOn as any).isFlatRate;
     const days = isPerDay ? (addOnSelection.days || 1) : 1;
     
     if (isPerDay) {
       // Per-day items: price * days * numberOfPeople
       return sum + (addOn.price * days * numberOfPeople);
-    } else if (isFlatRate) {
-      // Flat rate items: price (same regardless of number of people)
-      return sum + addOn.price;
     } else {
-      // Per-person items: price * numberOfPeople
+      // Per-person items: price * numberOfPeople (including Lessons)
       return sum + (addOn.price * numberOfPeople);
     }
   }, 0);
@@ -773,7 +769,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                           data-testid={`checkbox-addon-${addOn.id}`}
                         />
                         <Label htmlFor={addOn.id} className="flex-1 cursor-pointer">
-                          {addOn.name} {addOn.price > 0 && addOn.id !== 'none' ? `(€${addOn.price}${isPerDay ? '/day' : (addOn as any).isFlatRate ? '' : '/person'})` : addOn.id === 'none' ? '' : '(Free)'}
+                          {addOn.name} {addOn.price > 0 && addOn.id !== 'none' ? `(€${addOn.price}${isPerDay ? '/day' : '/person'})` : addOn.id === 'none' ? '' : '(Free)'}
                         </Label>
                       </div>
                       {isSelected && isPerDay && (
