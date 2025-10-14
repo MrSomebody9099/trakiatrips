@@ -272,7 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalAmount, 
         paymentPlan, 
         flightNumber, 
-        guestsCount: guests ? guests.length : 0
+        guestsCount: guests ? guests.length : 0,
+        guests: guests ? guests.map((g: any) => ({name: g.name, email: g.email})) : []
       });
 
       if (!userEmail || !packageName || !totalAmount) {
@@ -329,10 +330,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if lead booker already exists, if so update it, otherwise create new
       let leadBookerLead;
       const existingLeads = await storage.getLeadsByEmail(userEmail);
+      console.log(`Found ${existingLeads.length} existing leads for user ${userEmail}`);
       const existingLeadBooker = existingLeads.find(lead => lead.role === 'lead_booker');
+      console.log(`Existing lead booker: ${existingLeadBooker ? 'found' : 'not found'}`);
       
       if (existingLeadBooker) {
         // Update existing lead booker
+        console.log('Updating existing lead booker:', existingLeadBooker.id);
         leadBookerLead = await storage.updateLeadById(existingLeadBooker.id, {
           name: leadBookerName || existingLeadBooker.name || null,
           phone: leadBookerPhone || existingLeadBooker.phone || null,
@@ -342,6 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         // Create new lead record for the lead booker
+        console.log('Creating new lead booker for:', userEmail);
         const leadBookerData = {
           email: userEmail,
           name: leadBookerName || null,
@@ -357,7 +362,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create guest records and corresponding lead records if provided
       if (guests && guests.length > 0 && leadBookerLead) {
+        console.log(`Processing ${guests.length} guests for booking ${newBooking.id}`);
         for (const guest of guests) {
+          console.log('Processing guest:', guest);
           // Create guest record in guests table (existing functionality)
           await storage.createGuest({
             bookingId: newBooking.id,
@@ -371,9 +378,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (guest.email) {
             const existingGuestLeads = await storage.getLeadsByEmail(guest.email);
             const existingGuestLead = existingGuestLeads.find(lead => lead.role === 'guest');
+            console.log(`Found ${existingGuestLeads.length} existing leads for guest ${guest.email}, ${existingGuestLead ? 'found guest role' : 'no guest role found'}`);
             
             if (existingGuestLead && leadBookerLead) {
               // Update existing guest lead
+              console.log('Updating existing guest lead:', existingGuestLead.id);
               await storage.updateLeadById(existingGuestLead.id, {
                 name: guest.name || existingGuestLead.name || null,
                 phone: guest.phone || existingGuestLead.phone || null,
@@ -385,6 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
             } else if (leadBookerLead) {
               // Create lead record for this guest
+              console.log('Creating new guest lead for:', guest.email);
               const guestLeadData = {
                 email: guest.email,
                 name: guest.name,

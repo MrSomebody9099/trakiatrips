@@ -416,7 +416,9 @@ class DatabaseStorage implements IStorage {
 
   // Lead operations
   async createLead(insertLead: InsertLead): Promise<Lead> {
+    console.log('Creating lead with data:', insertLead);
     const result = await this.db.insert(leads).values(insertLead).returning();
+    console.log('Lead created successfully:', result[0]);
     return result[0];
   }
 
@@ -426,6 +428,16 @@ class DatabaseStorage implements IStorage {
 
   async getLeadByEmail(email: string): Promise<Lead | undefined> {
     const result = await this.db.select().from(leads).where(eq(leads.email, email)).limit(1);
+    return result[0];
+  }
+
+  async updateLeadById(id: string, updates: Partial<Lead>): Promise<Lead | undefined> {
+    console.log('Updating lead ID:', id, 'with data:', updates);
+    const result = await this.db.update(leads)
+      .set(updates)
+      .where(eq(leads.id, id))
+      .returning();
+    console.log('Lead updated:', result[0]);
     return result[0];
   }
 
@@ -485,12 +497,17 @@ class DatabaseStorage implements IStorage {
 
   // Guest operations
   async createGuest(insertGuest: InsertGuest): Promise<Guest> {
+    console.log('Creating guest with data:', insertGuest);
     const result = await this.db.insert(guests).values(insertGuest).returning();
+    console.log('Guest created successfully:', result[0]);
     return result[0];
   }
-
+  
   async getGuestsByBookingId(bookingId: string): Promise<Guest[]> {
-    return await this.db.select().from(guests).where(eq(guests.bookingId, bookingId));
+    console.log('Fetching guests for booking ID:', bookingId);
+    const result = await this.db.select().from(guests).where(eq(guests.bookingId, bookingId));
+    console.log('Found guests:', result);
+    return result;
   }
 
   async updateGuest(id: string, updates: Partial<Guest>): Promise<Guest | undefined> {
@@ -538,14 +555,6 @@ class DatabaseStorage implements IStorage {
 
   async getLeadById(id: string): Promise<Lead | undefined> {
     const result = await this.db.select().from(leads).where(eq(leads.id, id)).limit(1);
-    return result[0];
-  }
-
-  async updateLeadById(id: string, updates: Partial<Lead>): Promise<Lead | undefined> {
-    const result = await this.db.update(leads)
-      .set(updates)
-      .where(eq(leads.id, id))
-      .returning();
     return result[0];
   }
 

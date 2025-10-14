@@ -268,6 +268,8 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
       // Create pending booking immediately - this ensures no bookings are lost
       const bookingPayload = {
         userEmail: leadBooker.email,
+        leadBookerName: leadBooker.name, // Add lead booker name
+        leadBookerPhone: leadBooker.phone, // Add lead booker phone
         packageName: selectedPackage?.name || '',
         packagePrice: selectedPackage?.price.toString() || '0',
         dates: selectedPackage?.dates || '',
@@ -284,6 +286,9 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         flightNumber: flightNumber || undefined,
         guests: allGuests
       };
+
+      // Log the payload for debugging
+      console.log('Sending booking payload:', bookingPayload);
 
       const response = await fetch('/api/create-pending-booking', {
         method: 'POST',
