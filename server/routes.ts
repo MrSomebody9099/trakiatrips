@@ -365,6 +365,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Processing ${guests.length} guests for booking ${newBooking.id}`);
         for (const guest of guests) {
           console.log('Processing guest:', guest);
+          // Validate guest data
+          if (!guest.name || !guest.email || !guest.phone || !guest.date_of_birth) {
+            console.warn('Skipping guest with missing required fields:', guest);
+            continue;
+          }
+          
           // Create guest record in guests table (existing functionality)
           await storage.createGuest({
             bookingId: newBooking.id,

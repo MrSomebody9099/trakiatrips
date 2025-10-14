@@ -498,16 +498,26 @@ class DatabaseStorage implements IStorage {
   // Guest operations
   async createGuest(insertGuest: InsertGuest): Promise<Guest> {
     console.log('Creating guest with data:', insertGuest);
-    const result = await this.db.insert(guests).values(insertGuest).returning();
-    console.log('Guest created successfully:', result[0]);
-    return result[0];
+    try {
+      const result = await this.db.insert(guests).values(insertGuest).returning();
+      console.log('Guest created successfully:', result[0]);
+      return result[0];
+    } catch (error) {
+      console.error('Error creating guest:', error);
+      throw error;
+    }
   }
   
   async getGuestsByBookingId(bookingId: string): Promise<Guest[]> {
     console.log('Fetching guests for booking ID:', bookingId);
-    const result = await this.db.select().from(guests).where(eq(guests.bookingId, bookingId));
-    console.log('Found guests:', result);
-    return result;
+    try {
+      const result = await this.db.select().from(guests).where(eq(guests.bookingId, bookingId));
+      console.log('Found guests:', result);
+      return result;
+    } catch (error) {
+      console.error('Error fetching guests:', error);
+      throw error;
+    }
   }
 
   async updateGuest(id: string, updates: Partial<Guest>): Promise<Guest | undefined> {

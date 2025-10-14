@@ -256,7 +256,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
         ? Math.ceil(totalPrice * 0.3) // 30% deposit for installments
         : totalPrice;
 
-      const allGuests = [leadBooker, ...guests].map(guest => ({
+      const allGuests = guests.map(guest => ({
         name: guest.name,
         email: guest.email,
         phone: guest.phone,
