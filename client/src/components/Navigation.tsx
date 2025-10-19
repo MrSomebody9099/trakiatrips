@@ -12,7 +12,7 @@ export default function Navigation() {
       <div className="fixed top-0 left-0 right-0 z-50 h-8 overflow-hidden" style={{background: '#004AAD'}}>
         <div className="flex items-center h-full animate-marquee whitespace-nowrap">
           <div className="text-white font-body font-medium text-xs sm:text-sm px-4 sm:px-8">
-            Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out • Early bird Sale 80% sold out
+            Trip is 50% Sold Out • Trip is 50% Sold Out • Trip is 50% Sold Out • Trip is 50% Sold Out • Trip is 50% Sold Out • Trip is 50% Sold Out
           </div>
         </div>
       </div>
