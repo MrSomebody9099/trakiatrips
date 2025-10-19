@@ -27,16 +27,16 @@ try {
 export const PACKAGES = {
   PACKAGE_A: {
     name: 'Package A',
-    fullAmount: 18500, // €185 in cents
+    fullAmount: 19500, // €195 in cents
     deposit: 5000,     // €50 in cents
-    remaining: 13500,  // €135 in cents
+    remaining: 14500,  // €145 in cents
     dueDate: '2026-01-06'
   },
   PACKAGE_B: {
     name: 'Package B',
-    fullAmount: 24500, // €245 in cents
-    deposit: 7400,     // €74 in cents
-    remaining: 17100,  // €171 in cents
+    fullAmount: 25500, // €255 in cents
+    deposit: 7500,     // €75 in cents
+    remaining: 18000,  // €180 in cents
     dueDate: '2026-01-06'
   }
 };

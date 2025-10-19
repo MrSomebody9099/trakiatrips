@@ -1,5 +1,5 @@
 export default function MarqueeTape() {
-  const marqueeText = "🎿 Early bird Sale 80% sold out • March 6-9 Ski Festival • 🏔️ Epic Adventures Await • 🎵 Afrobeats & House DJs • ";
+  const marqueeText = "🎿 Trip is 50% Sold Out • March 6-9 Ski Festival • 🏔️ Epic Adventures Await • 🎵 Afrobeats & House DJs • ";
 
   return (
     <div className="bg-primary text-primary-foreground py-3 overflow-hidden relative">

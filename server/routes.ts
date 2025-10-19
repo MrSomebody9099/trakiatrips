@@ -20,14 +20,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Canonical server-side package pricing (amounts in EUR)
   const PACKAGE_PRICING = {
     '2 Day Deal': {
-      total: 185,
+      total: 195,
       deposit: 50,
-      remaining: 135
+      remaining: 145
     },
     'Full Weekend Package': {
-      total: 245,
-      deposit: 74,
-      remaining: 171
+      total: 255,
+      deposit: 75,
+      remaining: 180
     }
   } as const;
 

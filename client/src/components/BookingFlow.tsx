@@ -22,7 +22,7 @@ const packages: Package[] = [
   {
     id: "weekend",
     name: "2 Day Deal",
-    price: 185,
+    price: 195,
     dates: "6th–8th of March",
     description: "Perfect for a weekend getaway",
     includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Airport transfers available (not included)", "This does not include flights or ski pass"],
@@ -30,7 +30,7 @@ const packages: Package[] = [
   {
     id: "extended",
     name: "Full Weekend Package", 
-    price: 245,
+    price: 255,
     dates: "6th–9th of March",
     description: "Extended adventure with extra day",
     includes: ["4★ hotel with Breakfast & Dinner", "Bus transport from Stara Zagora", "Club events with Afrobeats & House DJs", "Airport transfers available (not included)", "This does not include flights or ski pass"],
@@ -890,7 +890,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                         <div className="font-medium text-blue-900">Installment Plan</div>
                         <div className="text-sm text-blue-700">
                           Pay €
-                          {selectedPackage?.price === 185 ? '50' : selectedPackage?.price === 245 ? '74' : Math.ceil(totalPrice * 0.3)} 
+                          {selectedPackage?.price === 195 ? '50' : selectedPackage?.price === 255 ? '75' : Math.ceil(totalPrice * 0.3)} 
                           deposit now, rest amount due by January 6th
                         </div>
                       </div>
@@ -905,7 +905,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   data-testid="button-proceed-payment"
                 >
                   {paymentPlan === 'installment' 
-                    ? `Pay Deposit - €${selectedPackage?.price === 185 ? '50' : selectedPackage?.price === 245 ? '74' : Math.ceil(totalPrice * 0.3)}`
+                    ? `Pay Deposit - €${selectedPackage?.price === 195 ? '50' : selectedPackage?.price === 255 ? '75' : Math.ceil(totalPrice * 0.3)}`
                     : `Proceed to Payment - €${totalPrice}`
                   }
                 </Button>

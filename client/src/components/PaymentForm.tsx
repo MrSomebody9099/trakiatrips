@@ -44,7 +44,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
         setPackageData({
           id: packageId,
           name: packageId === 'package-a' ? 'Package A' : 'Package B',
-          price: packageId === 'package-a' ? 185 : 245,
+          price: packageId === 'package-a' ? 195 : 255,
           payment_deadline: '2026-01-06'
         });
         
@@ -176,7 +176,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
           packageType: packageData.name,
           paymentMode,
           totalAmount: totalAmount,
-          depositAmount: packageData.name === 'Package A' ? 50 : 74,
+          depositAmount: packageData.name === 'Package A' ? 50 : 75,
           couponCode: appliedDiscount ? couponCode : null,
           groupSize: groupSize,
           bookingData: {
@@ -254,7 +254,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="installment" id="installment" />
                       <Label htmlFor="installment">
-                        Pay deposit ({formatPrice(packageData.name === 'Package A' ? 5600 : 7400)}) now, remaining ({formatPrice(packageData.name === 'Package A' ? 12900 : 17100)}) due Jan 6, 2026
+                        Pay deposit ({formatPrice(packageData.name === 'Package A' ? 5000 : 7500)}) now, remaining ({formatPrice(packageData.name === 'Package A' ? 14500 : 18000)}) due Jan 6, 2026
                       </Label>
                     </div>
                   </RadioGroup>
@@ -272,7 +272,7 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                     <span>
                       {paymentMode === 'full' 
                         ? formatPrice(totalAmount * 100) 
-                        : formatPrice(packageData.name === 'Package A' ? 5000 : 7400)}
+                        : formatPrice(packageData.name === 'Package A' ? 5000 : 7500)}
                     </span>
                   </div>
                   
@@ -283,14 +283,14 @@ export default function PaymentForm({ packageId, experienceIds = [], onSuccess, 
                       <span>
                         {paymentMode === 'full' 
                           ? formatPrice((totalAmount - finalAmount) * 100)
-                          : formatPrice(((packageData.name === 'Package A' ? 50 : 74) * (appliedDiscount.percent_off || 0) / 100) * 100)}
+                          : formatPrice(((packageData.name === 'Package A' ? 50 : 75) * (appliedDiscount.percent_off || 0) / 100) * 100)}
                       </span>
                     </div>
                   )}
                   
                   {paymentMode === 'installment' && (
                     <div className="text-sm text-gray-500 mt-1">
-                      Remaining balance of {formatPrice(packageData.name === 'Package A' ? 13500 : 17100)} due January 6, 2026
+                      Remaining balance of {formatPrice(packageData.name === 'Package A' ? 14500 : 18000)} due January 6, 2026
                     </div>
                   )}
                 </div>
