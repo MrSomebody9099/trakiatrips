@@ -138,32 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pool party booking count endpoint
   app.get('/api/pool-party-count', async (req, res) => {
     try {
-      const allBookings = await storage.getAllBookings();
-      
-      // Count people who have booked pool party
-      let poolPartyBookingCount = 0;
-      
-      for (const booking of allBookings) {
-        if (booking.paymentStatus === 'paid') {
-          // Check if booking includes pool party
-          const addOns = Array.isArray(booking.addOns) ? booking.addOns : [];
-          const hasPoolParty = addOns.some((addOn: string) => 
-            addOn.toLowerCase().includes('pool party')
-          );
-          
-          if (hasPoolParty) {
-            poolPartyBookingCount += booking.numberOfGuests;
-          }
-        }
-      }
-      
-      return res.json({
-        success: true,
-        count: poolPartyBookingCount,
-        remaining: Math.max(0, 60 - poolPartyBookingCount),
-        isFree: poolPartyBookingCount < 60
-      });
-      
+      return res.status(404).json({ error: 'Pool party option is currently unavailable' });
     } catch (error) {
       console.error('Error getting pool party count:', error);
       return res.status(500).json({ error: 'Failed to get pool party booking count' });

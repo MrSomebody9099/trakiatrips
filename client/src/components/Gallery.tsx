@@ -2,7 +2,6 @@ import skiGroupPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.52_8921f21
 import atvSoloPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_89b49da5_1757579817546.jpg";
 import atvGroupPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e5ee5227_1757579817548.jpg";
 import skiCelebrationPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.02.53_e23d55a8_1757579817549.jpg";
-import poolPartyPhoto from "@assets/WhatsApp Image 2025-09-09 at 18.14.12_3eb30612_1757579827194.jpg";
 import { Button } from "@/components/ui/button";
 
 const galleryItems = [
@@ -24,25 +23,6 @@ const galleryItems = [
     featured: false,
     orientation: "portrait",
     testId: "video-skiing",
-  },
-  {
-    type: "image" as const,
-    src: poolPartyPhoto,
-    title: "Legendary Pool Parties",
-    description: "Vibrant nights with Afrobeats, House DJs and amazing vibes",
-    category: "party",
-    featured: false,
-    orientation: "portrait",
-  },
-  {
-    type: "video" as const,
-    src: "/videos/pool-party.mp4",
-    title: "Night Pool Parties",
-    description: "Epic nighttime pool parties with amazing vibes, music and unforgettable moments.",
-    category: "party",
-    featured: false,
-    orientation: "portrait",
-    testId: "video-pool-party",
   },
   {
     type: "image" as const,
@@ -100,7 +80,7 @@ const instagramVideos = [
   },
   {
     src: "https://www.instagram.com/reel/DB9bNrjMVSZ/embed", 
-    title: "Party Highlights",
+    title: "Adventure Highlights",
   },
 ];
 

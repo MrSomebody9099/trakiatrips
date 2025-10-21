@@ -41,7 +41,6 @@ const baseAddOns = [
   { id: "ski", name: "Ski gear (includes poles, boots and skis)", price: 16.50, isPerDay: true },
   { id: "snowboard", name: "Snowboard gear (includes boots and snowboard)", price: 22.50, isPerDay: true },
   { id: "lessons", name: "Lessons (2hr session)", price: 50 }, // Per person pricing
-  { id: "poolParty", name: "Pool Party (20 FREE places left)", price: 0 }, // Always free
   { id: "none", name: "None", price: 0 },
 ];
 
@@ -145,7 +144,6 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installment'>('full');
-  const [poolPartyCount, setPoolPartyCount] = useState<{count: number, remaining: number, isFree: boolean} | null>(null);
   const [addOns, setAddOns] = useState(baseAddOns);
 
   // Auto-fill email from localStorage if available and fetch pool party count
@@ -154,28 +152,6 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
     if (savedEmail && !leadBooker.email) {
       setLeadBooker(prev => ({ ...prev, email: savedEmail }));
     }
-    
-    // Fetch pool party booking count
-    const fetchPoolPartyCount = async () => {
-      try {
-        const response = await fetch('/api/pool-party-count');
-        const data = await response.json();
-        if (data.success) {
-          setPoolPartyCount(data);
-          // Update the pool party add-on name based on count, but keep price at 0
-          setAddOns(prev => prev.map(addon => 
-            addon.id === 'poolParty' 
-              ? { ...addon, price: 0, name: `Pool Party (20 FREE places left)` }
-              : addon
-          ));
-        }
-      } catch (error) {
-        console.error('Error fetching pool party count:', error);
-        // Keep default pricing (free) if API fails
-      }
-    };
-    
-    fetchPoolPartyCount();
   }, []);
 
   const basePrice = selectedPackage ? selectedPackage.price * numberOfPeople : 0;
