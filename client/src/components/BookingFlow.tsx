@@ -450,7 +450,7 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
                   <Card key={pkg.id} className="relative hover-elevate transition-all duration-300 hover:scale-105 border-2 border-border/50">
                     <CardHeader className="text-center">
                       <Badge className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
-                        Early Bird Offer
+                        General Sale - prices increase December 1st!
                       </Badge>
                       <Calendar className="h-12 w-12 text-primary mx-auto mb-4 mt-4" />
                       <CardTitle className="font-heading text-xl">{pkg.name}</CardTitle>
